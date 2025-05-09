@@ -38,8 +38,9 @@ if (!empty($collegeFilter)) {
       const savedTextSize = localStorage.getItem('plpTextSize') || '100';
       document.querySelector('html').style.fontSize = savedTextSize + '%';
     });
-    
-     /* Dropdown Styles */
+  </script>
+  <style>
+            /* Dropdown Styles */
         nav ul li.dropdown {
       position: relative;
     }
@@ -74,7 +75,7 @@ if (!empty($collegeFilter)) {
     nav ul li.dropdown .dropdown-menu a:hover {
       background-color: #04b032;
     }
-  </script>
+   </style>
 </head>
 <body>
   <div class="header">
@@ -299,7 +300,7 @@ if (!empty($collegeFilter)) {
       <input type="hidden" name="faculty_id" id="delete_faculty_id">
   </form>
 
-<script>
+ <script>
         // Reports dropdown functionality
         document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('reportsDropdown').addEventListener('click', function(e) {
