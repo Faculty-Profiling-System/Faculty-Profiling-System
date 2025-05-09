@@ -27,6 +27,43 @@ if (!$result) {
   <link rel="stylesheet" href="../css/admin_style.css" />
 <!-- Change this in files_report.php -->
 <link rel="stylesheet" href="../css/report.css?v=<?php echo time(); ?>">
+<style>
+          /* Dropdown Styles */
+          nav ul li.dropdown {
+      position: relative;
+    }
+    
+    nav ul li.dropdown .dropdown-menu {
+      display: none;
+      position: relative;
+      left: 0;
+      background-color: #015f22;
+      min-width: 200px;
+      z-index: 1000;
+      border: 1px solid #024117;
+      box-shadow: 0px 8px 16px rgba(0,0,0,0.2);
+      padding: 0;
+      margin: 0;
+    }
+    
+    nav ul li.dropdown .dropdown-menu li {
+      padding: 0;
+      list-style: none;
+    }
+    
+    nav ul li.dropdown .dropdown-menu a {
+      color: white;
+      padding: 12px 16px;
+      text-decoration: none;
+      display: block;
+      font-size: 14px;
+      font-family: 'Trebuchet MS';
+    }
+    
+    nav ul li.dropdown .dropdown-menu a:hover {
+      background-color: #04b032;
+    }
+    </style>
 </head>
 <body>
 
@@ -49,20 +86,20 @@ if (!$result) {
     </div>
 
     <nav>
-      <ul>
-        <li><a href="home.php"><img src="../images/home.png" alt="Home Icon" class="menu-icon">HOME</a></li>
-        <li><a href="department.php"><img src="../images/department.png" alt="Department Icon" class="menu-icon">COLLEGE MANAGEMENT</a></li>
-        <li><a href="user.php"><img src="../images/user.png" alt="User Icon" class="menu-icon">USER MANAGEMENT</a></li>
-        <li class="dropdown active">
-          <a href="#" id="reportsDropdown"><img src="../images/reports.png" alt="Reports Icon" class="menu-icon">REPORTS</a>
-          <ul class="dropdown-menu">
-            <li><a class="active" href="files_report.php">Files</a></li>
-            <li><a href="logs_report.php">Logs</a></li>
-          </ul>
-        </li>
-        <li><a href="setting.php"><img src="../images/setting.png" alt="Settings Icon" class="menu-icon">SETTINGS</a></li>
-      </ul>
-    </nav>
+        <ul>
+          <li><a href="home.php"><img src="../images/home.png" alt="Home Icon" class="menu-icon">HOME</a></li>
+          <li><a href="department.php"><img src="../images/department.png" alt="Department Icon" class="menu-icon">DEPARTMENT MANAGEMENT</a></li>
+          <li><a href="user.php"><img src="../images/user.png" alt="User Icon" class="menu-icon">USER MANAGEMENT</a></li>
+          <li class="dropdown">
+            <a href="javascript:void(0)" id="reportsDropdown" class="active"><img src="../images/reports.png" alt="Reports Icon" class="menu-icon">REPORTS</a>
+            <ul class="dropdown-menu">
+              <li><a href="files_report.php" class="active">Files</a></li>
+              <li><a href="logs_report.php">Logs</a></li>
+            </ul>
+          </li>
+          <li><a href="setting.php"><img src="../images/setting.png" alt="Settings Icon" class="menu-icon">SETTINGS</a></li>
+        </ul>
+      </nav>
 
     <div class="logout-section">
       <a href="#" onclick="confirmLogout()"><img src="../images/logout.png" alt="Logout Icon" class="menu-icon">LOGOUT</a>
@@ -143,6 +180,36 @@ if (!$result) {
   <script src="report.js"></script>
   <script src="scripts.js"></script>
   <script>
+        // Reports dropdown functionality
+        document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('reportsDropdown').addEventListener('click', function(e) {
+      e.preventDefault();
+      const dropdown = this.parentElement;
+      const menu = dropdown.querySelector('.dropdown-menu');
+      
+      // Toggle only the clicked dropdown
+      if (menu.style.display === 'block') {
+        menu.style.display = 'none';
+      } else {
+        // Close all other dropdowns first
+        document.querySelectorAll('.dropdown-menu').forEach(item => {
+          if (item !== menu) {
+            item.style.display = 'none';
+          }
+        });
+        menu.style.display = 'block';
+      }
+    });
+    
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(e) {
+      if (!e.target.closest('.dropdown')) {
+        document.querySelectorAll('.dropdown-menu').forEach(item => {
+          item.style.display = 'none';
+        });
+      }
+    });
+        })
     
     function confirmLogout() {
       if (confirm('Are you sure you want to logout?')) {

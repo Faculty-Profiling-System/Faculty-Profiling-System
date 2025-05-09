@@ -66,6 +66,42 @@ session_start();
       font-weight: bold;
     }
 
+            /* Dropdown Styles */
+        nav ul li.dropdown {
+      position: relative;
+    }
+    
+    nav ul li.dropdown .dropdown-menu {
+      display: none;
+      position: relative;
+      left: 0;
+      background-color: #015f22;
+      min-width: 200px;
+      z-index: 1000;
+      border: 1px solid #024117;
+      box-shadow: 0px 8px 16px rgba(0,0,0,0.2);
+      padding: 0;
+      margin: 0;
+    }
+    
+    nav ul li.dropdown .dropdown-menu li {
+      padding: 0;
+      list-style: none;
+    }
+    
+    nav ul li.dropdown .dropdown-menu a {
+      color: white;
+      padding: 12px 16px;
+      text-decoration: none;
+      display: block;
+      font-size: 14px;
+      font-family: 'Trebuchet MS';
+    }
+    
+    nav ul li.dropdown .dropdown-menu a:hover {
+      background-color: #04b032;
+    }
+
     /* Dark theme */
     body.dark-theme {
       background: #101010 !important;
@@ -166,9 +202,15 @@ session_start();
       <nav>
         <ul>
           <li><a href="home.php" class="active"><img src="../images/home.png" alt="Home Icon" class="menu-icon">HOME</a></li>
-          <li><a href="department.php"><img src="../images/department.png" alt="Department Icon" class="menu-icon">COLLEGE MANAGEMENT</a></li>
+          <li><a href="department.php"><img src="../images/department.png" alt="Department Icon" class="menu-icon">DEPARTMENT MANAGEMENT</a></li>
           <li><a href="user.php"><img src="../images/user.png" alt="User Icon" class="menu-icon">USER MANAGEMENT</a></li>
-          <li><a href="reports.php"><img src="../images/reports.png" alt="Reports Icon" class="menu-icon">REPORTS</a></li>
+          <li class="dropdown">
+            <a href="javascript:void(0)" id="reportsDropdown"><img src="../images/reports.png" alt="Reports Icon" class="menu-icon">REPORTS</a>
+            <ul class="dropdown-menu">
+              <li><a href="files_report.php">Files</a></li>
+              <li><a href="logs_report.php">Logs</a></li>
+            </ul>
+          </li>
           <li><a href="setting.php"><img src="../images/setting.png" alt="Settings Icon" class="menu-icon">SETTINGS</a></li>
         </ul>
       </nav>
@@ -209,12 +251,45 @@ session_start();
       </div>
     </div>
   </div>
-  <script src="scripts.js">
+  <script>
+        // Reports dropdown functionality
+        document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('reportsDropdown').addEventListener('click', function(e) {
+      e.preventDefault();
+      const dropdown = this.parentElement;
+      const menu = dropdown.querySelector('.dropdown-menu');
+      
+      // Toggle only the clicked dropdown
+      if (menu.style.display === 'block') {
+        menu.style.display = 'none';
+      } else {
+        // Close all other dropdowns first
+        document.querySelectorAll('.dropdown-menu').forEach(item => {
+          if (item !== menu) {
+            item.style.display = 'none';
+          }
+        });
+        menu.style.display = 'block';
+      }
+    });
+    
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(e) {
+      if (!e.target.closest('.dropdown')) {
+        document.querySelectorAll('.dropdown-menu').forEach(item => {
+          item.style.display = 'none';
+        });
+      }
+    });
+        })
+    
+    //log-out
         function confirmLogout() {
       if (confirm('Are you sure you want to logout?')) {
         window.location.href = '../landing/index.php';
       }
     }
   </script>
+    <script src="scripts.js"></script>
 </body>
 </html> 
