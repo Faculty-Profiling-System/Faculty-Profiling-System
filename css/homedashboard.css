@@ -1,0 +1,253 @@
+/* Dashboard Styles */
+.dashboard-container {
+    margin: 100px auto 30px;
+    padding: 30px;
+    max-width: 1200px;
+}
+
+.welcome-banner {
+    background: linear-gradient(135deg, #007c2c, #015f22);
+    color: white;
+    padding: 25px 30px;
+    border-radius: 8px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.welcome-banner h2 {
+    margin: 0;
+    color: #fff;
+    font-size: 28px;
+}
+
+.welcome-banner p {
+    margin: 5px 0 0;
+    opacity: 0.9;
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 25px;
+}
+
+.dashboard-card {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.dashboard-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+}
+
+.card-header {
+    background-color: #007c2c;
+    color: white;
+    padding: 18px 25px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.card-header i {
+    font-size: 24px;
+}
+
+.card-header h3 {
+    margin: 0;
+    font-size: 20px;
+}
+
+.card-body {
+    padding: 25px;
+}
+
+.profile-info {
+    margin-bottom: 20px;
+}
+
+.info-item {
+    margin-bottom: 12px;
+    display: flex;
+}
+
+.info-label {
+    font-weight: 600;
+    width: 120px;
+    color: #555;
+}
+
+.info-value {
+    flex: 1;
+    color: #333;
+}
+
+.credentials-list {
+    margin-bottom: 20px;
+}
+
+.credential-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid #eee;
+    gap: 15px;
+}
+
+.credential-item i {
+    color: #e74c3c;
+    font-size: 20px;
+}
+
+.credential-name {
+    flex: 1;
+    font-weight: 500;
+}
+
+.credential-date {
+    font-size: 13px;
+    color: #777;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border-radius: 6px;
+    background: #007c2c;
+    color: white;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn:hover {
+    background: #015f22;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.action-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.action-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px 15px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    text-decoration: none;
+    color: #333;
+    transition: all 0.3s ease;
+}
+
+.action-btn i {
+    font-size: 24px;
+    margin-bottom: 8px;
+    color: #007c2c;
+}
+
+.action-btn span {
+    font-size: 14px;
+    text-align: center;
+}
+
+.action-btn:hover {
+    background: #e6f4ea;
+    transform: translateY(-3px);
+}
+
+/* Schedule Card Specific Styles */
+.schedule-summary {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 15px 0;
+}
+
+.schedule-count {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.schedule-count i {
+    font-size: 2.5rem;
+    color: #4CAF50;
+    margin-right: 15px;
+}
+
+.count-number {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #2c3e50;
+}
+
+.count-label {
+    font-size: 1rem;
+    color: #7f8c8d;
+    margin-left: 5px;
+}
+
+.schedule-info {
+    margin-bottom: 15px;
+}
+
+.schedule-info p {
+    margin: 5px 0;
+    color: #555;
+}
+
+.latest-upload {
+    background-color: #f8f9fa;
+    padding: 10px;
+    border-radius: 5px;
+    margin-top: 10px;
+    font-size: 0.9rem;
+}
+
+.latest-upload a {
+    color: #3498db;
+    text-decoration: none;
+}
+
+.latest-upload a:hover {
+    text-decoration: underline;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 1200px) {
+    .dashboard-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .dashboard-container {
+        padding: 20px;
+        margin: 100px 15px 30px;
+    }
+    
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .action-buttons {
+        grid-template-columns: 1fr;
+    }
+    
+    .welcome-banner h2 {
+        font-size: 24px;
+    }
+}
