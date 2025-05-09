@@ -1,10 +1,81 @@
+<?php
+session_start();
+if (!isset($_SESSION['faculty_id'])) {
+    header('Location: ../landing/index.html');
+    exit();
+}
+
+// Database connection
+require_once('../db_connection.php');
+
+// Get faculty ID from session
+$faculty_id = $_SESSION['faculty_id'];
+
+// Fetch faculty data
+$faculty_query = "SELECT f.*, c.college_name 
+                 FROM faculty f 
+                 JOIN colleges c ON f.college_id = c.college_id 
+                 WHERE f.faculty_id = ?";
+$stmt = $conn->prepare($faculty_query);
+$stmt->bind_param("s", $faculty_id);
+$stmt->execute();
+$result = $stmt->get_result();
+
+if ($result->num_rows === 0) {
+    // Faculty not found
+    header('Location: ../landing/index.html');
+    exit();
+}
+
+$faculty_data = $result->fetch_assoc();
+
+// Assign variables for use in HTML
+$full_name = $faculty_data['full_name'];
+$birthday = $faculty_data['birthday'];
+$gender = $faculty_data['gender'];
+$email = $faculty_data['email'];
+$employment_type = $faculty_data['employment_type'];
+$contact_number = $faculty_data['contact_number'];
+$address = $faculty_data['address'];
+$profile_picture = $faculty_data['profile_picture'];
+$college_name = $faculty_data['college_name'];
+
+// Fetch academic background
+$academic_backgrounds = [];
+$academic_query = "SELECT * FROM academic_background WHERE faculty_id = ? ORDER BY degree_level DESC, end_year DESC";
+$stmt = $conn->prepare($academic_query);
+$stmt->bind_param("s", $faculty_id);
+$stmt->execute();
+$academic_result = $stmt->get_result();
+
+if ($academic_result->num_rows > 0) {
+    while ($row = $academic_result->fetch_assoc()) {
+        $academic_backgrounds[] = $row;
+    }
+}
+
+// Check for existing PDF in database (if needed for other parts of the page)
+$currentPdf = null;
+$stmt = $conn->prepare("SELECT file_path FROM teaching_load WHERE faculty_id = ? ORDER BY created_at DESC LIMIT 1");
+$stmt->bind_param("s", $faculty_id);
+$stmt->execute();
+$pdf_result = $stmt->get_result();
+
+if ($pdf_result->num_rows > 0) {
+    $row = $pdf_result->fetch_assoc();
+    $currentPdf = $row['file_path'];
+}
+
+$pdfExists = $currentPdf && file_exists(__DIR__ . '/' . $currentPdf);
+?>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Profile | Faculty</title>
     <link rel="stylesheet" href="../css/faculty_style.css??v=<?php echo time(); ?>" />
-    <link rel="stylesheet" href="../css/profile.css?v=<?php echo time(); ?>" />
+    <link rel="stylesheet" href="../css/profile.css?v=<?php echo time(); ?>"/>
+    <link rel="stylesheet" href="../css/help.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
 </head>
 <body>
@@ -37,320 +108,223 @@
     </nav>
 
     <div class="logout-section">
-        <a href="#" onclick="confirmLogout()"><img src="../images/logout.png" alt="Logout Icon" class="menu-icon">LOGOUT</a>
-      </div>
-  </div>
-
-
-    <div class="profile-container">
-        <!-- Profile Header -->
-        <div class="profile-header">
-            <div class="profile-image">
-                <img src="../images/profile.jpg" alt="Faculty Profile" id="profile-pic" />
-                <button class="edit-btn" onclick="document.getElementById('profile-upload').click()">
-                    <i class="fas fa-camera"></i>
-                </button>
-                <input type="file" id="profile-upload" accept="image/*" style="display: none;" />
-            </div>
-            <div class="profile-info">
-                <h1 id="faculty-name">Prof. Rebecca Fajardo</h1>
-                <p class="faculty-title">Associate Professor</p>
-                <p class="faculty-dept">College of Computer Studies</p>
-                <div class="profile-stats">
-                    <div class="stat-item">
-                        <span class="stat-number">10</span>
-                        <span class="stat-label">Years</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-number">15</span>
-                        <span class="stat-label">Courses</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-number">4.9</span>
-                        <span class="stat-label">Rating</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Profile Content Tabs -->
-        <div class="profile-tabs">
-            <button class="tab-btn active" onclick="openTab('personal-info')">Personal Information</button>
-            <button class="tab-btn" onclick="openTab('academic-background')">Academic Background</button>
-            <button class="tab-btn" onclick="openTab('professional-experience')">Professional Experience</button>
-            <button class="tab-btn" onclick="openTab('publications')">Publications</button>
-        </div>
-
-        <!-- Tab Content -->
-        <div class="tab-content">
-            <!-- Personal Information Tab -->
-            <div id="personal-info" class="tab-pane active">
-                <div class="info-section">
-                    <h2><i class="fas fa-user-circle"></i> Basic Information</h2>
-                    <div class="info-grid">
-                        <div class="info-item">
-                            <label>Full Name:</label>
-                            <p>Rebecca Fajardo</p>
-                        </div>
-                        <div class="info-item">
-                            <label>Date of Birth:</label>
-                            <p>January 15, 1980</p>
-                        </div>
-                        <div class="info-item">
-                            <label>Gender:</label>
-                            <p>Female</p>
-                        </div>
-                        <div class="info-item">
-                            <label>PLP Email:</label>
-                            <p>fajardo_rebecca@plpasig.edu.ph</p>
-                        </div>
-                        <div class="info-item">
-                            <label>Contact Number:</label>
-                            <p>+63 912 345 6789</p>
-                        </div>
-                        <div class="info-item">
-                            <label>Address:</label>
-                            <p>123 Alkalde St. Kapasigan, Pasig City</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="info-section">
-                    <h2><i class="fas fa-id-card"></i> Employment Details</h2>
-                    <div class="info-grid">
-                        <div class="info-item">
-                            <label>Faculty ID:</label>
-                            <p>PLP-FAC-2020-001</p>
-                        </div>
-                        <div class="info-item">
-                            <label>Position:</label>
-                            <p>Associate Professor</p>
-                        </div>
-                        <div class="info-item">
-                            <label>College:</label>
-                            <p>College of Computer Studies</p>
-                        </div>
-                        <div class="info-item">
-                            <label>Date Hired:</label>
-                            <p>June 15, 2010</p>
-                        </div>
-                        <div class="info-item">
-                            <label>Employment Status:</label>
-                            <p>Regular</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Academic Background Tab -->
-            <div id="academic-background" class="tab-pane">
-                <div class="info-section">
-                    <h2><i class="fas fa-graduation-cap"></i> Educational Attainment</h2>
-                    
-                    <div class="education-item">
-                        <div class="edu-header">
-                            <h3>Doctor of Philosophy in Computer Science</h3>
-                            <span class="edu-year">2015 - 2018</span>
-                        </div>
-                        <p class="edu-school">University of the Philippines, Diliman</p>
-                        <p class="edu-details">Dissertation: "Advanced Algorithms for Machine Learning Applications"</p>
-                    </div>
-                    
-                    <div class="education-item">
-                        <div class="edu-header">
-                            <h3>Master of Science in Computer Science</h3>
-                            <span class="edu-year">2010 - 2013</span>
-                        </div>
-                        <p class="edu-school">Ateneo de Manila University</p>
-                        <p class="edu-details">Thesis: "Data Mining Techniques for Educational Systems"</p>
-                    </div>
-                    
-                    <div class="education-item">
-                        <div class="edu-header">
-                            <h3>Bachelor of Science in Computer Science</h3>
-                            <span class="edu-year">2000 - 2004</span>
-                        </div>
-                        <p class="edu-school">Pamantasan ng Lungsod ng Pasig</p>
-                        <p class="edu-details">Magna Cum Laude</p>
-                    </div>
-                </div>
-
-                <div class="info-section">
-                    <h2><i class="fas fa-certificate"></i> Certifications</h2>
-                    <div class="certification-list">
-                        <div class="cert-item">
-                            <i class="fas fa-award"></i>
-                            <div class="cert-details">
-                                <h3>Certified Data Professional</h3>
-                                <p>Institute for Certification of Computing Professionals • 2019</p>
-                            </div>
-                        </div>
-                        <div class="cert-item">
-                            <i class="fas fa-award"></i>
-                            <div class="cert-details">
-                                <h3>Microsoft Certified Azure AI Engineer</h3>
-                                <p>Microsoft • 2020</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Professional Experience Tab -->
-            <div id="professional-experience" class="tab-pane">
-                <div class="info-section">
-                    <h2><i class="fas fa-briefcase"></i> Work Experience</h2>
-                    
-                    <div class="experience-item">
-                        <div class="exp-header">
-                            <h3>Associate Professor</h3>
-                            <span class="exp-year">2018 - Present</span>
-                        </div>
-                        <p class="exp-company">Pamantasan ng Lungsod ng Pasig</p>
-                        <ul class="exp-details">
-                            <li>Teaches advanced courses in algorithms and machine learning</li>
-                            <li>Department Research Coordinator</li>
-                            <li>Adviser for Computer Science majors</li>
-                        </ul>
-                    </div>
-                    
-                    <div class="experience-item">
-                        <div class="exp-header">
-                            <h3>Assistant Professor</h3>
-                            <span class="exp-year">2010 - 2018</span>
-                        </div>
-                        <p class="exp-company">Pamantasan ng Lungsod ng Pasig</p>
-                        <ul class="exp-details">
-                            <li>Taught core Computer Science subjects</li>
-                            <li>Developed new curriculum for Data Science track</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="info-section">
-                    <h2><i class="fas fa-users"></i> Administrative Roles</h2>
-                    <div class="role-list">
-                        <div class="role-item">
-                            <i class="fas fa-chalkboard-teacher"></i>
-                            <div class="role-details">
-                                <h3>Department Chair</h3>
-                                <p>Computer Science Department • 2020 - Present</p>
-                            </div>
-                        </div>
-                        <div class="role-item">
-                            <i class="fas fa-clipboard-list"></i>
-                            <div class="role-details">
-                                <h3>Curriculum Committee Member</h3>
-                                <p>College of Computer Studies • 2016 - 2020</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Publications Tab -->
-            <div id="publications" class="tab-pane">
-                <div class="info-section">
-                    <h2><i class="fas fa-book"></i> Research Publications</h2>
-                    
-                    <div class="publication-item">
-                        <div class="pub-header">
-                            <h3>Machine Learning Approaches to Student Performance Prediction</h3>
-                            <span class="pub-year">2021</span>
-                        </div>
-                        <p class="pub-journal">Journal of Educational Technology • Volume 12, Issue 3</p>
-                        <p class="pub-authors">Dela Cruz, J., Santos, M., Reyes, A.</p>
-                    </div>
-                    
-                    <div class="publication-item">
-                        <div class="pub-header">
-                            <h3>Optimizing Neural Networks for Edge Devices</h3>
-                            <span class="pub-year">2019</span>
-                        </div>
-                        <p class="pub-journal">International Conference on Artificial Intelligence Proceedings</p>
-                        <p class="pub-authors">Dela Cruz, J., Tan, R.</p>
-                    </div>
-                </div>
-
-                <div class="info-section">
-                    <h2><i class="fas fa-trophy"></i> Research Grants</h2>
-                    <div class="grant-list">
-                        <div class="grant-item">
-                            <i class="fas fa-graduation-cap"></i>
-                            <div class="grant-details">
-                                <h3>DOST PCIEERD Grant</h3>
-                                <p>AI Applications in Education • 2020-2022 • ₱2,500,000</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Edit Profile Button -->
-        <div class="profile-actions">
-            <button class="edit-profile-btn" onclick="openEditModal()">
-                <i class="fas fa-edit"></i> Edit Profile
-            </button>
+            <a href="#" onclick="confirmLogout()"><img src="../images/logout.png" alt="Logout Icon" class="menu-icon">LOGOUT</a>
         </div>
     </div>
 
-    <!-- Edit Profile Modal -->
-    <div id="edit-modal" class="modal">
-        <div class="modal-content">
-            <span class="close-btn" onclick="closeEditModal()">&times;</span>
-            <h2>Edit Profile Information</h2>
-            <form id="profile-form">
-                <!-- Form content would go here -->
-                <div class="form-group">
-                    <label for="full-name">Full Name</label>
-                    <input type="text" id="full-name" value="Rebecca Fajardo">
+    <div class="profile-container">
+        <div class="profile-header">
+            <div class="profile-picture-container">
+                <img id="profile-picture" src="<?php echo $profile_picture ? $profile_picture : '../images/profile.jpg'; ?>" alt="Profile Picture">
+                <div class="upload-overlay" onclick="document.getElementById('profile-upload').click()">
+                    <i class="fas fa-camera"></i>
+                    <input type="file" id="profile-upload" accept="image/*" style="display: none;">
                 </div>
-                <!-- More form fields... -->
-                <div class="form-actions">
-                    <button type="button" class="cancel-btn" onclick="closeEditModal()">Cancel</button>
-                    <button type="submit" class="save-btn">Save Changes</button>
+            </div>
+            <div class="profile-info">
+                <h1 id="faculty-name"><?php echo htmlspecialchars($full_name); ?></h1>
+                <p id="faculty-id">Faculty ID: <?php echo htmlspecialchars($faculty_id); ?></p>
+                <p id="college-name"><?php echo htmlspecialchars($college_name); ?></p>
+                <p id="employment-type"><?php echo htmlspecialchars($employment_type); ?></p>
+            </div>
+        </div>
+
+        <div class="profile-sections">
+            <!-- Personal Information Section -->
+            <div class="profile-section">
+                <div class="section-header">
+                    <h2>Personal Information</h2>
+                    <button class="edit-section-btn" onclick="toggleSectionEdit('personal-info')">Edit</button>
                 </div>
-            </form>
+                <div class="section-content" id="personal-info">
+                    <div class="info-row">
+                        <span class="info-label">Birthday:</span>
+                        <span class="info-value" id="birthday-display"><?php echo date('F j, Y', strtotime($birthday)); ?></span>
+                        <input type="date" class="info-edit" id="birthday-edit" value="<?php echo $birthday; ?>" style="display: none;">
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Gender:</span>
+                        <span class="info-value" id="gender-display"><?php echo $gender; ?></span>
+                        <select class="info-edit" id="gender-edit" style="display: none;">
+                            <option value="Male" <?php echo $gender == 'Male' ? 'selected' : ''; ?>>Male</option>
+                            <option value="Female" <?php echo $gender == 'Female' ? 'selected' : ''; ?>>Female</option>
+                        </select>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Email:</span>
+                        <span class="info-value" id="email-display"><?php echo htmlspecialchars($email); ?></span>
+                        <input type="email" class="info-edit" id="email-edit" value="<?php echo htmlspecialchars($email); ?>" style="display: none;">
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Contact Number:</span>
+                        <span class="info-value" id="contact-display"><?php echo $contact_number ? htmlspecialchars($contact_number) : 'Not provided'; ?></span>
+                        <input type="tel" class="info-edit" id="contact-edit" value="<?php echo htmlspecialchars($contact_number); ?>" style="display: none;">
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Address:</span>
+                        <span class="info-value" id="address-display"><?php echo $address ? htmlspecialchars($address) : 'Not provided'; ?></span>
+                        <textarea class="info-edit" id="address-edit" style="display: none;"><?php echo htmlspecialchars($address); ?></textarea>
+                    </div>
+                    <div class="section-actions" style="display: none;">
+                        <button class="save-btn" onclick="saveSection('personal-info')">Save</button>
+                        <button class="cancel-btn" onclick="cancelSectionEdit('personal-info')">Cancel</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Academic Background Section -->
+            <div class="profile-section">
+                <div class="section-header">
+                    <h2>Academic Background</h2>
+                    <button class="add-btn" onclick="addAcademicBackground()">Add Degree</button>
+                </div>
+                <div class="section-content" id="academic-background">
+                    <?php if (!empty($academic_backgrounds)): ?>
+                        <?php foreach ($academic_backgrounds as $degree): ?>
+                            <div class="degree-item" data-id="<?php echo $degree['id']; ?>">
+                                <div class="degree-header">
+                                    <h3><?php echo htmlspecialchars($degree['degree_title']); ?> in <?php echo htmlspecialchars($degree['field_of_study']); ?></h3>
+                                    <div class="degree-actions">
+                                        <button class="edit-btn" onclick="editDegree(this)"><i class="fas fa-edit"></i></button>
+                                        <button class="delete-btn" onclick="deleteDegree(<?php echo $degree['id']; ?>)"><i class="fas fa-trash"></i></button>
+                                    </div>
+                                </div>
+                                <div class="degree-details">
+                                    <p><strong>Degree Level:</strong> <?php echo $degree['degree_level']; ?></p>
+                                    <p><strong>Institution:</strong> <?php echo htmlspecialchars($degree['institution_name']); ?></p>
+                                    <?php if ($degree['start_year'] && $degree['end_year']): ?>
+                                        <p><strong>Years:</strong> <?php echo $degree['start_year']; ?> - <?php echo $degree['end_year']; ?></p>
+                                    <?php endif; ?>
+                                    <?php if ($degree['thesis_title']): ?>
+                                        <p><strong>Thesis/Dissertation:</strong> <?php echo htmlspecialchars($degree['thesis_title']); ?></p>
+                                    <?php endif; ?>
+                                    <?php if ($degree['honors']): ?>
+                                        <p><strong>Honors:</strong> <?php echo htmlspecialchars($degree['honors']); ?></p>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <p class="no-data">No academic background information added yet.</p>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </div>
+
+        <!-- Academic Background Modal -->
+        <div id="degree-modal" class="modal">
+            <div class="modal-content">
+                <span class="close-modal" onclick="closeModal()">&times;</span>
+                <h2 id="modal-title">Add Academic Degree</h2>
+                <form id="degree-form">
+                    <input type="hidden" id="degree-id" value="">
+                    <div class="form-group">
+                        <label for="degree-level">Degree Level*</label>
+                        <select id="degree-level" required>
+                            <option value="">Select degree level</option>
+                            <option value="Bachelor">Bachelor's Degree</option>
+                            <option value="Master">Master's Degree</option>
+                            <option value="Doctor">Doctoral Degree</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="degree-title">Degree Title*</label>
+                        <input type="text" id="degree-title" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="field-of-study">Field of Study*</label>
+                        <input type="text" id="field-of-study" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="institution-name">Institution Name*</label>
+                        <input type="text" id="institution-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="thesis-title">Thesis/Dissertation Title</label>
+                        <textarea id="thesis-title"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="honors">Honors/Awards</label>
+                        <input type="text" id="honors">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="start-year">Start Year</label>
+                            <input type="number" id="start-year" min="1900" max="<?php echo date('Y'); ?>">
+                        </div>
+                        <div class="form-group">
+                            <label for="end-year">End Year</label>
+                            <input type="number" id="end-year" min="1900" max="<?php echo date('Y'); ?>">
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="save-btn">Save</button>
+                        <button type="button" class="cancel-btn" onclick="closeModal()">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Help Button -->
+    <div class="help-button" onclick="toggleHelpPopout()">
+        <i class="fas fa-question"></i>
+    </div>
+
+    <!-- Main Help Popout -->
+    <div id="helpPopout" class="popout">
+        <div class="popout-header">
+            <h3>Need Help?</h3>
+            <span class="popout-close" onclick="closeHelpPopout()">&times;</span>
+        </div>
+        <div class="help-option" onclick="openFaqPopout()">
+            <i class="fas fa-question-circle"></i> FAQ's
+        </div>
+        <div class="help-option" onclick="openContactPopout()">
+            <i class="fas fa-headset"></i> Still need help?
+        </div>
+    </div>
+
+    <!-- FAQ Popout -->
+    <div id="faqPopout" class="content-popout">
+        <div class="popout-header">
+            <h3>Frequently Asked Questions</h3>
+            <span class="popout-close" onclick="closeFaqPopout()">&times;</span>
+        </div>
+        <div class="faq-item">
+            <div class="faq-question">Q: How do I update my profile information?</div>
+            <p>A: Go to the Profile section and click on the "Edit Profile" button.</p>
+        </div>
+        <div class="faq-item">
+            <div class="faq-question">Q: How do I upload my teaching schedule?</div>
+            <p>A: Navigate to Teaching Load section and use the "Upload Schedule" button.</p>
+        </div>
+        <div class="faq-item">
+            <div class="faq-question">Q: What file formats are accepted?</div>
+            <p>A: We accept PDF, JPG, and PNG files for credential uploads.</p>
+        </div>
+        <div class="faq-item">
+            <div class="faq-question">Q: How do I change my password?</div>
+            <p>A: Go to Settings and use the "Change Password" option.</p>
+        </div>
+    </div>
+
+    <!-- Contact Popout -->
+    <div id="contactPopout" class="content-popout">
+        <div class="popout-header">
+            <h3>Contact Support</h3>
+            <span class="popout-close" onclick="closeContactPopout()">&times;</span>
+        </div>
+        <p>If you need further assistance:</p>
+        <div class="contact-info">
+            <p><i class="fas fa-envelope"></i> support@plpasig.edu.ph</p>
+            <p><i class="fas fa-phone"></i> +63 2 123 4567</p>
+            <p><i class="fas fa-clock"></i> Mon-Fri, 8:00 AM - 5:00 PM</p>
+            <p><i class="fas fa-map-marker-alt"></i> Admin Building, Room 101</p>
         </div>
     </div>
 
     <script>
-        // Tab functionality
-        function openTab(tabName) {
-            const tabPanes = document.getElementsByClassName('tab-pane');
-            for (let i = 0; i < tabPanes.length; i++) {
-                tabPanes[i].classList.remove('active');
-            }
-            
-            const tabBtns = document.getElementsByClassName('tab-btn');
-            for (let i = 0; i < tabBtns.length; i++) {
-                tabBtns[i].classList.remove('active');
-            }
-            
-            document.getElementById(tabName).classList.add('active');
-            event.currentTarget.classList.add('active');
-        }
-        
-        // Modal functionality
-        function openEditModal() {
-            document.getElementById('edit-modal').style.display = 'block';
-        }
-        
-        function closeEditModal() {
-            document.getElementById('edit-modal').style.display = 'none';
-        }
-        
-        // Profile picture upload preview
-        document.getElementById('profile-upload').addEventListener('change', function(e) {
-            if (e.target.files && e.target.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                    document.getElementById('profile-pic').src = event.target.result;
-                };
-                reader.readAsDataURL(e.target.files[0]);
-            }
-        });
         function confirmLogout() {
         if (confirm('Are you sure you want to logout?')) {
             // If user confirms, redirect to logout page
@@ -359,6 +333,8 @@
         // If user cancels, do nothing
         }
     </script>
+    <script src="help.js"></script>
+    <script src="profile.js"></script>
     <script src="../scripts.js"></script>
 </body>
 </html>
