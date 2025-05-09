@@ -1,2 +1,2 @@
 # Faculty-Profiling-System
-faculty profiling system
+updated faculty profiling system
