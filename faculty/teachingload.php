@@ -100,7 +100,12 @@ $pdfExists = $currentPdf && file_exists(__DIR__ . '/' . $currentPdf);
             </h2>
             <div class="pdf-viewer-container">
                 <?php if ($pdfExists): ?>
-                    <iframe class="pdf-embed" src="<?= htmlspecialchars($currentPdf) ?>#toolbar=0&navpanes=0&zoom=fit"></iframe>
+                    <object class="pdf-embed" data="<?= htmlspecialchars($currentPdf) ?>#view=FitH&embedded=true&toolbar=0&navpanes=0" type="application/pdf">
+                        <div class="no-pdf">
+                            <i class="fas fa-file-pdf"></i>
+                            <p>Unable to display PDF. Click download to view the file.</p>
+                        </div>
+                    </object>
                 <?php else: ?>
                     <div class="no-pdf">
                         <i class="fas fa-file-pdf"></i>
@@ -196,7 +201,7 @@ $pdfExists = $currentPdf && file_exists(__DIR__ . '/' . $currentPdf);
                     const pdfControls = document.querySelector('.pdf-controls');
                     
                     if (pdfViewer) {
-                        pdfViewer.src = data.filepath + '?t=' + Date.now() + '#toolbar=0&navpanes=0&zoom=fit';
+                        pdfViewer.data = data.filepath + '?t=' + Date.now() + '#view=FitH&embedded=true&toolbar=0&navpanes=0';
                         pdfViewer.style.display = 'block';
                     }
                     if (noPdfMsg) noPdfMsg.style.display = 'none';
@@ -251,7 +256,355 @@ $pdfExists = $currentPdf && file_exists(__DIR__ . '/' . $currentPdf);
       }
       // If user cancels, do nothing
     }
+
+    // Check and apply theme and text size on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        // Apply theme
+        const savedTheme = localStorage.getItem('plpTheme') || 'light';
+        if (savedTheme === 'dark') {
+            document.body.classList.add('dark-theme');
+        }
+        // Apply text size
+        const savedTextSize = localStorage.getItem('plpTextSize') || '100';
+        document.documentElement.style.fontSize = savedTextSize + '%';
+    });
     </script>
     <script src="../scripts.js"></script>
 </body>
 </html>
+
+<style>
+/* Light theme (default) */
+body {
+  background: #f4fff4;
+  color: #187436;
+}
+
+/* Dark theme */
+body.dark-theme {
+    background: #101010 !important;
+    color: #f3f3f3 !important;
+}
+
+body.dark-theme .dashboard-container {
+    background: #101010;
+}
+
+body.dark-theme .card {
+    background: #1a1a1a;
+    border: 1px solid #333;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 4px;
+}
+
+body.dark-theme .dashboard-title,
+body.dark-theme .card-title {
+    color: #00d34a;
+    margin-bottom: 15px;
+}
+
+body.dark-theme .card-title i {
+    color: #00d34a;
+}
+
+body.dark-theme .upload-form {
+    background: #1a1a1a;
+    padding: 20px;
+    border-radius: 4px;
+}
+
+body.dark-theme .form-group label {
+    color: #00d34a;
+    margin-bottom: 8px;
+    display: block;
+}
+
+body.dark-theme .file-input {
+    background: #222;
+    border: 1px solid #333;
+    color: #f3f3f3;
+    padding: 8px;
+    width: 100%;
+    border-radius: 4px;
+}
+
+body.dark-theme .btn-primary {
+    background: #00d34a;
+    color: #101010;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 15px;
+}
+
+body.dark-theme .btn-primary:hover {
+    background: #00b341;
+}
+
+body.dark-theme .pdf-viewer-container {
+    background: #1a1a1a;
+    border: 1px solid #333;
+    min-height: 500px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+}
+
+body.dark-theme .no-pdf {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #cccccc;
+}
+
+body.dark-theme .no-pdf i {
+    color: #00d34a;
+    font-size: 48px;
+    margin-bottom: 15px;
+}
+
+body.dark-theme .no-pdf p {
+    color: #cccccc;
+    margin: 10px 0 0 0;
+    font-size: 16px;
+}
+
+body.dark-theme .pdf-controls {
+    margin-top: 15px;
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+body.dark-theme .btn-accent {
+    background: #222;
+    color: #f3f3f3;
+    border: 1px solid #333;
+    padding: 8px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+body.dark-theme .btn-accent:hover {
+    background: #333;
+}
+
+body.dark-theme .loading {
+    background: rgba(26, 26, 26, 0.9);
+    color: #f3f3f3;
+}
+
+body.dark-theme .status-message {
+    background: #222;
+    border: 1px solid #333;
+    color: #f3f3f3;
+    padding: 10px;
+    margin-top: 15px;
+    border-radius: 4px;
+}
+
+body.dark-theme .status-message.success {
+    border-color: #00d34a;
+    color: #00d34a;
+}
+
+body.dark-theme .status-message.error {
+    border-color: #ff4444;
+    color: #ff4444;
+}
+
+/* File input styling */
+body.dark-theme input[type="file"] {
+    background: #222;
+    color: #f3f3f3;
+    border: 1px solid #333;
+    padding: 8px;
+    border-radius: 4px;
+    width: 100%;
+}
+
+body.dark-theme input[type="file"]::-webkit-file-upload-button {
+    background: #00d34a;
+    color: #101010;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 10px;
+}
+
+body.dark-theme input[type="file"]::-webkit-file-upload-button:hover {
+    background: #00b341;
+}
+
+/* Description text */
+body.dark-theme p {
+    color: #cccccc;
+}
+
+body.dark-theme .teaching-container {
+  background: #1a1a1a;
+  border: 1px solid #333;
+}
+
+body.dark-theme .teaching-header {
+  color: #f3f3f3;
+  border-bottom: 1px solid #333;
+}
+
+body.dark-theme .teaching-table {
+  color: #f3f3f3;
+  border-color: #333;
+}
+
+body.dark-theme .teaching-table th {
+  background: #222;
+  color: #00d34a;
+  border-color: #333;
+}
+
+body.dark-theme .teaching-table td {
+  border-color: #333;
+  color: #cccccc;
+}
+
+body.dark-theme .upload-section {
+  background: #1a1a1a;
+  border: 1px solid #333;
+}
+
+body.dark-theme .upload-header {
+  color: #f3f3f3;
+  border-bottom: 1px solid #333;
+}
+
+body.dark-theme .upload-form label {
+  color: #f3f3f3;
+}
+
+body.dark-theme .upload-form input[type="submit"] {
+  background: #00d34a;
+  color: #101010;
+}
+
+body.dark-theme .upload-form input[type="submit"]:hover {
+  background: #00b341;
+}
+
+body.dark-theme .status-badge {
+  background: #222;
+  color: #f3f3f3;
+  border: 1px solid #333;
+}
+
+body.dark-theme .status-badge.success {
+  background: #00d34a;
+  color: #101010;
+}
+
+body.dark-theme .status-badge.pending {
+  background: #d3a500;
+  color: #101010;
+}
+
+body.dark-theme .status-badge.failed {
+  background: #d30000;
+  color: #f3f3f3;
+}
+
+body.dark-theme .action-btn {
+  background: #222;
+  color: #f3f3f3;
+  border: 1px solid #333;
+}
+
+body.dark-theme .action-btn:hover {
+  background: #00d34a;
+  color: #101010;
+  border-color: #00d34a;
+}
+
+body.dark-theme .navigation {
+  background: #101010;
+  border-right: 1px solid #333;
+}
+
+body.dark-theme .navigation a {
+  color: #f3f3f3;
+}
+
+body.dark-theme .navigation a:hover,
+body.dark-theme .navigation a.active {
+  background: #00d34a;
+  color: #101010;
+}
+
+body.dark-theme .navigation-header h1,
+body.dark-theme .navigation-header h2 {
+  color: #f3f3f3;
+}
+
+body.dark-theme .logout-section a {
+  color: #f3f3f3;
+}
+
+body.dark-theme .logout-section a:hover {
+  background: #00d34a;
+  color: #101010;
+}
+
+/* Additional dark theme styles for specific elements */
+body.dark-theme .fas {
+  color: #00d34a;
+}
+
+body.dark-theme .file-preview {
+  background: #222;
+  border: 1px solid #333;
+}
+
+body.dark-theme .preview-header {
+  border-bottom: 1px solid #333;
+  color: #f3f3f3;
+}
+
+body.dark-theme .preview-content {
+  color: #cccccc;
+}
+
+body.dark-theme .empty-state {
+  color: #cccccc;
+}
+
+body.dark-theme .upload-instructions {
+  color: #cccccc;
+}
+
+body.dark-theme .file-requirements {
+  background: #222;
+  border: 1px solid #333;
+  color: #cccccc;
+}
+
+body.dark-theme .file-requirements h4 {
+  color: #00d34a;
+}
+
+body.dark-theme .pdf-embed {
+    width: 100%;
+    height: 600px;
+    border: none;
+}
+
+body.dark-theme .pdf-viewer-container object {
+    background: #1a1a1a;
+    width: 100%;
+    height: 100%;
+    min-height: 600px;
+}
+</style>

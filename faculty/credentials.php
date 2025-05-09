@@ -12,7 +12,7 @@ $error = null;
 
 try {
     $stmt = $conn->prepare("SELECT * FROM credentials WHERE faculty_id = ? ORDER BY issued_date DESC");
-    $stmt->bind_param("s", $faculty_id);
+    $stmt->bind_param("i", $faculty_id);
     $stmt->execute();
     $result = $stmt->get_result();
     $credentials = $result->fetch_all(MYSQLI_ASSOC);
@@ -29,6 +29,223 @@ try {
     <link rel="stylesheet" href="../css/faculty_style.css??v=<?php echo time(); ?>" />
     <link rel="stylesheet" href="../css/credentials.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Dark theme overrides for credentials page */
+        body.dark-theme {
+            background: #101010;
+            color: #f3f3f3;
+        }
+
+        body.dark-theme .dashboard-container {
+            background: #101010;
+        }
+
+        body.dark-theme .card {
+            background: #1a1a1a;
+            border: 1px solid #333;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        body.dark-theme .dashboard-title,
+        body.dark-theme .card-title {
+            color: #00d34a;
+        }
+
+        body.dark-theme .form-group label {
+            color: #00d34a;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        body.dark-theme .form-control,
+        body.dark-theme select,
+        body.dark-theme input[type="text"],
+        body.dark-theme input[type="date"] {
+            background: #222;
+            border: 1px solid #333;
+            color: #f3f3f3;
+            padding: 8px 12px;
+            width: 100%;
+            border-radius: 4px;
+        }
+
+        body.dark-theme .form-control:focus {
+            border-color: #00d34a;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(0, 211, 74, 0.25);
+        }
+
+        body.dark-theme .btn-primary {
+            background: #00d34a;
+            color: #101010;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        body.dark-theme .btn-primary:hover {
+            background: #00b341;
+        }
+
+        body.dark-theme .file-upload-wrapper {
+            background: #222;
+            border: 1px solid #333;
+            padding: 10px;
+            border-radius: 4px;
+        }
+
+        body.dark-theme .file-upload-label {
+            color: #00d34a;
+            cursor: pointer;
+        }
+
+        body.dark-theme .file-name {
+            color: #cccccc;
+            margin-top: 5px;
+        }
+
+        body.dark-theme small.form-text {
+            color: #888;
+            margin-top: 5px;
+            display: block;
+        }
+
+        body.dark-theme .search-box {
+            background: #222;
+            border: 1px solid #333;
+            border-radius: 4px;
+            padding: 8px 12px;
+        }
+
+        body.dark-theme .search-box input {
+            background: transparent;
+            border: none;
+            color: #f3f3f3;
+            width: 100%;
+        }
+
+        body.dark-theme .search-box input:focus {
+            outline: none;
+        }
+
+        body.dark-theme .credentials-list {
+            margin-top: 20px;
+        }
+
+        body.dark-theme .credential-item {
+            background: #222;
+            border: 1px solid #333;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+        }
+
+        body.dark-theme .credential-details h3 {
+            color: #00d34a;
+            margin: 0 0 10px 0;
+        }
+
+        body.dark-theme .credential-meta {
+            color: #cccccc;
+        }
+
+        body.dark-theme .status-badge {
+            background: #333;
+            color: #f3f3f3;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
+        body.dark-theme .empty-state {
+            color: #cccccc;
+            text-align: center;
+            padding: 40px 0;
+        }
+
+        body.dark-theme .empty-state i {
+            color: #00d34a;
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+
+        body.dark-theme .empty-state-help {
+            color: #888;
+        }
+
+        /* Modal Dark Theme */
+        body.dark-theme .modal-content {
+            background: #1a1a1a;
+            border: 1px solid #333;
+        }
+
+        body.dark-theme .modal-content h2 {
+            color: #00d34a;
+        }
+
+        body.dark-theme .close {
+            color: #f3f3f3;
+        }
+
+        /* Button styles for dark theme */
+        body.dark-theme .credential-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        body.dark-theme .btn-sm {
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            border: 1px solid #333;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        body.dark-theme .btn-view {
+            background: #1a1a1a;
+            color: #f3f3f3;
+            border-color: #333;
+        }
+
+        body.dark-theme .btn-view:hover {
+            background: #00d34a;
+            color: #101010;
+            border-color: #00d34a;
+        }
+
+        body.dark-theme .btn-download {
+            background: #1a1a1a;
+            color: #f3f3f3;
+            border-color: #333;
+        }
+
+        body.dark-theme .btn-download:hover {
+            background: #00d34a;
+            color: #101010;
+            border-color: #00d34a;
+        }
+
+        body.dark-theme .btn-delete {
+            background: #1a1a1a;
+            color: #f3f3f3;
+            border-color: #333;
+        }
+
+        body.dark-theme .btn-delete:hover {
+            background: #d33000;
+            color: #f3f3f3;
+            border-color: #d33000;
+        }
+
+        body.dark-theme .btn-sm i {
+            font-size: 14px;
+        }
+    </style>
 </head>
 <body>
     <div class="header">
@@ -397,6 +614,19 @@ try {
       }
       // If user cancels, do nothing
     }
+    </script>
+    <script>
+    // Check and apply theme and text size on page load
+    document.addEventListener('DOMContentLoaded', function() {
+      // Apply theme
+      const savedTheme = localStorage.getItem('plpTheme') || 'light';
+      if (savedTheme === 'dark') {
+        document.body.classList.add('dark-theme');
+      }
+      // Apply text size
+      const savedTextSize = localStorage.getItem('plpTextSize') || '100';
+      document.documentElement.style.fontSize = savedTextSize + '%';
+    });
     </script>
     <script src="../scripts.js"></script>
 </body>
