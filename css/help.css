@@ -1,0 +1,154 @@
+/* Help Button Styles */
+.help-button {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #0e8639;
+    color: white;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    z-index: 1001;
+    transition: all 0.3s;
+}
+    
+.help-button:hover {
+    background-color: #0d3f1f;
+    transform: scale(1.1);
+}
+    
+.help-button i {
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+}
+
+/* Popout Styles */
+.popout {
+    display: none;
+    position: fixed;
+    z-index: 1001;
+    bottom: 80px;
+    right: 25px;
+    width: 260px;
+    background-color: #fefefe;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,.75);
+    padding: 15px;
+    transform-origin: bottom right;
+    animation: popout 0.2s ease-out;
+}
+    
+@keyframes popout {
+    from { transform: scale(0.5); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+    
+.popout-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+}
+    
+.popout-header h3 {
+    margin: 0;
+    color: #0e8639;
+    font-size: 16px;
+}
+    
+.popout-close {
+    color: #aaa;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+}
+    
+.popout-close:hover {
+    color: black;
+}
+    
+.help-option {
+    padding: 10px;
+    margin: 8px 0;
+    background-color: #f8f9fa;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-size: 14px;
+}
+    
+.help-option:hover {
+    background-color: #e9ecef;
+}
+    
+.help-option i {
+    margin-right: 8px;
+    color: #0e8639;
+    font-size: 14px;
+}
+    
+/* FAQ and Contact Popouts */
+.content-popout {
+    display: none;
+    position: fixed;
+    z-index: 1002;
+    bottom: 80px;
+    right: 25px;
+    width: 360px;
+    max-height: 400px;
+    overflow-y: auto;
+    background-color: #fefefe;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.75);
+    padding: 15px;
+    transform-origin: bottom right;
+    animation: popout 0.2s ease-out;
+}
+    
+.faq-item {
+    margin-bottom: 12px;
+    font-size: 15px;
+}
+    
+.faq-question {
+    font-weight: bold;
+    color: #0e8639;
+    margin-bottom: 5px;
+}
+    
+.contact-info {
+    margin-top: 10px;
+    font-size: 16px;
+}
+    
+.contact-info p {
+    margin: 5px 0;
+}
+    
+.contact-info i {
+    margin-right: 8px;
+    color: #0e8639;
+    font-size: 14px;
+}
+
+/* Close popouts when clicking outside */
+.popout-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1000;
+    display: none;
+}

@@ -1,299 +1,270 @@
-/* Profile Page Styles */
+/* Profile Container */
 .profile-container {
     max-width: 1200px;
-    margin: 100px auto 30px;
-    padding: 0 30px;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    color: #333;
-    margin-top: 20px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
+/* Profile Header */
 .profile-header {
     display: flex;
     align-items: center;
-    gap: 40px;
-    margin-bottom: 40px;
-    background: white;
-    padding: 30px;
-    border-radius: 10px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    padding-bottom: 20px;
+    margin-bottom: 30px;
+    border-bottom: 1px solid #eee;
 }
 
-.profile-image {
+.profile-picture-container {
     position: relative;
-    width: 180px;
-    height: 180px;
+    width: 150px;
+    height: 150px;
+    margin-right: 30px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 3px solid #f0f0f0;
 }
 
-.profile-image img {
+#profile-picture {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    border-radius: 50%;
-    border: 5px solid #007c2c;
 }
 
-.edit-btn {
+.upload-overlay {
     position: absolute;
-    bottom: 10px;
-    right: 10px;
-    background: #007c2c;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: rgba(0, 0, 0, 0.5);
     color: white;
-    border: none;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
+    text-align: center;
+    padding: 8px 0;
     cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-    transition: all 0.3s ease;
+    transition: all 0.3s;
 }
 
-.edit-btn:hover {
-    background: #015f22;
-    transform: scale(1.1);
+.upload-overlay:hover {
+    background-color: rgba(0, 0, 0, 0.7);
+}
+
+.upload-overlay i {
+    font-size: 20px;
+}
+
+.profile-info {
+    flex-grow: 1;
 }
 
 .profile-info h1 {
     margin: 0;
     color: #007c2c;
-    font-size: 2.2rem;
+    font-size: 28px;
 }
 
-.faculty-title {
-    font-size: 1.2rem;
-    color: #555;
+.profile-info p {
     margin: 5px 0;
-    font-weight: 500;
+    color: #404243;
 }
 
-.faculty-dept {
-    color: #777;
-    margin: 5px 0 15px;
-}
-
-.profile-stats {
-    display: flex;
-    gap: 30px;
-}
-
-.stat-item {
-    text-align: center;
-}
-
-.stat-number {
-    display: block;
-    font-size: 1.8rem;
+#faculty-id {
     font-weight: bold;
-    color: #007c2c;
+    color: #000000;
 }
 
-.stat-label {
-    font-size: 0.9rem;
-    color: #777;
+#college-name {
+    font-size: 16px;
+    color: #111314;
 }
 
-.profile-tabs {
-    display: flex;
-    background: white;
-    padding: 10px;
-    border-radius: 10px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    margin-bottom: 30px;
-}
-
-.tab-btn {
-    padding: 12px 25px;
-    background: none;
-    border: none;
-    border-bottom: 3px solid transparent;
-    font-size: 1rem;
-    font-weight: 600;
-    color: #555;
-    cursor: pointer;
-    position: relative;
-    overflow: hidden;
-    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-}
-
-.tab-btn:hover {
-    color: #007c2c;
-    transform: scale(1.05);
-}
-
-.tab-btn:hover::after {
-    width: 80%;
-}
-
-.tab-btn.active::after {
-    width: 80%;
-}
-
-.tab-btn.active {
-    color: #007c2c;
-    border-bottom-color: #007c2c;
-}
-
-.tab-pane {
-    display: none;
-    background: white;
-    padding: 30px;
-    border-radius: 10px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    margin-bottom: 30px;
-}
-
-.tab-pane.active {
-    display: block;
-}
-
-.info-section {
-    margin-bottom: 40px;
-}
-
-.info-section h2 {
-    color: #007c2c;
-    border-bottom: 2px solid #eee;
-    padding-bottom: 10px;
-    margin-bottom: 20px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.info-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 20px;
-}
-
-.info-item {
-    margin-bottom: 15px;
-}
-
-.info-item label {
-    display: block;
-    font-weight: 600;
-    color: #555;
-    margin-bottom: 5px;
-}
-
-.info-item p {
-    margin: 0;
-    padding: 8px 12px;
-    background: #f8f9fa;
-    border-radius: 5px;
-}
-
-.education-item, .experience-item, .publication-item {
-    margin-bottom: 25px;
-    padding-bottom: 20px;
-    border-bottom: 1px solid #eee;
-}
-
-.education-item:last-child, .experience-item:last-child, .publication-item:last-child {
-    border-bottom: none;
-}
-
-.edu-header, .exp-header, .pub-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 5px;
-}
-
-.edu-header h3, .exp-header h3, .pub-header h3 {
-    margin: 0;
-    color: #007c2c;
-}
-
-.edu-year, .exp-year, .pub-year {
-    background: #e6f4ea;
+#employment-type {
+    background-color: #a5e7c9;
     color: #007c2c;
     padding: 3px 10px;
     border-radius: 20px;
-    font-size: 0.9rem;
-    font-weight: 500;
+    display: inline-block;
+    font-size: 14px;
 }
 
-.edu-school, .exp-company, .pub-journal {
-    color: #555;
-    margin: 5px 0;
-    font-style: italic;
+/* Profile Sections */
+.profile-sections {
+    margin-top: 30px;
 }
 
-.edu-details, .exp-details, .pub-authors {
-    color: #666;
-    margin: 5px 0;
-}
-
-.exp-details li {
-    margin-bottom: 5px;
-}
-
-.certification-list, .role-list, .grant-list {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-
-.cert-item, .role-item, .grant-item {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    padding: 15px;
-    background: #f8f9fa;
+.profile-section {
+    margin-bottom: 40px;
+    border: 1px solid #eee;
     border-radius: 8px;
-    transition: all 0.3s ease;
+    overflow: hidden;
 }
 
-.cert-item:hover, .role-item:hover, .grant-item:hover {
-    background: #e6f4ea;
-    transform: translateX(5px);
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #eee;
 }
 
-.cert-item i, .role-item i, .grant-item i {
-    font-size: 1.5rem;
-    color: #007c2c;
-}
-
-.cert-details h3, .role-details h3, .grant-details h3 {
-    margin: 0 0 5px;
-    color: #007c2c;
-}
-
-.cert-details p, .role-details p, .grant-details p {
+.section-header h2 {
     margin: 0;
-    color: #666;
-    font-size: 0.9rem;
+    color: #007c2c;
+    font-size: 20px;
 }
 
-.profile-actions {
-    text-align: center;
-    margin: 30px 0;
-}
-
-.edit-profile-btn {
-    background: #007c2c;
+.edit-section-btn, .add-btn {
+    background-color: #007c2c;
     color: white;
     border: none;
-    padding: 12px 25px;
-    border-radius: 6px;
-    font-size: 1rem;
-    font-weight: 500;
+    padding: 10px 20px;
+    border-radius: 4px;
     cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    transition: all 0.3s ease;
+    font-weight: bold;
+    transition: background-color 0.3s;
 }
 
-.edit-profile-btn:hover {
-    background: #015f22;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+.edit-section-btn:hover, .add-btn:hover {
+    background-color: #0c4520;
+}
+
+.add-btn {
+    background-color: #007c2c;
+    color: white;
+    border-color: #007c2c;
+}
+
+.add-btn:hover {
+    background-color: #0c4520;
+}
+
+.section-content {
+    padding: 20px;
+}
+
+.info-row {
+    display: flex;
+    margin-bottom: 15px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.info-row:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+.info-label {
+    width: 150px;
+    font-weight: bold;
+    color: #000000;
+}
+
+.info-value {
+    flex-grow: 1;
+    color: #000000;
+}
+
+.info-edit {    
+    flex-grow: 1;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: inherit;
+}
+
+textarea.info-edit {
+    min-height: 80px;
+    resize: vertical;
+}
+
+.section-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
+}
+
+.save-btn, .cancel-btn {
+    padding: 8px 20px;
+    margin-left: 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.save-btn {
+    background-color: #007c2c;
+    color: white;
+}
+
+.save-btn:hover {
+    background-color: #0c4520;
+}
+
+.cancel-btn {
+    background-color: #e74c3c;
+    color: white;
+}
+
+.cancel-btn:hover {
+    background-color: #c0392b;
+}
+
+/* Academic Background */
+.degree-item {
+    margin-bottom: 20px;
+    padding: 15px;
+    border: 1px solid #eee;
+    border-radius: 6px;
+    background-color: #f9f9f9;
+}
+
+.degree-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.degree-header h3 {
+    margin: 0;
+    color: #007c2c;
+    font-size: 18px;
+}
+
+.degree-actions button {
+    background: none;
+    border: none;
+    color: #7f9281;
+    cursor: pointer;
+    margin-left: 10px;
+    font-size: 16px;
+    transition: color 0.3s;
+}
+
+.degree-actions button:hover {
+    color: #066627;
+}
+
+.degree-details p {
+    margin: 5px 0;
+    color: #020202;
+}
+
+.degree-details strong {
+    color: #0b0b0b;
+}
+
+.no-data {
+    color: #839888;
+    font-style: italic;
+    text-align: center;
+    padding: 20px;
 }
 
 /* Modal Styles */
@@ -306,128 +277,105 @@
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.5);
+    overflow: auto;
 }
 
 .modal-content {
-    background-color: white;
+    background-color: #fff;
     margin: 5% auto;
-    padding: 30px;
-    border-radius: 10px;
-    width: 80%;
-    max-width: 700px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-    position: relative;
+    padding: 25px;
+    border-radius: 8px;
+    width: 600px;
+    max-width: 90%;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
 }
 
-.close-btn {
-    position: absolute;
-    top: 15px;
-    right: 20px;
+.close-modal {
+    color: #c4cbbe;
+    float: right;
     font-size: 28px;
     font-weight: bold;
-    color: #aaa;
     cursor: pointer;
 }
 
-.close-btn:hover {
-    color: #333;
+.close-modal:hover {
+    color: #545b54;
+}
+
+#modal-title {
+    margin-top: 0;
+    color: #007c2c;
+    font-size: 24px;
 }
 
 .form-group {
-    margin-bottom: 20px;
+    margin-bottom: 15px;
 }
 
 .form-group label {
     display: block;
-    margin-bottom: 8px;
-    font-weight: 500;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #393f3b;
 }
 
-.form-group input, .form-group select, .form-group textarea {
+.form-group input[type="text"],
+.form-group input[type="number"],
+.form-group input[type="email"],
+.form-group input[type="tel"],
+.form-group select,
+.form-group textarea {
     width: 100%;
     padding: 10px;
     border: 1px solid #ddd;
-    border-radius: 5px;
-    font-size: 1rem;
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 16px;
+}
+
+.form-group textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+.form-row {
+    display: flex;
+    gap: 15px;
+}
+
+.form-row .form-group {
+    flex: 1;
 }
 
 .form-actions {
     display: flex;
     justify-content: flex-end;
-    gap: 15px;
-    margin-top: 30px;
+    margin-top: 20px;
 }
 
-.cancel-btn, .save-btn {
-    padding: 10px 20px;
-    border-radius: 5px;
-    font-weight: 500;
-    cursor: pointer;
-}
-
-.cancel-btn {
-    background: #f8f9fa;
-    border: 1px solid #ddd;
-    color: #333;
-}
-
-.save-btn {
-    background: #007c2c;
-    border: none;
-    color: white;
-}
-
-/* Responsive Styles */
+/* Responsive Design */
 @media (max-width: 768px) {
     .profile-header {
         flex-direction: column;
         text-align: center;
-        gap: 20px;
     }
     
-    .profile-stats {
-        justify-content: center;
+    .profile-picture-container {
+        margin-right: 0;
+        margin-bottom: 20px;
     }
     
-    .profile-tabs {
-        overflow-x: auto;
-        white-space: nowrap;
+    .info-row {
+        flex-direction: column;
     }
     
-    .tab-btn {
-        padding: 10px 15px;
-        font-size: 0.9rem;
+    .info-label {
+        width: 100%;
+        margin-bottom: 5px;
     }
     
-    .info-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .modal-content {
-        width: 90%;
-        margin: 10% auto;
-    }
-}
-
-@media (max-width: 480px) {
-    .profile-container {
-        padding: 0 15px;
-    }
-    
-    .profile-image {
-        width: 120px;
-        height: 120px;
-    }
-    
-    .profile-info h1 {
-        font-size: 1.8rem;
-    }
-    
-    .stat-number {
-        font-size: 1.4rem;
-    }
-    
-    .tab-pane {
-        padding: 20px;
+    .form-row {
+        flex-direction: column;
+        gap: 0;
     }
 }

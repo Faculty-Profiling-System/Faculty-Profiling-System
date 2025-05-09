@@ -3,85 +3,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Settings | Faculty</title>
-    <link rel="stylesheet" href="../css/faculty_style.css??v=<?php echo time(); ?>" />
-    <script>
-    // Initialize states
-    let currentSize = parseInt(localStorage.getItem('plpTextSize')) || 100;
-
-    // Check and apply theme and text size on page load
-    document.addEventListener('DOMContentLoaded', function() {
-      const savedTheme = localStorage.getItem('plpTheme') || 'light';
-      if (savedTheme === 'dark') {
-        document.body.classList.add('dark-theme');
-      }
-      // Apply saved text size
-      document.body.style.fontSize = currentSize + '%';
-      updateSelected();
-    });
-
-    function applyTheme(theme) {
-      if (theme === 'dark') {
-        document.body.classList.add('dark-theme');
-      } else {
-        document.body.classList.remove('dark-theme');
-      }
-      localStorage.setItem('plpTheme', theme);
-    }
-
-    function setTextSize(size) {
-      currentSize = size;
-      document.body.style.fontSize = size + '%';
-      localStorage.setItem('plpTextSize', size);
-      updateSelected();
-    }
-
-    function setTheme(theme) {
-      applyTheme(theme);
-      updateSelected();
-    }
-
-    function updateSelected() {
-      // Text size buttons
-      [100, 150, 200].forEach(s => {
-        document.getElementById('size-' + s).classList.toggle('selected', currentSize === s);
-      });
-      // Theme buttons
-      const currentTheme = localStorage.getItem('plpTheme') || 'light';
-      document.getElementById('theme-light').classList.toggle('selected', currentTheme === 'light');
-      document.getElementById('theme-dark').classList.toggle('selected', currentTheme === 'dark');
-    }
-  </script>
-  <style>
-    /* Light theme (default) */
-    body {
-      background: #f4fff4;
-      color: #187436;
-    }
-
-    /* Dark theme */
-    body.dark-theme {
-      background: #101010 !important;
-      color: #f3f3f3 !important;
-    }
-
-    body.dark-theme .settings-label {
-      color: #f3f3f3;
-    }
-
-    body.dark-theme .settings-btn {
-      background: #222;
-      color: #ccc;
-    }
-
-    body.dark-theme .settings-btn.selected {
-      background: #00d34a;
-      color: #101010;
-    }
-
-    body.dark-theme hr {
-      border-top: 6px solid #333;
-    }
-  </style>
+    <link rel="stylesheet" href="../css/faculty_style.css??v=<?php echo time(); ?>"/>
+    <link rel="stylesheet" href="../css/help.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
     <div class="header">
@@ -113,106 +37,80 @@
     </nav>
 
     <div class="logout-section">
-        <a href="#" onclick="confirmLogout()"><img src="../images/logout.png" alt="Logout Icon" class="menu-icon">LOGOUT</a>
-      </div>
-  </div> 
+          <a href="#" onclick="confirmLogout()"><img src="../images/logout.png" alt="Logout Icon" class="menu-icon">LOGOUT</a>
+        </div>
+    </div> 
 
-  <div id="main" class="main-content">
-    <h2>Settings</h2>
-    <hr>
-    <div class="settings-section">
-      <label class="settings-label">Text Size</label>
-      <div class="settings-options">
-        <button class="settings-btn" id="size-100" onclick="setTextSize(100)">100%</button>
-        <button class="settings-btn" id="size-150" onclick="setTextSize(150)">150%</button>
-        <button class="settings-btn" id="size-200" onclick="setTextSize(200)">200%</button>
+    <div id="main" class="main-content">
+      <!-- Help Button -->
+      <div class="help-button" onclick="toggleHelpPopout()">
+          <i class="fas fa-question"></i>
+      </div>
+
+      <!-- Main Help Popout -->
+      <div id="helpPopout" class="popout">
+          <div class="popout-header">
+              <h3>Need Help?</h3>
+              <span class="popout-close" onclick="closeHelpPopout()">&times;</span>
+          </div>
+          <div class="help-option" onclick="openFaqPopout()">
+              <i class="fas fa-question-circle"></i> FAQ's
+          </div>
+          <div class="help-option" onclick="openContactPopout()">
+              <i class="fas fa-headset"></i> Still need help?
+          </div>
+      </div>
+
+      <!-- FAQ Popout -->
+      <div id="faqPopout" class="content-popout">
+          <div class="popout-header">
+              <h3>Frequently Asked Questions</h3>
+              <span class="popout-close" onclick="closeFaqPopout()">&times;</span>
+          </div>
+          <div class="faq-item">
+              <div class="faq-question">Q: How do I update my profile information?</div>
+              <p>A: Go to the Profile section and click on the "Edit Profile" button.</p>
+          </div>
+          <div class="faq-item">
+              <div class="faq-question">Q: How do I upload my teaching schedule?</div>
+              <p>A: Navigate to Teaching Load section and use the "Upload Schedule" button.</p>
+          </div>
+          <div class="faq-item">
+              <div class="faq-question">Q: What file formats are accepted?</div>
+              <p>A: We accept PDF, JPG, and PNG files for credential uploads.</p>
+          </div>
+          <div class="faq-item">
+              <div class="faq-question">Q: How do I change my password?</div>
+              <p>A: Go to Settings and use the "Change Password" option.</p>
+          </div>
+      </div>
+
+      <!-- Contact Popout -->
+      <div id="contactPopout" class="content-popout">
+          <div class="popout-header">
+              <h3>Contact Support</h3>
+              <span class="popout-close" onclick="closeContactPopout()">&times;</span>
+          </div>
+          <p>If you need further assistance:</p>
+          <div class="contact-info">
+              <p><i class="fas fa-envelope"></i> support@plpasig.edu.ph</p>
+              <p><i class="fas fa-phone"></i> +63 2 123 4567</p>
+              <p><i class="fas fa-clock"></i> Mon-Fri, 8:00 AM - 5:00 PM</p>
+              <p><i class="fas fa-map-marker-alt"></i> Admin Building, Room 101</p>
+          </div>
       </div>
     </div>
-    <hr>
-    <div class="settings-section">
-      <label class="settings-label">Theme</label>
-      <div class="settings-options">
-        <button class="settings-btn" id="theme-light" onclick="setTheme('light')">Light</button>
-        <button class="settings-btn" id="theme-dark" onclick="setTheme('dark')">Dark</button>
-      </div>
-    </div>
-    <hr>
-    <style>
-      body, .main-content {
-        background: #101010 !important;
-        color: #f3f3f3 !important;
-      }
-      .settings-section {
-        margin: 2em 0;
-      }
-      .settings-label {
-        display: block;
-        font-size: 2em;
-        font-weight: bold;
-        margin-bottom: 1em;
-        color: #f3f3f3;
-      }
-      .settings-options {
-        display: flex;
-        gap: 1em;
-      }
-      .settings-btn {
-        background: #222;
-        border: none;
-        border-radius: 2em;
-        padding: 0.7em 2em;
-        font-size: 1.5em;
-        font-family: inherit;
-        color: #ccc;
-        cursor: pointer;
-        transition: background 0.2s, color 0.2s;
-        font-weight: 500;
-      }
-      .settings-btn.selected {
-        background: #00d34a;
-        color: #101010;
-      }
-      .settings-btn:focus {
-        outline: 2px solid #00d34a;
-      }
-      hr {
-        border: none;
-        border-top: 6px solid #333;
-        margin: 2em 0;
-      }
-      /* For light theme */
-      body:not(.dark-theme) .main-content,
-      body:not(.dark-theme) {
-        background: #f4fff4 !important;
-        color: #187436 !important;
-      }
-      body:not(.dark-theme) .settings-label {
-        color: #187436;
-      }
-      body:not(.dark-theme) .settings-btn {
-        background: #e3f3e3;
-        color: #187436;
-      }
-      body:not(.dark-theme) .settings-btn.selected {
-        background: #00723F; /* Deeper green */
-        color: #ffffff;
-      }
-      body:not(.dark-theme) hr {
-        border-top: 6px solid #187436;
-      }
-    </style>
-  </div>
-
     
     <script>
-        function confirmLogout() {
-        if (confirm('Are you sure you want to logout?')) {
-            // If user confirms, redirect to logout page
-            window.location.href = '../landing/index.php';
-        }
-        // If user cancels, do nothing
-        }
+      function confirmLogout() {
+      if (confirm('Are you sure you want to logout?')) {
+        // If user confirms, redirect to logout page
+        window.location.href = '../landing/index.php';
+      }
+      // If user cancels, do nothing
+      }
     </script>
+    <script src="help.js"></script>
     <script src="../scripts.js"></script>
 </body>
 </html>
