@@ -56,7 +56,7 @@ try {
         issued_by, issued_date, expiry_date, file_path, status
     ) VALUES (?, ?, ?, ?, ?, ?, ?, 'Pending')");
     
-    $stmt->bind_param("issssss", 
+    $stmt->bind_param("sssssss", 
     $_SESSION['faculty_id'],
     $_POST['credentialType'],
     $_POST['credentialName'],

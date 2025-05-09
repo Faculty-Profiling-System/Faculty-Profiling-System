@@ -4,7 +4,8 @@ document.addEventListener('DOMContentLoaded', () => {
   fetchAdminData();
   fetchStatsData();
   fetchRecentCredentials();
-});
+  });
+
 
 // ====== MENU TOGGLE ==========
 function toggleMenu() {
@@ -35,7 +36,6 @@ function toggleMenu() {
   }
 }
 
-// Initialize menu state
 document.addEventListener('DOMContentLoaded', function() {
   const menu = document.getElementById('menu');
   const bar1 = document.getElementById('bar1');
@@ -165,7 +165,6 @@ function confirmLogout() {
     window.location.href = '../landing/index.php';
   }
 }
-
 function updateDashboardCounts() {
-  // Implementation can be added here if needed
+
 }
