@@ -8,17 +8,17 @@ if (!isset($_SESSION['user_id']) || !isset($_SESSION['faculty_id'])) {
     exit();
 }
 
-if (!isset($_GET['id'])) {
+if (!isset($_GET['credential_id'])) {
     echo json_encode(['success' => false, 'message' => 'Missing credential ID']);
     exit();
 }
 
 $faculty_id = $_SESSION['faculty_id'];
-$credential_id = intval($_GET['id']);
+$credential_id = intval($_GET['credential_id']);
 
 try {
     $stmt = $conn->prepare("SELECT * FROM credentials WHERE credential_id = ? AND faculty_id = ?");
-    $stmt->bind_param("ii", $credential_id, $faculty_id);
+    $stmt->bind_param("is", $credential_id, $faculty_id);
     $stmt->execute();
     $result = $stmt->get_result();
     $credential = $result->fetch_assoc();
