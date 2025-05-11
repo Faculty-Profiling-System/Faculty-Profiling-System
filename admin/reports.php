@@ -77,8 +77,8 @@
     <li class="dropdown">
       <a href="javascript:void(0)" id="reportsDropdown" class="active"><img src="../images/reports.png" alt="Reports Icon" class="menu-icon">REPORTS</a>
       <ul class="dropdown-menu" style="display: block;"> <!-- Changed to display: block -->
-        <li><a href="files_report.php">Files</a></li>
-        <li><a href="logs_report.php">Logs</a></li>
+              <li><a href="files_report.php" class="active">CREDENTIAL FILES</a></li>
+              <li><a href="logs_report.php">USER LOGS</a></li>
       </ul>
     </li>
     <li><a href="setting.php"><img src="../images/setting.png" alt="Settings Icon" class="menu-icon">SETTINGS</a></li>
