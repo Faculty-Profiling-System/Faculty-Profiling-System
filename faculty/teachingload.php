@@ -30,6 +30,7 @@ $pdfExists = $currentPdf && file_exists(__DIR__ . '/' . $currentPdf);
     <link rel="stylesheet" href="../css/faculty_style.css??v=<?php echo time(); ?>" />
     <link rel="stylesheet" href="../css/teachingload.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="../css/help.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="css/theme.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
 </head>
@@ -313,6 +314,7 @@ $pdfExists = $currentPdf && file_exists(__DIR__ . '/' . $currentPdf);
     }
     </script>
     <script src="help.js"></script>
+    <script src="js/settings.js"></script>
     <script src="../scripts.js"></script>
 </body>
 </html>
