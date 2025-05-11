@@ -8,6 +8,11 @@
     max-width: 98%;
 }
 
+.header-user-management h1 {
+     color:#017a2b;
+    padding:  0 0 -220px 0;
+}
+
 /* Filter Section */
 .filter-section {
     display: flex;
@@ -81,6 +86,7 @@
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
     border-radius: 10px;
     overflow: hidden;
+    z-index: 999; /* Lower than your navigation's z-index */
 }
 
 .user-table thead tr {

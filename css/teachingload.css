@@ -23,6 +23,7 @@
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     position: relative;
     z-index: 1; /* Ensure it stays below header */
+    margin-top: 1px;
 }
 
 .dashboard-title {
