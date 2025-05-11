@@ -86,7 +86,7 @@
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
     border-radius: 10px;
     overflow: hidden;
-    z-index: 999; /* Lower than your navigation's z-index */
+    z-index: 1; /* Lower than your navigation's z-index */
 }
 
 .user-table thead tr {

@@ -173,7 +173,6 @@ session_start();
       text-decoration: underline;
     }
 
-    /* Responsive adjustments */
     @media (max-width: 768px) {
       .stats-grid {
         grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -202,13 +201,13 @@ session_start();
       <nav>
         <ul>
           <li><a href="home.php" class="active"><img src="../images/home.png" alt="Home Icon" class="menu-icon">HOME</a></li>
-          <li><a href="department.php"><img src="../images/department.png" alt="Department Icon" class="menu-icon">DEPARTMENT MANAGEMENT</a></li>
+          <li><a href="department.php"><img src="../images/department.png" alt="Department Icon" class="menu-icon">COLLEGE MANAGEMENT</a></li>
           <li><a href="user.php"><img src="../images/user.png" alt="User Icon" class="menu-icon">USER MANAGEMENT</a></li>
           <li class="dropdown">
             <a href="javascript:void(0)" id="reportsDropdown"><img src="../images/reports.png" alt="Reports Icon" class="menu-icon">REPORTS</a>
             <ul class="dropdown-menu">
-              <li><a href="files_report.php">Files</a></li>
-              <li><a href="logs_report.php">Logs</a></li>
+              <li><a href="files_report.php">CREDENTIAL FILES</a></li>
+              <li><a href="logs_report.php">USER LOGS</a></li>
             </ul>
           </li>
           <li><a href="setting.php"><img src="../images/setting.png" alt="Settings Icon" class="menu-icon">SETTINGS</a></li>
@@ -237,7 +236,6 @@ session_start();
       <div class="admin-credentials-card">
         <h3><img src="../images/pendingdoc.png" alt="pendingdoc-icon" class="preview-icon">Pending Document Verifications</h3>
         <ul class="credentials-list" id="pendingDocumentsList">
-          <!-- Will be populated by JavaScript -->
         </ul>
         <a href="pending_documents.php" class="view-link">View Pending Documents</a>
       </div>
@@ -245,14 +243,12 @@ session_start();
       <div class="admin-credentials-card">
         <h3><img src="../images/accredit.png" alt="accredit-icon" class="preview-icon">Under Review for Accreditation</h3>
         <ul class="credentials-list" id="accreditationReviewList">
-          <!-- Will be populated by JavaScript -->
         </ul>
         <a href="accreditation_review.php" class="view-link">View Review for Accreditation</a>
       </div>
     </div>
   </div>
   <script>
-        // Reports dropdown functionality
         document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('reportsDropdown').addEventListener('click', function(e) {
       e.preventDefault();
