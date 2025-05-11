@@ -173,7 +173,6 @@ session_start();
       text-decoration: underline;
     }
 
-    /* Responsive adjustments */
     @media (max-width: 768px) {
       .stats-grid {
         grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -237,7 +236,6 @@ session_start();
       <div class="admin-credentials-card">
         <h3><img src="../images/pendingdoc.png" alt="pendingdoc-icon" class="preview-icon">Pending Document Verifications</h3>
         <ul class="credentials-list" id="pendingDocumentsList">
-          <!-- Will be populated by JavaScript -->
         </ul>
         <a href="pending_documents.php" class="view-link">View Pending Documents</a>
       </div>
@@ -245,14 +243,12 @@ session_start();
       <div class="admin-credentials-card">
         <h3><img src="../images/accredit.png" alt="accredit-icon" class="preview-icon">Under Review for Accreditation</h3>
         <ul class="credentials-list" id="accreditationReviewList">
-          <!-- Will be populated by JavaScript -->
         </ul>
         <a href="accreditation_review.php" class="view-link">View Review for Accreditation</a>
       </div>
     </div>
   </div>
   <script>
-        // Reports dropdown functionality
         document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('reportsDropdown').addEventListener('click', function(e) {
       e.preventDefault();
