@@ -1,0 +1,307 @@
+<?php
+require_once '../db_connection.php';
+session_start();
+
+// Check if user is logged in and has a college_id
+if (!isset($_SESSION['user_id'])) {
+    header("Location: ../landing/index.php");
+    exit();
+}
+
+// Get the logged-in user's college_id
+$current_user_id = $_SESSION['user_id'];
+$user_query = "SELECT college_id FROM users WHERE user_id = ?";
+$stmt = $conn->prepare($user_query);
+$stmt->bind_param("i", $current_user_id);
+$stmt->execute();
+$user_result = $stmt->get_result();
+$current_user = $user_result->fetch_assoc();
+
+if (!$current_user || !isset($current_user['college_id'])) {
+    die("Error: Unable to determine user's college");
+}
+
+$current_college_id = $current_user['college_id'];
+
+// Fetch the college name for the current user
+$college_query = "SELECT college_name FROM colleges WHERE college_id = ?";
+$stmt = $conn->prepare($college_query);
+$stmt->bind_param("i", $current_college_id);
+$stmt->execute();
+$college_result = $stmt->get_result();
+$college_row = $college_result->fetch_assoc();
+$current_college_name = $college_row['college_name'];
+
+$available_faculty_query = "SELECT f.faculty_id 
+                           FROM faculty f 
+                           LEFT JOIN users u ON f.faculty_id = u.faculty_id 
+                           WHERE u.user_id IS NULL AND f.college_id = ?";
+$stmt = $conn->prepare($available_faculty_query);
+$stmt->bind_param("i", $current_college_id);
+$stmt->execute();
+$available_faculty_result = $stmt->get_result();
+$available_faculty = [];
+while ($row = $available_faculty_result->fetch_assoc()) {
+    $available_faculty[] = $row['faculty_id'];
+}
+
+// Fetch users from the same college
+$sql = "SELECT * FROM vw_faculty_users WHERE college = ? ORDER BY name";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("s", $current_college_name);
+$stmt->execute();
+$users = $stmt->get_result();
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>User Management | Admin</title>
+  <link rel="stylesheet" href="../css/admin_style.css?v=<?php echo time(); ?>" />
+  <link rel="stylesheet" href="../css/user.css?v=<?php echo time(); ?>" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+</head>
+<body>
+  <div class="header">
+    <div class="logo-section">
+      <img src="../images/logo.png" alt="Logo" />
+      <div class="title">PAMANTASAN NG LUNGSOD NG PASIG</div>
+      <button class="hamburger" onclick="toggleMenu()">
+        <div id="bar1" class="bar"></div>
+        <div id="bar2" class="bar"></div>
+        <div id="bar3" class="bar"></div>
+      </button>
+    </div>
+
+    <div class="navigation" id="menu">
+      <div class="navigation-header">
+        <h1>ADMINISTRATOR</h1>
+        <h2>| PLP FACULTY PROFILING SYSTEM |</h2>
+      </div>
+
+      <nav>
+        <ul>
+          <li><a href="home.php"><img src="../images/home.png" alt="Home Icon" class="menu-icon">HOME</a></li>
+          <li><a href="college_management.php"><img src="../images/department.png" alt="Department Icon" class="menu-icon">COLLEGE MANAGEMENT</a></li>
+          <li><a href="user.php" class="active"><img src="../images/user.png" alt="User Icon" class="menu-icon">USER MANAGEMENT</a></li>
+          <li class="dropdown">
+            <a href="javascript:void(0)" id="reportsDropdown"><img src="../images/reports.png" alt="Reports Icon" class="menu-icon">REPORTS</a>
+            <ul class="dropdown-menu">
+              <li><a href="files_report.php">CREDENTIAL FILES</a></li>
+              <li><a href="logs_report.php">USER LOGS</a></li>
+            </ul>
+          </li>
+          <li><a href="setting.php"><img src="../images/setting.png" alt="Settings Icon" class="menu-icon">SETTINGS</a></li>
+        </ul>
+      </nav>
+
+      <div class="logout-section">
+        <a href="#" onclick="confirmLogout()"><img src="../images/logout.png" class="menu-icon">LOGOUT</a>
+      </div>
+    </div>
+  </div>
+
+  <div id="main" class="main-content">
+      <div class="header-user-management">
+        <h1>User Management - <?php echo htmlspecialchars($current_college_name); ?></h1>
+      </div>
+      <div class="user-management-container">
+          <div class="search-add-container">
+              <div class="search-box">
+                  <i class="fas fa-search"></i>
+                  <input type="text" id="searchInput" placeholder="Search faculty...">
+              </div>
+              
+              <button class="add-user-btn" onclick="openAddModal()">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M12 5v14M5 12h14"></path>
+                  </svg>
+                  Add User
+              </button>
+          </div>
+
+          <div class="table-container">
+              <table class="user-table">
+                  <thead>
+                      <tr>
+                          <th>Faculty ID</th>
+                          <th>Name</th>
+                          <th>Email</th>
+                          <th>Username</th>
+                          <th>Actions</th>
+                      </tr>
+                  </thead>
+                  <tbody>
+                      <?php if ($users->num_rows > 0): ?>
+                          <?php while ($user = $users->fetch_assoc()): ?>
+                              <tr>
+                                  <td><?= htmlspecialchars($user['faculty_id']) ?></td>
+                                  <td><?= htmlspecialchars($user['name']) ?></td>
+                                  <td><?= htmlspecialchars($user['email_address']) ?></td>
+                                  <td><?= htmlspecialchars($user['username']) ?></td>
+                                  <td>
+                                      <button class="action-btn edit-btn" onclick="openEditModal(
+                                          '<?= htmlspecialchars($user['faculty_id']) ?>',
+                                          '<?= htmlspecialchars($user['college']) ?>',
+                                          '<?= htmlspecialchars($user['name']) ?>',
+                                          '<?= htmlspecialchars($user['email_address']) ?>',
+                                          '<?= htmlspecialchars($user['username']) ?>'
+                                      )">
+                                          Edit
+                                      </button>
+                                      <button class="action-btn delete-btn" onclick="confirmDelete('<?= htmlspecialchars($user['faculty_id']) ?>')">
+                                          Delete
+                                      </button>
+                                  </td>
+                              </tr>
+                          <?php endwhile; ?>
+                      <?php else: ?>
+                          <tr>
+                              <td colspan="5" class="no-results">No users found</td>
+                          </tr>
+                      <?php endif; ?>
+                  </tbody>
+              </table>
+          </div>
+      </div>
+  </div>
+
+  <!-- ADD NEW USER MODAL -->
+  <div id="addModal" class="modal">
+      <div class="modal-content">
+          <h2>Add New Faculty User</h2>
+          <form id="addUserForm" method="POST">
+              <select name="faculty_id" required>
+                  <option value="">Select Faculty ID</option>
+                  <?php foreach ($available_faculty as $faculty_id): ?>
+                      <option value="<?= htmlspecialchars($faculty_id) ?>"><?= htmlspecialchars($faculty_id) ?></option>
+                  <?php endforeach; ?>
+                  <?php if (empty($available_faculty)): ?>
+                      <option value="" disabled>No available faculty IDs</option>
+                  <?php endif; ?>
+              </select>
+              <input type="hidden" name="college_id" value="<?= $current_college_id ?>">
+              <div class="college-display">College: <?= htmlspecialchars($current_college_name) ?></div>
+              <input type="text" name="username" placeholder="Username" required>
+              
+              <div class="password-container">
+                  <input type="password" name="password" id="password" placeholder="Password" required>
+                  <span class="toggle-password" onclick="togglePassword('password')">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                          <circle cx="12" cy="12" r="3"></circle>
+                      </svg>
+                  </span>
+              </div>
+              
+              <div class="password-container">
+                  <input type="password" name="confirm_password" id="confirm_password" placeholder="Confirm Password" required>
+                  <span class="toggle-password" onclick="togglePassword('confirm_password')">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                          <circle cx="12" cy="12" r="3"></circle>
+                      </svg>
+                  </span>
+              </div>
+              <small id="password-match-message" style="color: #dc3545; display: none;">Passwords do not match!</small>
+
+              <select name="role" required>
+                  <option value="">Select Role</option>
+                  <option value="Admin">Admin</option>
+                  <option value="Faculty">Faculty</option>
+                  <option value="Head">Head</option>
+              </select>
+
+              <div class="modal-buttons">
+                  <button type="button" class="cancel-btn" onclick="closeModal()">Cancel</button>
+                  <button type="submit" class="submit-btn">Add User</button>
+              </div>
+          </form>
+      </div>
+  </div>
+
+  <!-- EDIT USER MODAL -->
+  <div id="editModal" class="modal">
+      <div class="modal-content">
+          <h2>Edit User</h2>
+          <form id="editUserForm" method="POST">
+              <input type="text" name="faculty_id" id="edit_faculty_id" readonly>
+              <input type="hidden" name="college_id" value="<?= $current_college_id ?>">
+              <div class="college-display">College: <?= htmlspecialchars($current_college_name) ?></div>
+              <input type="text" name="name" id="edit_name" required>
+              <input type="email" name="email_address" id="edit_email" required>
+              <input type="text" name="username" id="edit_username">
+              <input type="password" name="password" placeholder="New Password (leave blank to keep current)">
+              
+              <div class="modal-buttons">
+                  <button type="button" class="cancel-btn" onclick="closeModal()">Cancel</button>
+                  <button type="submit" class="submit-btn">Update User</button>
+              </div>
+          </form>
+      </div>
+  </div>
+
+  <form id="deleteForm" method="POST" style="display:none;">
+      <input type="hidden" name="faculty_id" id="delete_faculty_id">
+  </form>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const savedTheme = localStorage.getItem('plpTheme') || 'light';
+      if (savedTheme === 'dark') {
+        document.body.classList.add('dark-theme');
+      }
+
+      const savedTextSize = localStorage.getItem('plpTextSize') || '100';
+      document.querySelector('html').style.fontSize = savedTextSize + '%';
+      
+      // Search functionality
+      document.getElementById('searchInput').addEventListener('keyup', function() {
+        const input = this.value.toLowerCase();
+        const rows = document.querySelectorAll('.user-table tbody tr');
+        
+        rows.forEach(row => {
+          const text = row.textContent.toLowerCase();
+          row.style.display = text.includes(input) ? '' : 'none';
+        });
+      });
+
+      // Reports dropdown functionality
+      document.getElementById('reportsDropdown').addEventListener('click', function(e) {
+        e.preventDefault();
+        const dropdown = this.parentElement;
+        const menu = dropdown.querySelector('.dropdown-menu');
+
+        if (menu.style.display === 'block') {
+          menu.style.display = 'none';
+        } else {
+          document.querySelectorAll('.dropdown-menu').forEach(item => {
+            if (item !== menu) item.style.display = 'none';
+          });
+          menu.style.display = 'block';
+        }
+      });
+
+      // Close dropdown when clicking outside
+      document.addEventListener('click', function(e) {
+        if (!e.target.closest('.dropdown')) {
+          document.querySelectorAll('.dropdown-menu').forEach(item => {
+            item.style.display = 'none';
+          });
+        }
+      });
+    });
+
+    function confirmLogout() {
+      if (confirm('Are you sure you want to logout?')) {
+        window.location.href = '../landing/index.php';
+      }
+    }
+  </script>
+  <script src="scripts.js"></script>
+  <script src="users.js"></script>
+  <?php if (isset($conn)) $conn->close(); ?>
+</body>
+</html>
