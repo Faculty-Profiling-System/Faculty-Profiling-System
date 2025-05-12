@@ -14,8 +14,8 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
-        if (newPassword.length < 10) {
-            alert('Password must be at least 10 characters long!');
+        if (newPassword.length < 8) {
+            alert('Password must be at least 8 characters long!');
             return;
         }
         

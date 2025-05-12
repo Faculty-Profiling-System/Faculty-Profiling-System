@@ -649,4 +649,21 @@ body.dark-theme #employment-type {
     padding: 2rem;
     margin-left: 250px;
     margin-top: 60px;
+}
+
+/* Dark theme for credential items */
+body.dark-theme .credential-item {
+    background: #00723F;
+    border: 1px solid #333;
+    color: #ffffff;
+}
+
+body.dark-theme .credential-details h3,
+body.dark-theme .credential-meta {
+    color: #ffffff;
+}
+
+body.dark-theme .credential-icon {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
 } 

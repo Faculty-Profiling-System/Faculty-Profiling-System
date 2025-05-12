@@ -80,12 +80,13 @@
 }
 
 #employment-type {
-    background-color: #a5e7c9;
-    color: #007c2c;
-    padding: 3px 10px;
+    background-color: #e6f7ee;
+    color: #00723F;
+    padding: 5px 15px;
     border-radius: 20px;
     display: inline-block;
     font-size: 14px;
+    font-weight: 600;
 }
 
 /* Profile Sections */

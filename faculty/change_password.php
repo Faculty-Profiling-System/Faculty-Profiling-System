@@ -18,6 +18,12 @@ $faculty_id = $_SESSION['faculty_id'];
 $current_password = $_POST['current_password'];
 $new_password = $_POST['new_password'];
 
+// Validate password length
+if (strlen($new_password) < 8) {
+    echo json_encode(['status' => 'error', 'message' => 'Password must be at least 8 characters long!']);
+    exit;
+}
+
 // Verify current password
 $stmt = $conn->prepare("SELECT password_hash FROM users WHERE faculty_id = ?");
 $stmt->bind_param("s", $faculty_id);
