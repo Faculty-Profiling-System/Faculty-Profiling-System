@@ -5,6 +5,7 @@ $password = "";
 $dbname = "finalproj";
 
 // Create connection
+global $conn;
 $conn = new mysqli($servername, $username, $password, $dbname);
 
 // Check connection

@@ -8,6 +8,8 @@ session_start();
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Settings | Admin</title>
   <link rel="stylesheet" href="../css/admin_style.css" />
+  <link rel="stylesheet" href="../css/help.css?v=<?php echo time(); ?>">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <script>
     // Initialize states
     let currentSize = parseInt(localStorage.getItem('plpTextSize')) || 100;
@@ -71,11 +73,8 @@ session_start();
       display: none;
       position: relative;
       left: 0;
-      background-color: #015f22;
       min-width: 200px;
       z-index: 1000;
-      border: 1px solid #024117;
-      box-shadow: 0px 8px 16px rgba(0,0,0,0.2);
       padding: 0;
       margin: 0;
     }
@@ -95,7 +94,13 @@ session_start();
     }
     
     nav ul li.dropdown .dropdown-menu a:hover {
-      background-color: #04b032;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    border-right: 3px solid #04b032; /* Color accent */
+    border-left: 3px solid #04b032; /* Color accent */
+    margin-right: 15px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    background-color: #0e4301;
     }
 
     /* Dark theme */
@@ -148,9 +153,9 @@ session_start();
           <li><a href="college_management.php"><img src="../images/department.png" alt="Department Icon" class="menu-icon">DEPARTMENT MANAGEMENT</a></li>
           <li><a href="user.php"><img src="../images/user.png" alt="User Icon" class="menu-icon">USER MANAGEMENT</a></li>
           <li class="dropdown">
-            <a href="javascript:void(0)" id="reportsDropdown"><img src="../images/reports.png" alt="Reports Icon" class="menu-icon">REPORTS</a>
+            <a href="javascript:void(0)" id="reportsDropdown"><img src="../images/reports.png" alt="Reports Icon" class="menu-icon">REPORTS<img src="../images/dropdown.png" alt="Dropdown Icon" class="down-icon"></a>
             <ul class="dropdown-menu">
-              <li><a href="files_report.php" class="active">CREDENTIAL FILES</a></li>
+              <li><a href="files_report.php">CREDENTIAL FILES</a></li>
               <li><a href="logs_report.php">USER LOGS</a></li>
             </ul>
           </li>
@@ -249,6 +254,64 @@ session_start();
     </style>
   </div>
 
+        <!-- Help Button -->
+    <div class="help-button" onclick="toggleHelpPopout()">
+        <i class="fas fa-question"></i>
+    </div>
+
+    <!-- Main Help Popout -->
+    <div id="helpPopout" class="popout">
+        <div class="popout-header">
+            <h3>Need Help?</h3>
+            <span class="popout-close" onclick="closeHelpPopout()">&times;</span>
+        </div>
+        <div class="help-option" onclick="openFaqPopout()">
+            <i class="fas fa-question-circle"></i> FAQ's
+        </div>
+        <div class="help-option" onclick="openContactPopout()">
+            <i class="fas fa-headset"></i> Still need help?
+        </div>
+    </div>
+
+    <!-- FAQ Popout -->
+    <div id="faqPopout" class="content-popout">
+        <div class="popout-header">
+            <h3>Frequently Asked Questions</h3>
+            <span class="popout-close" onclick="closeFaqPopout()">&times;</span>
+        </div>
+        <div class="faq-item">
+            <div class="faq-question">Q: How do I update my profile information?</div>
+            <p>A: Go to the Profile section and click on the "Edit Profile" button.</p>
+        </div>
+        <div class="faq-item">
+            <div class="faq-question">Q: How do I upload my teaching schedule?</div>
+            <p>A: Navigate to Teaching Load section and use the "Upload Schedule" button.</p>
+        </div>
+        <div class="faq-item">
+            <div class="faq-question">Q: What file formats are accepted?</div>
+            <p>A: We accept PDF, JPG, and PNG files for credential uploads.</p>
+        </div>
+        <div class="faq-item">
+            <div class="faq-question">Q: How do I change my password?</div>
+            <p>A: Go to Settings and use the "Change Password" option.</p>
+        </div>
+    </div>
+
+    <!-- Contact Popout -->
+    <div id="contactPopout" class="content-popout">
+        <div class="popout-header">
+            <h3>Contact Support</h3>
+            <span class="popout-close" onclick="closeContactPopout()">&times;</span>
+        </div>
+        <p>If you need further assistance:</p>
+        <div class="contact-info">
+            <p><i class="fas fa-envelope"></i> support@plpasig.edu.ph</p>
+            <p><i class="fas fa-phone"></i> +63 2 123 4567</p>
+            <p><i class="fas fa-clock"></i> Mon-Fri, 8:00 AM - 5:00 PM</p>
+            <p><i class="fas fa-map-marker-alt"></i> Admin Building, Room 101</p>
+        </div>
+    </div>
+
   <script src="scripts.js"></script>
   <script>
         // Reports dropdown functionality
@@ -288,5 +351,6 @@ session_start();
       }
     }
   </script>
+  <script src="../faculty/help.js"></script>
 </body>
 </html> 

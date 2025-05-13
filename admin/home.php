@@ -1,5 +1,29 @@
 <?php
 session_start();
+require_once '../db_connection.php'; // Your database connection file
+
+// Get admin info
+$adminName = "ADMIN";
+if (isset($_SESSION['user_id'])) {
+    $stmt = $conn->prepare("SELECT username FROM users WHERE user_id = ?");
+    $stmt->bind_param("i", $_SESSION['user_id']); // "i" means integer
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $user = $result->fetch_assoc();
+    $adminName = strtoupper(str_replace('_', ' ', $user['username']));
+}
+
+// Get college_id of the logged in admin
+// Get college_id of the logged in admin
+$college_id = null;
+if (isset($_SESSION['user_id'])) {
+    $stmt = $conn->prepare("SELECT college_id FROM users WHERE user_id = ?");
+    $stmt->bind_param("i", $_SESSION['user_id']); // "i" for integer
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $user = $result->fetch_assoc();
+    $college_id = $user['college_id'];
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -8,6 +32,8 @@ session_start();
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Home | Admin</title>
   <link rel="stylesheet" href="../css/admin_style.css" />
+  <link rel="stylesheet" href="../css/help.css?v=<?php echo time(); ?>">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <script>
     // Check and apply theme and text size on page load
     document.addEventListener('DOMContentLoaded', function() {
@@ -38,34 +64,6 @@ session_start();
     .section-title { font-size: 1.5em; }
     .view-link { font-size: 0.9em; }
 
-    /* Stats Grid Styles */
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      gap: 1rem;
-      padding: 1rem;
-      margin-bottom: 2rem;
-    }
-
-    .stat-card {
-      background: #ffffff;
-      border-radius: 8px;
-      padding: 1.5rem;
-      text-align: center;
-      transition: all 0.3s ease;
-    }
-
-    .stat-card h3 {
-      margin: 0 0 1rem 0;
-      font-size: 1.1em;
-      font-weight: bold;
-    }
-
-    .stat-value {
-      font-size: 2em;
-      font-weight: bold;
-    }
-
             /* Dropdown Styles */
         nav ul li.dropdown {
       position: relative;
@@ -75,11 +73,8 @@ session_start();
       display: none;
       position: relative;
       left: 0;
-      background-color: #015f22;
       min-width: 200px;
       z-index: 1000;
-      border: 1px solid #024117;
-      box-shadow: 0px 8px 16px rgba(0,0,0,0.2);
       padding: 0;
       margin: 0;
     }
@@ -99,8 +94,15 @@ session_start();
     }
     
     nav ul li.dropdown .dropdown-menu a:hover {
-      background-color: #04b032;
-    }
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    border-right: 3px solid #04b032; /* Color accent */
+    border-left: 3px solid #04b032; /* Color accent */
+    margin-right: 15px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    background-color: #0e4301;
+}
+
 
     /* Dark theme */
     body.dark-theme {
@@ -173,6 +175,7 @@ session_start();
       text-decoration: underline;
     }
 
+    /* Responsive adjustments */
     @media (max-width: 768px) {
       .stats-grid {
         grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -204,7 +207,7 @@ session_start();
           <li><a href="college_management.php"><img src="../images/department.png" alt="Department Icon" class="menu-icon">COLLEGE MANAGEMENT</a></li>
           <li><a href="user.php"><img src="../images/user.png" alt="User Icon" class="menu-icon">USER MANAGEMENT</a></li>
           <li class="dropdown">
-            <a href="javascript:void(0)" id="reportsDropdown"><img src="../images/reports.png" alt="Reports Icon" class="menu-icon">REPORTS</a>
+            <a href="javascript:void(0)" id="reportsDropdown"><img src="../images/reports.png" alt="Reports Icon" class="menu-icon">REPORTS<img src="../images/dropdown.png" alt="Dropdown Icon" class="down-icon"></a>
             <ul class="dropdown-menu">
               <li><a href="files_report.php">CREDENTIAL FILES</a></li>
               <li><a href="logs_report.php">USER LOGS</a></li>
@@ -220,35 +223,243 @@ session_start();
     </div>
   </div>
 
-  <div class="dashboard-container">
+  <div class="admin-dashboard-container">
     <header>
       <h1>Admin Home</h1>
-      <div class="welcome-message">Welcome, <span id="adminName"></span>!</div>
+      <div class="welcome-message">WELCOME BACK, <span id="adminName"><?php echo $adminName; ?></span>!</div>
     </header>
 
     <div class="stats-grid" id="statsContainer">
-      <!-- Stats will be populated by JavaScript -->
+      <?php
+// Get faculty stats for the admin's college
+$stats = [
+    'total_faculty' => 0,
+    'total_female' => 0,
+    'total_male' => 0,
+    'full_time' => 0,
+    'part_time' => 0,
+    'masters_degrees' => 0,
+    'doctoral_degrees' => 0
+];
+
+if ($college_id) {
+    // Total faculty
+    $stmt = $conn->prepare("SELECT COUNT(*) FROM faculty WHERE college_id = ?");
+    $stmt->bind_param("i", $college_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $row = $result->fetch_row();
+    $stats['total_faculty'] = $row[0];
+
+    // Gender counts
+    $stmt = $conn->prepare("SELECT gender, COUNT(*) FROM faculty WHERE college_id = ? GROUP BY gender");
+    $stmt->bind_param("i", $college_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    while ($row = $result->fetch_assoc()) {
+        if ($row['gender'] === 'Female') $stats['total_female'] = $row['COUNT(*)'];
+        if ($row['gender'] === 'Male') $stats['total_male'] = $row['COUNT(*)'];
+    }
+
+    // Employment type
+    $stmt = $conn->prepare("SELECT employment_type, COUNT(*) FROM faculty WHERE college_id = ? GROUP BY employment_type");
+    $stmt->bind_param("i", $college_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    while ($row = $result->fetch_assoc()) {
+        if ($row['employment_type'] === 'Full-Time') $stats['full_time'] = $row['COUNT(*)'];
+        if ($row['employment_type'] === 'Part-Time') $stats['part_time'] = $row['COUNT(*)'];
+    }
+
+    // Specialization
+    $stmt = $conn->prepare("SELECT specialization, COUNT(*) FROM faculty WHERE college_id = ? GROUP BY specialization");
+    $stmt->bind_param("i", $college_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    while ($row = $result->fetch_assoc()) {
+        if ($row['specialization'] === 'Master') $stats['masters_degrees'] = $row['COUNT(*)'];
+        if ($row['specialization'] === 'Doctorate') $stats['doctoral_degrees'] = $row['COUNT(*)'];
+    }
+}
+      ?>
+      <div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-header">
+      <img src="../images/totalfaculty.png" alt="Faculty" class="stat-icon">
+      <h3>Total Faculty Members</h3>
     </div>
+    <div class="value"><?php echo $stats['total_faculty']; ?></div>
+  </div>
+  
+  <div class="stat-card">
+    <div class="stat-header">
+      <img src="../images/female.png" alt="Female" class="stat-icon">
+      <h3>Total Female</h3> 
+    </div>
+    <div class="value"><?php echo $stats['total_female']; ?></div>
+  </div>
+  
+  <div class="stat-card">
+    <div class="stat-header">
+      <img src="../images/male.png" alt="Male" class="stat-icon">
+      <h3>Total Male</h3>
+    </div>
+    <div class="value"><?php echo $stats['total_male']; ?></div>
+  </div>
+  
+  <div class="stat-card">
+    <div class="stat-header">
+      <img src="../images/emptype.png" alt="Full-Time" class="stat-icon">
+      <h3>Full-Time</h3>
+    </div>
+    <div class="value"><?php echo $stats['full_time']; ?></div>
+  </div>
+  
+  <div class="stat-card">
+    <div class="stat-header">
+      <img src="../images/emptype.png" alt="Part-Time" class="stat-icon">
+      <h3>Part-Time</h3>
+    </div>
+    <div class="value"><?php echo $stats['part_time']; ?></div>
+  </div>
+  
+  <div class="stat-card">
+    <div class="stat-header">
+      <img src="../images/degree.png" alt="Master's" class="stat-icon">
+      <h3>Master's Degree Holder</h3>
+    </div>
+    <div class="value"><?php echo $stats['masters_degrees']; ?></div>
+  </div>
+  
+  <div class="stat-card">
+    <div class="stat-header">
+      <img src="../images/degree.png" alt="Doctoral" class="stat-icon">
+      <h3>Doctoral Degree Holder</h3>
+    </div>
+    <div class="value"><?php echo $stats['doctoral_degrees']; ?></div>
+  </div>
+</div>
 
-    <h2 class="section-title">Recent Credential & Accreditation Status</h2>
+    <h2 class="section-title">Pending Credentials and Recent Faculty Status</h2>
 
-
+    <div class="credentials-section">
       <div class="admin-credentials-card">
-        <h3><img src="../images/pendingdoc.png" alt="pendingdoc-icon" class="preview-icon">Pending Document Verifications</h3>
-        <ul class="credentials-list" id="pendingDocumentsList">
+        <h3><img src="../images/pendingdoc.png" alt="pendingdoc-icon" class="preview-icon">Pending Credentials for Verification</h3>
+        <ul class="credentials-list">
+          <?php
+          // Get pending credentials count
+          $pendingCredentials = 0;
+          if ($college_id) {
+              $stmt = $conn->prepare("SELECT COUNT(*) FROM credentials c 
+                                    JOIN faculty f ON c.faculty_id = f.faculty_id 
+                                    WHERE f.college_id = ? AND c.status = 'Pending'");
+              $stmt->bind_param("i", $college_id);
+              $stmt->execute();
+              $result = $stmt->get_result();
+              $row = $result->fetch_row();
+              $pendingCredentials = $row[0];
+          }
+          ?>
+          <li>Total Pending: <?php echo $pendingCredentials; ?></li>
+          <li> </li>
+          <li> </li>
         </ul>
-        <a href="pending_documents.php" class="view-link">View Pending Documents</a>
+        <a href="files_report.php" class="view-link">View All Pending Documents</a>
       </div>
 
       <div class="admin-credentials-card">
-        <h3><img src="../images/accredit.png" alt="accredit-icon" class="preview-icon">Under Review for Accreditation</h3>
-        <ul class="credentials-list" id="accreditationReviewList">
+        <h3><img src="../images/status.png" alt="status-icon" class="preview-icon">Faculty Status</h3>
+        <ul class="credentials-list">
+          <?php
+          // Get active/inactive faculty counts
+          $activeFaculty = 0;
+          $inactiveFaculty = 0;
+          if ($college_id) {
+              // Count active faculty (matches previous MySQLi conversions)
+              $stmt = $conn->prepare("SELECT COUNT(*) FROM faculty WHERE college_id = ?");
+              $stmt->bind_param("i", $college_id);  // "i" for integer parameter
+              $stmt->execute();
+              $result = $stmt->get_result();
+              $row = $result->fetch_row();
+              $activeFaculty = $row[0];
+              
+              // Count inactive faculty (if you implement this later)
+              $stmt = $conn->prepare("SELECT COUNT(*) FROM faculty WHERE college_id = ? AND status = 'Inactive'");
+              $stmt->bind_param("i", $college_id);
+              $stmt->execute();
+              $result = $stmt->get_result();
+              $row = $result->fetch_row();
+              $inactiveFaculty = $row[0];
+          }
+          ?>
+          <li>Currently Active Faculty: <?php echo $activeFaculty; ?></li>
+          <li>Currently Inactive Faculty: <?php echo $inactiveFaculty; ?></li>
         </ul>
-        <a href="accreditation_review.php" class="view-link">View Review for Accreditation</a>
+        <a href="college_management.php" class="view-link">View All Faculty Status</a>
       </div>
     </div>
   </div>
+
+      <!-- Help Button -->
+    <div class="help-button" onclick="toggleHelpPopout()">
+        <i class="fas fa-question"></i>
+    </div>
+
+    <!-- Main Help Popout -->
+    <div id="helpPopout" class="popout">
+        <div class="popout-header">
+            <h3>Need Help?</h3>
+            <span class="popout-close" onclick="closeHelpPopout()">&times;</span>
+        </div>
+        <div class="help-option" onclick="openFaqPopout()">
+            <i class="fas fa-question-circle"></i> FAQ's
+        </div>
+        <div class="help-option" onclick="openContactPopout()">
+            <i class="fas fa-headset"></i> Still need help?
+        </div>
+    </div>
+
+    <!-- FAQ Popout -->
+    <div id="faqPopout" class="content-popout">
+        <div class="popout-header">
+            <h3>Frequently Asked Questions</h3>
+            <span class="popout-close" onclick="closeFaqPopout()">&times;</span>
+        </div>
+        <div class="faq-item">
+            <div class="faq-question">Q: How do I update my profile information?</div>
+            <p>A: Go to the Profile section and click on the "Edit Profile" button.</p>
+        </div>
+        <div class="faq-item">
+            <div class="faq-question">Q: How do I upload my teaching schedule?</div>
+            <p>A: Navigate to Teaching Load section and use the "Upload Schedule" button.</p>
+        </div>
+        <div class="faq-item">
+            <div class="faq-question">Q: What file formats are accepted?</div>
+            <p>A: We accept PDF, JPG, and PNG files for credential uploads.</p>
+        </div>
+        <div class="faq-item">
+            <div class="faq-question">Q: How do I change my password?</div>
+            <p>A: Go to Settings and use the "Change Password" option.</p>
+        </div>
+    </div>
+
+    <!-- Contact Popout -->
+    <div id="contactPopout" class="content-popout">
+        <div class="popout-header">
+            <h3>Contact Support</h3>
+            <span class="popout-close" onclick="closeContactPopout()">&times;</span>
+        </div>
+        <p>If you need further assistance:</p>
+        <div class="contact-info">
+            <p><i class="fas fa-envelope"></i> support@plpasig.edu.ph</p>
+            <p><i class="fas fa-phone"></i> +63 2 123 4567</p>
+            <p><i class="fas fa-clock"></i> Mon-Fri, 8:00 AM - 5:00 PM</p>
+            <p><i class="fas fa-map-marker-alt"></i> Admin Building, Room 101</p>
+        </div>
+    </div>
+
   <script>
+        // Reports dropdown functionality
         document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('reportsDropdown').addEventListener('click', function(e) {
       e.preventDefault();
@@ -285,7 +496,37 @@ session_start();
         window.location.href = '../landing/index.php';
       }
     }
+
+// ====== MENU TOGGLE ==========
+function toggleMenu() {
+  const menu = document.getElementById('menu');
+  const body = document.body;
+  const bar1 = document.getElementById('bar1');
+  const bar2 = document.getElementById('bar2');
+  const bar3 = document.getElementById('bar3');
+
+  if (!bar1.style.transform) {
+    bar1.style.transform = 'rotate(0) translate(0)';
+    bar2.style.opacity = '1';
+    bar3.style.transform = 'rotate(0) translate(0)';
+  }
+
+  if (menu.classList.contains('active')) {
+    menu.classList.remove('active');
+    body.classList.remove('menu-open');
+    bar1.style.transform = 'rotate(0) translate(0)';
+    bar2.style.opacity = '1';
+    bar3.style.transform = 'rotate(0) translate(0)';
+  } else {
+    menu.classList.add('active');
+    body.classList.add('menu-open');
+    bar1.style.transform = 'rotate(45deg) translate(5px, 5px)';
+    bar2.style.opacity = '0';
+    bar3.style.transform = 'rotate(-45deg) translate(7px, -6px)';
+  }
+}
   </script>
+    <script src="../faculty/help.js"></script>
     <script src="scripts.js"></script>
 </body>
 </html> 
