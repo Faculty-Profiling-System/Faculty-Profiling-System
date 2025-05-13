@@ -157,6 +157,22 @@
     transform: translateY(-1px);
 }
 
+.custom-alert {
+    display: none;
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+    padding: 15px;
+    margin-top: 10px;
+    border-radius: 5px;
+    font-size: 14px;
+}
+.custom-alert a {
+    color: #721c24;
+    font-weight: bold;
+    text-decoration: underline;
+}
+
 /* Modal Styling */
 .modal {
     display: none;

@@ -8,27 +8,24 @@ function confirmLogout() {
     document.getElementById('addModal').style.display = 'block';
   }
 
-  function openEditModal(id, college_id, name, email, username) {
-      document.getElementById('edit_faculty_id').value = id;
-      document.getElementById('edit_name').value = name;
-      document.getElementById('edit_email').value = email;
-      document.getElementById('edit_username').value = username;
+  function openEditModal(id, username) {
+        console.log('Opening edit modal for:', id, username); // Debug log
+        
+        // Set the form values
+        document.getElementById('edit_faculty_id').value = id;
+        document.getElementById('edit_username').value = username;
+        
+        // Reset password change fields
+        document.getElementById('new_password').value = '';
+        
+        // Show the modal
+        document.getElementById('editModal').style.display = 'block';
+    }
 
-      // Pre-select the current college_id in the dropdown
-      var collegeSelect = document.querySelector('[name="college_id"]');
-      for (var i = 0; i < collegeSelect.options.length; i++) {
-          if (collegeSelect.options[i].value == college_id) {
-              collegeSelect.options[i].selected = true;
-              break;
-          }
-      }
-
-      document.getElementById('editModal').style.display = 'block';
-  }
-
-  function closeModal() {
-    document.getElementById('addModal').style.display = 'none';
-  }
+    function closeModal() {
+        document.getElementById('addModal').style.display = 'none';
+        document.getElementById('editModal').style.display = 'none';
+    }
 
   function confirmDelete(id) {s
       if (confirm('Are you sure you want to delete this user?')) {
@@ -61,27 +58,28 @@ function confirmLogout() {
       const formData = new FormData(this);
       
       fetch('add_user.php', {
-          method: 'POST',
-          body: formData
-      })
-      .then(response => {
-          if (!response.ok) {
-              throw new Error('Network response was not ok');
-          }
-          return response.json(); // Parse as JSON
-      })
-      .then(data => {
-          if (data.status === 'success') {
-              alert(data.message);
-              window.location.reload(); // Reload the page
-          } else {
-              alert('Error: ' + data.message);
-          }
-      })
-      .catch(error => {
-          console.error('Error:', error);
-          alert('An error occurred: ' + error.message);
-      });
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.text())
+        .then(text => {
+            try {
+                const data = JSON.parse(text);
+                // success - work with data
+                if (data.status === 'success') {
+                    alert('User added successfully!');
+                } else {
+                    alert('Error: ' + (data.message || 'Unknown error'));
+                }
+            } catch (e) {
+                console.error('Server did not return valid JSON:', text);
+                alert('Server error:\n' + text);  // Show raw error from PHP
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred: ' + error.message);
+        });
   });
 
   document.getElementById('editUserForm').addEventListener('submit', function(e) {
@@ -107,6 +105,7 @@ function confirmLogout() {
           alert("An unexpected error occurred.");
       });
   });
+  
   // Password toggle functionality
   function togglePassword(fieldId) {
       const field = document.getElementById(fieldId);
@@ -148,3 +147,30 @@ function confirmLogout() {
           message.style.display = 'none';
       }
   });
+
+  function validateFacultyID() {
+    var facultyId = document.getElementById('faculty_id').value;
+
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", "check_faculty_id.php", true);
+    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState == 4 && xhr.status == 200) {
+            var response = xhr.responseText.trim();
+
+            if (response === "found") {
+                document.getElementById('faculty-id-error').style.display = 'none';
+                // Proceed with form submission or next step
+            } else if (response === "not_found") {
+                document.getElementById('faculty-id').innerText = facultyId;
+                document.getElementById('faculty-id-error').style.display = 'block';
+            } else {
+                alert("An unexpected error occurred.");
+            }
+        }
+    };
+
+    xhr.send("faculty_id=" + encodeURIComponent(facultyId));
+    return false; // Prevent default form submission
+  }

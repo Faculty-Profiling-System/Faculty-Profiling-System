@@ -46,7 +46,7 @@ while ($row = $available_faculty_result->fetch_assoc()) {
 }
 
 // Fetch users from the same college
-$sql = "SELECT * FROM vw_faculty_users WHERE college = ? ORDER BY name";
+$sql = "SELECT * FROM vw_faculty_users WHERE college_name = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("s", $current_college_name);
 $stmt->execute();
@@ -138,15 +138,12 @@ $users = $stmt->get_result();
                           <?php while ($user = $users->fetch_assoc()): ?>
                               <tr>
                                   <td><?= htmlspecialchars($user['faculty_id']) ?></td>
-                                  <td><?= htmlspecialchars($user['name']) ?></td>
-                                  <td><?= htmlspecialchars($user['email_address']) ?></td>
+                                  <td><?= htmlspecialchars($user['full_name']) ?></td>
+                                  <td><?= htmlspecialchars($user['email']) ?></td>
                                   <td><?= htmlspecialchars($user['username']) ?></td>
                                   <td>
                                       <button class="action-btn edit-btn" onclick="openEditModal(
                                           '<?= htmlspecialchars($user['faculty_id']) ?>',
-                                          '<?= htmlspecialchars($user['college']) ?>',
-                                          '<?= htmlspecialchars($user['name']) ?>',
-                                          '<?= htmlspecialchars($user['email_address']) ?>',
                                           '<?= htmlspecialchars($user['username']) ?>'
                                       )">
                                           Edit
@@ -172,16 +169,8 @@ $users = $stmt->get_result();
   <div id="addModal" class="modal">
       <div class="modal-content">
           <h2>Add New Faculty User</h2>
-          <form id="addUserForm" method="POST">
-              <select name="faculty_id" required>
-                  <option value="">Select Faculty ID</option>
-                  <?php foreach ($available_faculty as $faculty_id): ?>
-                      <option value="<?= htmlspecialchars($faculty_id) ?>"><?= htmlspecialchars($faculty_id) ?></option>
-                  <?php endforeach; ?>
-                  <?php if (empty($available_faculty)): ?>
-                      <option value="" disabled>No available faculty IDs</option>
-                  <?php endif; ?>
-              </select>
+          <form id="addUserForm" method="POST" onsubmit="return validateFacultyID()">
+              <input type="text" name="faculty_id" id="faculty_id" placeholder="Enter Faculty ID" required>
               <input type="hidden" name="college_id" value="<?= $current_college_id ?>">
               <div class="college-display">College: <?= htmlspecialchars($current_college_name) ?></div>
               <input type="text" name="username" placeholder="Username" required>
@@ -219,28 +208,33 @@ $users = $stmt->get_result();
                   <button type="submit" class="submit-btn">Add User</button>
               </div>
           </form>
+          <div id="faculty-id-error" class="custom-alert">
+              There is no existing faculty with this Faculty ID. You need to add a faculty with the Faculty ID 
+              <span id="faculty-id" style="font-weight: bold;"></span> first 
+              <a href="http://localhost/Faculty-Profiling-System/admin/college_management.php">here</a>.
+          </div>
       </div>
   </div>
 
   <!-- EDIT USER MODAL -->
   <div id="editModal" class="modal">
-      <div class="modal-content">
-          <h2>Edit User</h2>
-          <form id="editUserForm" method="POST">
-              <input type="text" name="faculty_id" id="edit_faculty_id" readonly>
-              <input type="hidden" name="college_id" value="<?= $current_college_id ?>">
-              <div class="college-display">College: <?= htmlspecialchars($current_college_name) ?></div>
-              <input type="text" name="name" id="edit_name" required>
-              <input type="email" name="email_address" id="edit_email" required>
-              <input type="text" name="username" id="edit_username">
-              <input type="password" name="password" placeholder="New Password (leave blank to keep current)">
-              
-              <div class="modal-buttons">
-                  <button type="button" class="cancel-btn" onclick="closeModal()">Cancel</button>
-                  <button type="submit" class="submit-btn">Update User</button>
-              </div>
-          </form>
-      </div>
+    <div class="modal-content">
+        <h2>Edit User</h2>
+        <form id="editUserForm" method="POST" onsubmit="return handlePasswordChange()">
+            <input type="text" name="faculty_id" id="edit_faculty_id" readonly>
+            <input type="hidden" name="college_id" value="<?= $current_college_id ?>">
+            <div class="college-display">College: <?= htmlspecialchars($current_college_name) ?></div>
+            
+            <input type="text" name="username" id="edit_username" required>
+
+            <input type="password" name="new_password" id="new_password" placeholder="Provide a temporary password">
+
+            <div class="modal-buttons">
+                <button type="button" class="cancel-btn" onclick="closeModal()">Cancel</button>
+                <button type="submit" class="submit-btn">Update User</button>
+            </div>
+        </form>
+    </div>
   </div>
 
   <form id="deleteForm" method="POST" style="display:none;">
