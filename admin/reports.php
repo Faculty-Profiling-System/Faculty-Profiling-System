@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Admin | PLP Faculty Profiling System</title>
-  <link rel="stylesheet" href="../css/admin_style.css" />
+  <link rel="stylesheet" href="../css/admin_style.css?v=<?php echo time(); ?>" />
   <link rel="stylesheet" href="../css/help.css?v=<?php echo time(); ?>">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <style>
@@ -137,7 +137,7 @@
     }
   }
 </script>
-<script src="scripts.js"></script>
-    <script src="../faculty/help.js"></script>
+<script src="scripts.js?v=<?php echo time(); ?>"></script>
+    <script src="../faculty/help.js?v=<?php echo time(); ?>"></script>
 </body>
 </html>
