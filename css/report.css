@@ -1,0 +1,157 @@
+/* report.css - Optimized styles for report pages */
+.report-header h1 {
+  color: #007c2c;
+  margin-bottom: 7px;
+}
+
+.report-header h3 {
+  font-size: 23px;
+  margin-top: 2px;
+}
+
+.report-container {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  margin: 20px auto;
+  max-width: 1500px;
+}
+
+.report-controls {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.filter-box {
+  display: flex;
+  gap: 10px;
+}
+
+.filter-box select {
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.report-table {
+    width: 100%;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin-bottom: 20px;
+    table-layout: auto;
+    overflow: hidden;
+}
+
+.report-table th, 
+.report-table td {
+  padding: 12px 15px;
+  border-bottom: 1px solid #ddd;
+}
+
+.report-table th {
+  background-color: #007c2c;
+  text-align: left;
+  color: white;
+}
+
+.report-table tr:hover {
+  background-color: #f5f5f5;
+}
+
+.view-file {
+  color: #007c2c;
+  font-weight: bold;
+}
+
+.view-file:hover {
+  text-decoration: underline;
+}
+
+.report-container button {
+  padding: 8px 15px;
+  background-color: #007c2c;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+}
+
+.actions button {
+  padding: 6px 12px;
+}
+
+.actions .approve-btn {
+  background-color: #28a745;
+}
+
+.actions .approve-btn:hover {
+  background-color: #218838;
+}
+
+.actions .reject-btn {
+  background-color: #dc3545;
+}
+
+.actions .reject-btn:hover {
+  background-color: #c82333;
+}
+
+/* Dropdown Styles */
+nav ul li.dropdown {
+    position: relative;
+}
+
+nav ul li.dropdown .dropdown-menu {
+    display: none;
+    position: relative;
+    left: 0;
+    background-color: #015f22;
+    min-width: 200px;
+    z-index: 1000;
+    border: 1px solid #024117;
+    box-shadow: 0px 8px 16px rgba(0,0,0,0.2);
+    padding: 0;
+    margin: 0;
+}
+
+nav ul li.dropdown .dropdown-menu li {
+    padding: 0;
+    list-style: none;
+}
+
+nav ul li.dropdown .dropdown-menu a {
+    color: white;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+    font-size: 14px;
+    font-family: 'Trebuchet MS';
+}
+
+nav ul li.dropdown .dropdown-menu a:hover {
+    background-color: #04b032;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .report-controls {
+    flex-direction: column;
+  }
+  
+  .report-table {
+    display: block;
+    overflow-x: auto;
+  }
+}

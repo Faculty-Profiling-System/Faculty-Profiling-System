@@ -1,0 +1,236 @@
+/* Main container styles */
+.faculty-management-container {
+    background-color: #fff;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    margin: 2rem auto;
+    max-width: 98%;
+}
+
+.page-header h1 {
+    color: #187436;
+    font-size: 32px;
+    margin-bottom: 20px;
+}
+
+table {
+    width: 100%;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin-bottom: 20px;
+    table-layout: auto;
+    overflow: hidden;
+}
+
+th, td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+    white-space: nowrap;
+}
+
+
+th {
+    background-color: #187436;
+    color: white;
+    font-weight: bold;
+    position: sticky;
+    top: 0;
+}
+
+tbody tr {
+    transition: all 0.2s;
+}
+
+tbody tr:hover {
+    background-color: #dcede3;
+    transform: translateX(2px);
+}
+
+/* Status badge styles */
+.status-badge {
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.status-active {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.status-inactive {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+/* Action buttons */
+.action-btn {
+    padding: 5px 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    transition: all 0.3s;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.activate-btn {
+    background-color: #28a745;
+    color: white;
+}
+
+.activate-btn:hover {
+    background-color: #218838;
+}
+
+.deactivate-btn {
+    background-color: #dc3545;
+    color: white;
+}
+
+.deactivate-btn:hover {
+    background-color: #c82333;
+}
+
+/* Table controls */
+.table-controls {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    align-items: center;
+}
+
+.search-box {
+    position: relative;
+    width: 300px;
+}
+
+.search-box input {
+    width: 100%;
+    padding: 8px 15px 8px 35px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.search-box i {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #777;
+}
+
+/* Dropdown Styles */
+nav ul li.dropdown {
+    position: relative;
+}
+
+nav ul li.dropdown .dropdown-menu {
+    display: none;
+    position: relative;
+    left: 0;
+    background-color: #015f22;
+    min-width: 200px;
+    z-index: 1000;
+    border: 1px solid #024117;
+    box-shadow: 0px 8px 16px rgba(0,0,0,0.2);
+    padding: 0;
+    margin: 0;
+}
+
+nav ul li.dropdown .dropdown-menu li {
+    padding: 0;
+    list-style: none;
+}
+
+nav ul li.dropdown .dropdown-menu a {
+    color: white;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+    font-size: 14px;
+    font-family: 'Trebuchet MS';
+}
+
+nav ul li.dropdown .dropdown-menu a:hover {
+    background-color: #04b032;
+}
+
+/* Dark theme styles */
+body.dark-theme .card {
+    background: #2a2a2a;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+body.dark-theme .search-box input {
+    background-color: #333;
+    color: #f3f3f3;
+    border-color: #444;
+}
+
+body.dark-theme .search-box i {
+    color: #aaa;
+}
+
+body.dark-theme .page-header h1 {
+    color: #f3f3f3;
+}
+
+body.dark-theme table {
+    border-color: #444;
+}
+
+body.dark-theme th, 
+body.dark-theme td {
+    border-right: 1px solid #444;
+    border-bottom: 1px solid #444;
+}
+
+body.dark-theme th {
+    background-color: #333;
+}
+
+body.dark-theme tr {
+    background-color: #222;
+    color: #f3f3f3;
+}
+
+body.dark-theme tr:hover {
+    background-color: #333;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+    .faculty-management-container {
+        padding: 15px;
+    }
+    
+    table {
+        font-size: 14px;
+    }
+    
+    th, td {
+        padding: 8px 10px;
+    }
+}
+
+@media (max-width: 768px) {
+    .table-controls {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    
+    .search-box {
+        width: 100%;
+    }
+}
