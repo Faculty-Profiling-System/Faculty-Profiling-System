@@ -283,7 +283,7 @@ if (isset($_SESSION['faculty_id'])) {
             window.location.href = '../landing/index.php';
         }}
     </script>
-    <script src="help.js"></script>
-    <script src="../scripts.js"></script>
+    <script src="help.js?v=<?php echo time(); ?>"></script>
+    <script src="../scripts.js?v=<?php echo time(); ?>"></script>
 </body>
 </html>

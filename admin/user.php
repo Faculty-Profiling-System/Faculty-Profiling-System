@@ -62,48 +62,6 @@ $users = $stmt->get_result();
   <link rel="stylesheet" href="../css/admin_style.css?v=<?php echo time(); ?>" />
   <link rel="stylesheet" href="../css/user.css?v=<?php echo time(); ?>" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
-  <link rel="stylesheet" href="../css/help.css?v=<?php echo time(); ?>">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-                    /* Dropdown Styles */
-        nav ul li.dropdown {
-      position: relative;
-    }
-    
-    nav ul li.dropdown .dropdown-menu {
-      display: none;
-      position: relative;
-      left: 0;
-      min-width: 200px;
-      z-index: 1000;
-      padding: 0;
-      margin: 0;
-    }
-    
-    nav ul li.dropdown .dropdown-menu li {
-      padding: 0;
-      list-style: none;
-    }
-    
-    nav ul li.dropdown .dropdown-menu a {
-      color: white;
-      padding: 12px 16px;
-      text-decoration: none;
-      display: block;
-      font-size: 14px;
-      font-family: 'Trebuchet MS';
-    }
-    
-    nav ul li.dropdown .dropdown-menu a:hover {
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-    border-right: 3px solid #04b032; /* Color accent */
-    border-left: 3px solid #04b032; /* Color accent */
-    margin-right: 15px;
-    padding-top: 10px;
-    padding-bottom: 10px;
-    background-color: #0e4301;
-    }
-    </style>
 </head>
 <body>
   <div class="header">
@@ -129,7 +87,7 @@ $users = $stmt->get_result();
           <li><a href="college_management.php"><img src="../images/department.png" alt="Department Icon" class="menu-icon">COLLEGE MANAGEMENT</a></li>
           <li><a href="user.php" class="active"><img src="../images/user.png" alt="User Icon" class="menu-icon">USER MANAGEMENT</a></li>
           <li class="dropdown">
-            <a href="javascript:void(0)" id="reportsDropdown"><img src="../images/reports.png" alt="Reports Icon" class="menu-icon">REPORTS<img src="../images/dropdown.png" alt="Dropdown Icon" class="down-icon"></a>
+            <a href="javascript:void(0)" id="reportsDropdown"><img src="../images/reports.png" alt="Reports Icon" class="menu-icon">REPORTS</a>
             <ul class="dropdown-menu">
               <li><a href="files_report.php">CREDENTIAL FILES</a></li>
               <li><a href="logs_report.php">USER LOGS</a></li>
@@ -172,27 +130,37 @@ $users = $stmt->get_result();
                           <th>Name</th>
                           <th>Email</th>
                           <th>Username</th>
+                          <th>Status</th>
                           <th>Actions</th>
                       </tr>
                   </thead>
                   <tbody>
                       <?php if ($users->num_rows > 0): ?>
-                          <?php while ($user = $users->fetch_assoc()): ?>
+                          <?php while ($user = $users->fetch_assoc()): 
+                            $statusClass = $user['status'] === 'Active' ? 'status-active' : 'status-inactive'; ?>
                               <tr>
                                   <td><?= htmlspecialchars($user['faculty_id']) ?></td>
                                   <td><?= htmlspecialchars($user['full_name']) ?></td>
                                   <td><?= htmlspecialchars($user['email']) ?></td>
                                   <td><?= htmlspecialchars($user['username']) ?></td>
                                   <td>
+                                    <span class="status-badge <?= $statusClass ?>">
+                                      <?= htmlspecialchars($user['status']) ?>
+                                    </span>
+                                  </td>
+                                  <td>
+                                    <?php if ($user['status'] === 'Active'): ?>
                                       <button class="action-btn edit-btn" onclick="openEditModal(
                                           '<?= htmlspecialchars($user['faculty_id']) ?>',
                                           '<?= htmlspecialchars($user['username']) ?>'
                                       )">
                                           Edit
                                       </button>
-                                      <button class="action-btn delete-btn" onclick="confirmDelete('<?= htmlspecialchars($user['faculty_id']) ?>')">
-                                          Delete
+                                    <?php else: ?>
+                                      <button class="action-btn edit-btn" disabled style="opacity: 0.5; cursor: not-allowed;">
+                                          Edit
                                       </button>
+                                    <?php endif; ?>
                                   </td>
                               </tr>
                           <?php endwhile; ?>
@@ -260,86 +228,41 @@ $users = $stmt->get_result();
 
   <!-- EDIT USER MODAL -->
   <div id="editModal" class="modal">
-    <div class="modal-content">
-        <h2>Edit User</h2>
-        <form id="editUserForm" method="POST" onsubmit="return handlePasswordChange()">
-            <input type="text" name="faculty_id" id="edit_faculty_id" readonly>
-            <input type="hidden" name="college_id" value="<?= $current_college_id ?>">
-            <div class="college-display">College: <?= htmlspecialchars($current_college_name) ?></div>
-            
-            <input type="text" name="username" id="edit_username" required>
+      <div class="modal-content">
+          <h2>Edit User</h2>
+          <form id="editUserForm" method="POST">
+              <input type="text" name="faculty_id" id="edit_faculty_id" readonly>
+              <input type="hidden" name="college_id" value="<?= $current_college_id ?>">
+              <div class="college-display">College: <?= htmlspecialchars($current_college_name) ?></div>
+              
+              <input type="text" name="username" id="edit_username" required>
 
-            <input type="password" name="new_password" id="new_password" placeholder="Provide a temporary password">
+              <div class="password-container">
+                  <input type="password" name="new_password" id="new_password" placeholder="Click Generate Password button" readonly>
+                  <div class="password-buttons">
+                    <button type="button" class="generate-password-btn" onclick="generateRandomPassword()">
+                        <i class="fas fa-key"></i> Generate Password
+                    </button>
+                    <button type="button" class="clear-password-btn" onclick="clearPassword()">
+                        <i class="fas fa-eraser"></i> Clear Password
+                    </button>
+                  </div>
+              </div>
+              <small style="color: #6c757d; display: block; margin-bottom: 1rem;">
+                  A strong random password will be generated and emailed to the user.
+              </small>
 
-            <div class="modal-buttons">
-                <button type="button" class="cancel-btn" onclick="closeModal()">Cancel</button>
-                <button type="submit" class="submit-btn">Update User</button>
-            </div>
-        </form>
-    </div>
+              <div class="modal-buttons">
+                  <button type="button" class="cancel-btn" onclick="closeModal()">Cancel</button>
+                  <button type="submit" class="submit-btn">Update User</button>
+              </div>
+          </form>
+      </div>
   </div>
 
   <form id="deleteForm" method="POST" style="display:none;">
       <input type="hidden" name="faculty_id" id="delete_faculty_id">
   </form>
-
-        <!-- Help Button -->
-    <div class="help-button" onclick="toggleHelpPopout()">
-        <i class="fas fa-question"></i>
-    </div>
-
-    <!-- Main Help Popout -->
-    <div id="helpPopout" class="popout">
-        <div class="popout-header">
-            <h3>Need Help?</h3>
-            <span class="popout-close" onclick="closeHelpPopout()">&times;</span>
-        </div>
-        <div class="help-option" onclick="openFaqPopout()">
-            <i class="fas fa-question-circle"></i> FAQ's
-        </div>
-        <div class="help-option" onclick="openContactPopout()">
-            <i class="fas fa-headset"></i> Still need help?
-        </div>
-    </div>
-
-    <!-- FAQ Popout -->
-    <div id="faqPopout" class="content-popout">
-        <div class="popout-header">
-            <h3>Frequently Asked Questions</h3>
-            <span class="popout-close" onclick="closeFaqPopout()">&times;</span>
-        </div>
-        <div class="faq-item">
-            <div class="faq-question">Q: How do I update my profile information?</div>
-            <p>A: Go to the Profile section and click on the "Edit Profile" button.</p>
-        </div>
-        <div class="faq-item">
-            <div class="faq-question">Q: How do I upload my teaching schedule?</div>
-            <p>A: Navigate to Teaching Load section and use the "Upload Schedule" button.</p>
-        </div>
-        <div class="faq-item">
-            <div class="faq-question">Q: What file formats are accepted?</div>
-            <p>A: We accept PDF, JPG, and PNG files for credential uploads.</p>
-        </div>
-        <div class="faq-item">
-            <div class="faq-question">Q: How do I change my password?</div>
-            <p>A: Go to Settings and use the "Change Password" option.</p>
-        </div>
-    </div>
-
-    <!-- Contact Popout -->
-    <div id="contactPopout" class="content-popout">
-        <div class="popout-header">
-            <h3>Contact Support</h3>
-            <span class="popout-close" onclick="closeContactPopout()">&times;</span>
-        </div>
-        <p>If you need further assistance:</p>
-        <div class="contact-info">
-            <p><i class="fas fa-envelope"></i> support@plpasig.edu.ph</p>
-            <p><i class="fas fa-phone"></i> +63 2 123 4567</p>
-            <p><i class="fas fa-clock"></i> Mon-Fri, 8:00 AM - 5:00 PM</p>
-            <p><i class="fas fa-map-marker-alt"></i> Admin Building, Room 101</p>
-        </div>
-    </div>
 
   <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -396,7 +319,6 @@ $users = $stmt->get_result();
   </script>
   <script src="scripts.js"></script>
   <script src="users.js"></script>
-  <script src="../faculty/help.js"></script>
   <?php if (isset($conn)) $conn->close(); ?>
 </body>
 </html>

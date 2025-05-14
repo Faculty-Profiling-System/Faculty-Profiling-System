@@ -14,7 +14,6 @@ if (isset($_SESSION['user_id'])) {
 }
 
 // Get college_id of the logged in admin
-// Get college_id of the logged in admin
 $college_id = null;
 if (isset($_SESSION['user_id'])) {
     $stmt = $conn->prepare("SELECT college_id FROM users WHERE user_id = ?");
@@ -31,7 +30,7 @@ if (isset($_SESSION['user_id'])) {
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Home | Admin</title>
-  <link rel="stylesheet" href="../css/admin_style.css" />
+  <link rel="stylesheet" href="../css/admin_style.css?v=<?php echo time(); ?>" />
   <link rel="stylesheet" href="../css/help.css?v=<?php echo time(); ?>">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <script>
@@ -54,7 +53,7 @@ if (isset($_SESSION['user_id'])) {
     body {
       background: #f4fff4;
       color: #187436;
-    }
+    } 
 
     .dashboard-container h1 { font-size: 2em; }
     .dashboard-container h2 { font-size: 1.5em; }
@@ -526,7 +525,7 @@ function toggleMenu() {
   }
 }
   </script>
-    <script src="../faculty/help.js"></script>
-    <script src="scripts.js"></script>
+    <script src="../faculty/help.js?v=<?php echo time(); ?>"></script>
+    <script src="scripts.js?v=<?php echo time(); ?>"></script>
 </body>
 </html> 

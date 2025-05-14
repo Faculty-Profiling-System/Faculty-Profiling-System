@@ -352,6 +352,68 @@ nav ul li.dropdown .dropdown-menu a:hover {
     background-color: #04b032;
 }
 
+/* Status badge styles */
+.status-badge {
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.status-active {
+    background-color: #28a745;
+    color: #ffffff;
+}
+
+.status-inactive {
+    background-color: #dc3545;
+    color: #fbfbfb;
+}
+
+.password-buttons {
+    display: flex;
+    margin-top: 0.5rem;
+}
+
+.generate-password-btn {
+    background-color: #04b032;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.8rem;
+    margin-left: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.clear-password-btn {
+    background-color: #d72b2b;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.8rem;
+    margin-left: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.generate-password-btn:hover {
+    background-color: #0c7127;
+}
+
+.clear-password-btn:hover {
+    background-color: #8a1717;
+}
+
 /* Responsive Adjustments */
 @media (max-width: 768px) {
     .search-add-container {
