@@ -62,6 +62,48 @@ $users = $stmt->get_result();
   <link rel="stylesheet" href="../css/admin_style.css?v=<?php echo time(); ?>" />
   <link rel="stylesheet" href="../css/user.css?v=<?php echo time(); ?>" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+  <link rel="stylesheet" href="../css/help.css?v=<?php echo time(); ?>">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+                    /* Dropdown Styles */
+        nav ul li.dropdown {
+      position: relative;
+    }
+    
+    nav ul li.dropdown .dropdown-menu {
+      display: none;
+      position: relative;
+      left: 0;
+      min-width: 200px;
+      z-index: 1000;
+      padding: 0;
+      margin: 0;
+    }
+    
+    nav ul li.dropdown .dropdown-menu li {
+      padding: 0;
+      list-style: none;
+    }
+    
+    nav ul li.dropdown .dropdown-menu a {
+      color: white;
+      padding: 12px 16px;
+      text-decoration: none;
+      display: block;
+      font-size: 14px;
+      font-family: 'Trebuchet MS';
+    }
+    
+    nav ul li.dropdown .dropdown-menu a:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    border-right: 3px solid #04b032; /* Color accent */
+    border-left: 3px solid #04b032; /* Color accent */
+    margin-right: 15px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    background-color: #0e4301;
+    }
+    </style>
 </head>
 <body>
   <div class="header">
@@ -87,7 +129,7 @@ $users = $stmt->get_result();
           <li><a href="college_management.php"><img src="../images/department.png" alt="Department Icon" class="menu-icon">COLLEGE MANAGEMENT</a></li>
           <li><a href="user.php" class="active"><img src="../images/user.png" alt="User Icon" class="menu-icon">USER MANAGEMENT</a></li>
           <li class="dropdown">
-            <a href="javascript:void(0)" id="reportsDropdown"><img src="../images/reports.png" alt="Reports Icon" class="menu-icon">REPORTS</a>
+            <a href="javascript:void(0)" id="reportsDropdown"><img src="../images/reports.png" alt="Reports Icon" class="menu-icon">REPORTS<img src="../images/dropdown.png" alt="Dropdown Icon" class="down-icon"></a>
             <ul class="dropdown-menu">
               <li><a href="files_report.php">CREDENTIAL FILES</a></li>
               <li><a href="logs_report.php">USER LOGS</a></li>
@@ -241,6 +283,64 @@ $users = $stmt->get_result();
       <input type="hidden" name="faculty_id" id="delete_faculty_id">
   </form>
 
+        <!-- Help Button -->
+    <div class="help-button" onclick="toggleHelpPopout()">
+        <i class="fas fa-question"></i>
+    </div>
+
+    <!-- Main Help Popout -->
+    <div id="helpPopout" class="popout">
+        <div class="popout-header">
+            <h3>Need Help?</h3>
+            <span class="popout-close" onclick="closeHelpPopout()">&times;</span>
+        </div>
+        <div class="help-option" onclick="openFaqPopout()">
+            <i class="fas fa-question-circle"></i> FAQ's
+        </div>
+        <div class="help-option" onclick="openContactPopout()">
+            <i class="fas fa-headset"></i> Still need help?
+        </div>
+    </div>
+
+    <!-- FAQ Popout -->
+    <div id="faqPopout" class="content-popout">
+        <div class="popout-header">
+            <h3>Frequently Asked Questions</h3>
+            <span class="popout-close" onclick="closeFaqPopout()">&times;</span>
+        </div>
+        <div class="faq-item">
+            <div class="faq-question">Q: How do I update my profile information?</div>
+            <p>A: Go to the Profile section and click on the "Edit Profile" button.</p>
+        </div>
+        <div class="faq-item">
+            <div class="faq-question">Q: How do I upload my teaching schedule?</div>
+            <p>A: Navigate to Teaching Load section and use the "Upload Schedule" button.</p>
+        </div>
+        <div class="faq-item">
+            <div class="faq-question">Q: What file formats are accepted?</div>
+            <p>A: We accept PDF, JPG, and PNG files for credential uploads.</p>
+        </div>
+        <div class="faq-item">
+            <div class="faq-question">Q: How do I change my password?</div>
+            <p>A: Go to Settings and use the "Change Password" option.</p>
+        </div>
+    </div>
+
+    <!-- Contact Popout -->
+    <div id="contactPopout" class="content-popout">
+        <div class="popout-header">
+            <h3>Contact Support</h3>
+            <span class="popout-close" onclick="closeContactPopout()">&times;</span>
+        </div>
+        <p>If you need further assistance:</p>
+        <div class="contact-info">
+            <p><i class="fas fa-envelope"></i> support@plpasig.edu.ph</p>
+            <p><i class="fas fa-phone"></i> +63 2 123 4567</p>
+            <p><i class="fas fa-clock"></i> Mon-Fri, 8:00 AM - 5:00 PM</p>
+            <p><i class="fas fa-map-marker-alt"></i> Admin Building, Room 101</p>
+        </div>
+    </div>
+
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       const savedTheme = localStorage.getItem('plpTheme') || 'light';
@@ -296,6 +396,7 @@ $users = $stmt->get_result();
   </script>
   <script src="scripts.js"></script>
   <script src="users.js"></script>
+  <script src="../faculty/help.js"></script>
   <?php if (isset($conn)) $conn->close(); ?>
 </body>
 </html>

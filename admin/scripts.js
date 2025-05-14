@@ -2,8 +2,6 @@ document.addEventListener('DOMContentLoaded', () => {
   toggleMenu(); 
   updateDashboardCounts();
   fetchAdminData();
-  fetchStatsData();
-  fetchRecentCredentials();
 });
 
 // ====== MENU TOGGLE ==========
@@ -121,8 +119,6 @@ function fetchRecentCredentials() {
     .then(data => {
       populateCredentialList('documentUploadsList', data.new_uploads || []);
       populateCredentialList('pendingDocumentsList', data.pending_verifications || []);
-      populateCredentialList('accreditationReviewList', data.accreditation_reviews || []);
-      
       document.querySelectorAll('.credential-card .stat-value').forEach((el, index) => {
         const counts = [
           data.new_uploads?.length || 0,
@@ -136,36 +132,12 @@ function fetchRecentCredentials() {
       console.error('Error loading credentials:', error);
       populateCredentialList('documentUploadsList', []);
       populateCredentialList('pendingDocumentsList', []);
-      populateCredentialList('accreditationReviewList', []);
     });
 }
 
-function populateCredentialList(listId, items) {
-  const listElement = document.getElementById(listId);
-  if (!listElement) return;
-
-  listElement.innerHTML = '';
-
-  if (items.length === 0) {
-    const li = document.createElement('li');
-    li.textContent = 'No items found';
-    listElement.appendChild(li);
-    return;
-  }
-
-  items.forEach(item => {
-    const li = document.createElement('li');
-    li.innerHTML = `<input type="checkbox"> ${item}`;
-    listElement.appendChild(li);
-  });
-}
 
 function confirmLogout() {
   if (confirm('Are you sure you want to logout?')) {
     window.location.href = '../landing/index.php';
   }
-}
-
-function updateDashboardCounts() {
-  // Implementation can be added here if needed
 }

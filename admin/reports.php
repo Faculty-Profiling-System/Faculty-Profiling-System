@@ -5,43 +5,48 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Admin | PLP Faculty Profiling System</title>
   <link rel="stylesheet" href="../css/admin_style.css" />
+  <link rel="stylesheet" href="../css/help.css?v=<?php echo time(); ?>">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <style>
 <style>
-  /* Dropdown Styles */
-  nav ul li.dropdown {
-    position: relative;
-  }
-  
-  nav ul li.dropdown .dropdown-menu {
-    display: none; /* Changed from none to block in HTML */
-    position: relative; /* Changed from absolute to relative */
-    left: 0;
-    background-color: #015f22;
-    min-width: 200px;
-    z-index: 1000;
-    border: 1px solid #024117;
-    box-shadow: 0px 8px 16px rgba(0,0,0,0.2);
-    padding: 0;
-    margin: 0;
-  }
-  
-  nav ul li.dropdown .dropdown-menu li {
-    padding: 0;
-    list-style: none;
-  }
-  
-  nav ul li.dropdown .dropdown-menu a {
-    color: white;
-    padding: 12px 16px;
-    text-decoration: none;
-    display: block;
-    font-size: 14px;
-    font-family: 'Trebuchet MS';
-  }
-  
-  nav ul li.dropdown .dropdown-menu a:hover {
-    background-color: #04b032;
-  }
+                /* Dropdown Styles */
+        nav ul li.dropdown {
+      position: relative;
+    }
+    
+    nav ul li.dropdown .dropdown-menu {
+      display: none;
+      position: relative;
+      left: 0;
+      min-width: 200px;
+      z-index: 1000;
+      padding: 0;
+      margin: 0;
+    }
+    
+    nav ul li.dropdown .dropdown-menu li {
+      padding: 0;
+      list-style: none;
+    }
+    
+    nav ul li.dropdown .dropdown-menu a {
+      color: white;
+      padding: 12px 16px;
+      text-decoration: none;
+      display: block;
+      font-size: 14px;
+      font-family: 'Trebuchet MS';
+    }
+    
+    nav ul li.dropdown .dropdown-menu a:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    border-right: 3px solid #04b032; /* Color accent */
+    border-left: 3px solid #04b032; /* Color accent */
+    margin-right: 15px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    background-color: #0e4301;
+    }
   
   /* Remove the pointer cursor from the Reports link */
   nav ul li.dropdown > a {
@@ -75,7 +80,7 @@
     <li><a href="college_management.php"><img src="../images/department.png" alt="Department Icon" class="menu-icon">COLLEGE MANAGEMENT</a></li>
     <li><a href="user.php"><img src="../images/user.png" alt="User Icon" class="menu-icon">USER MANAGEMENT</a></li>
     <li class="dropdown">
-      <a href="javascript:void(0)" id="reportsDropdown" class="active"><img src="../images/reports.png" alt="Reports Icon" class="menu-icon">REPORTS</a>
+      <a href="javascript:void(0)" id="reportsDropdown" class="active"><img src="../images/reports.png" alt="Reports Icon" class="menu-icon">REPORTS<img src="../images/dropdown.png" alt="Dropdown Icon" class="down-icon"></a>
       <ul class="dropdown-menu" style="display: block;">
               <li><a href="files_report.php">CREDENTIAL FILES</a></li>
               <li><a href="logs_report.php">USER LOGS</a></li>
@@ -133,5 +138,6 @@
   }
 </script>
 <script src="scripts.js"></script>
+    <script src="../faculty/help.js"></script>
 </body>
 </html>
