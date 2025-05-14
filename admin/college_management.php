@@ -261,7 +261,7 @@ $current_college_id = $current_user['college_id'];
         </div>
     </div>
 
-  <script src="scripts.js"></script>
+  <script src="scripts.js?v=<?php echo time(); ?>"></script>
   <script>
     // Reports dropdown functionality
     document.addEventListener('DOMContentLoaded', function() {
@@ -339,6 +339,6 @@ $current_college_id = $current_user['college_id'];
       }
     }
   </script>
-  <script src="../faculty/help.js"></script>
+  <script src="../faculty/help.js?v=<?php echo time(); ?>"></script>
 </body>
 </html>

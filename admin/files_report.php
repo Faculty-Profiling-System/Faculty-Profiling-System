@@ -244,7 +244,7 @@ $credentials_result = $stmt->get_result();
     </div>
 
   <script src="report.js?v=<?php echo time(); ?>"></script>
-  <script src="scripts.js"></script>
+  <script src="scripts.js?v=<?php echo time(); ?>"></script>
   <script>
       // Reports dropdown functionality
       document.addEventListener('DOMContentLoaded', function() {
@@ -283,6 +283,6 @@ $credentials_result = $stmt->get_result();
       }
     }
   </script>
-  <script src="../faculty/help.js"></script>
+  <script src="../faculty/help.js?v=<?php echo time(); ?>"></script>
 </body>
 </html>

@@ -317,8 +317,8 @@ $users = $stmt->get_result();
       }
     }
   </script>
-  <script src="scripts.js"></script>
-  <script src="users.js"></script>
+  <script src="scripts.js?v=<?php echo time(); ?>"></script>
+  <script src="users.js?v=<?php echo time(); ?>"></script>
   <?php if (isset($conn)) $conn->close(); ?>
 </body>
 </html>
