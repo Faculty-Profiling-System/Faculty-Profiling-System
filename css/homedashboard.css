@@ -13,9 +13,9 @@
     padding: 25px 30px;
     border-radius: 8px;
     margin-bottom: 30px;
-    margin-left: -140px;
+    margin-left: 0;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    width: 1420px;
+    width: 95%;
 }
 
 .welcome-banner h2 {

@@ -64,7 +64,9 @@ if (isset($_SESSION['faculty_id'])) {
     <link rel="stylesheet" href="../css/faculty_style.css?v=<?php echo time(); ?>"/>
     <link rel="stylesheet" href="../css/homedashboard.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="../css/help.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="css/theme.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="js/settings.js"></script>
 </head>
 <body>
 <div class="header">
