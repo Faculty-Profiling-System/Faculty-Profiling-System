@@ -22,16 +22,14 @@ if ($result->num_rows > 0) {
 
 $pdfExists = $currentPdf && file_exists(__DIR__ . '/' . $currentPdf);
 ?>
-<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Teaching Schedule | Faculty</title>
-    <link rel="stylesheet" href="../css/faculty_style.css?v=<?php echo time(); ?>"/>
+    <link rel="stylesheet" href="../css/faculty_style.css??v=<?php echo time(); ?>" />
     <link rel="stylesheet" href="../css/teachingload.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="../css/help.css?v=<?php echo time(); ?>">
-    <link rel="stylesheet" href="../css/theme.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
 </head>
@@ -314,8 +312,6 @@ $pdfExists = $currentPdf && file_exists(__DIR__ . '/' . $currentPdf);
       // If user cancels, do nothing
     }
     </script>
-    <script src="../js/theme.js"></script>
-    <script src="../js/text-size.js"></script>
     <script src="help.js"></script>
     <script src="../scripts.js"></script>
 </body>
