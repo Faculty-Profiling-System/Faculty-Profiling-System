@@ -80,3 +80,4 @@ function updateCredentialStatus(credentialId, status, reason = '') {
 document.addEventListener('DOMContentLoaded', function() {
     applyFilters();
 });
+

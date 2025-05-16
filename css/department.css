@@ -1,5 +1,5 @@
 /* Main container styles */
-.faculty-management-container {
+.faculty-gementgement-container {
     background-color: #fff;
     padding: 2rem;
     border-radius: 12px;
@@ -23,6 +23,7 @@ table {
     margin-bottom: 20px;
     table-layout: auto;
     overflow: hidden;
+    background-color: #fff;
 }
 
 th, td {
@@ -232,5 +233,186 @@ body.dark-theme tr:hover {
     
     .search-box {
         width: 100%;
+    }
+}
+/* Additional styles for the tab system - Updated to match log-tabs design */
+.faculty-management-container {
+    margin: 20px;
+}
+
+.management-tabs {
+    display: flex;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #ddd;
+}
+
+.tab-btn {
+    padding: 10px 20px;
+    color: #5c5d5e;
+    cursor: pointer;
+    background-color: #f1f1f1;
+    border: 1px solid #ddd;
+    border-bottom: none;
+    margin-right: 5px;
+    border-radius: 5px 5px 0 0;
+    transition: all 0.3s ease;
+    font-family: "Tahoma";
+    font-size: 16px;
+}
+
+.tab-btn:hover {
+    background-color: #e0e0e0;
+}
+
+.tab-btn.active {
+    background-color: #fff;
+    border-bottom: 1px solid #fff;
+    margin-bottom: -1px;
+    font-weight: bold;
+    color: #04b032;
+    border-top: 3px solid #04b032;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* college_management.css - Credentials Section */
+.credentials-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    color: #155724;
+}
+
+.back-btn {
+    padding: 8px 15px;
+    background-color: #015f22;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.credentials-container {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    padding: 20px;
+}
+
+.credentials-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.credentials-table-header {
+    display: flex;
+    background-color: #187436;
+    font-weight: bold;
+    padding: 12px 15px;
+    color: white;
+    border-bottom: 1px solid #ddd;
+}
+
+.credential-row {
+    display: flex;
+    padding: 12px 15px;
+    border-bottom: 1px solid #ddd;
+    align-items: center;
+}
+
+.credential-row:last-child {
+    border-bottom: none;
+}
+
+.credential-name {
+    flex: 2;
+}
+
+.credential-type {
+    flex: 1;
+}
+
+.issue-date, .expiry-date {
+    flex: 1;
+}
+
+.credential-actions {
+    flex: 1;
+    display: flex;
+    gap: 10px;
+}
+
+.view-btn {
+    background-color: #009d34;
+    color: rgb(255, 253, 253);
+    text-decoration: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.download-btn {
+    background-color: #009d34;
+    color: rgb(255, 255, 255);
+    text-decoration: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.loading-message, .no-credentials, .error-message {
+    text-align: center;
+    padding: 20px;
+    font-style: italic;
+    color: #666;
+}
+
+.error-message {
+    color: #e74c3c;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .credentials-table-header {
+        display: none
+    }
+    
+    .credential-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 15px;
+    }
+    
+    .credential-row > div {
+        width: 100%;
+    }
+    
+    .credential-row > div::before {
+        content: attr(data-label);
+        font-weight: bold;
+        display: inline-block;
+        width: 100px;
+    }
+    
+    .credential-actions {
+        justify-content: flex-start;
+        margin-top: 10px;
     }
 }
