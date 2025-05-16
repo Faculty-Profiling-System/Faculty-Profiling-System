@@ -9,7 +9,6 @@ session_start();
   <title>Settings | Admin</title>
   <link rel="stylesheet" href="../css/admin_style.css?v=<?php echo time(); ?>" />
   <link rel="stylesheet" href="../css/help.css?v=<?php echo time(); ?>">
-  <link rel="stylesheet" href="../css/themes.css?v=<?php echo time(); ?>">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <script>
     // Initialize states
@@ -58,6 +57,76 @@ session_start();
       document.getElementById('theme-dark').classList.toggle('selected', currentTheme === 'dark');
     }
   </script>
+  <style>
+    /* Light theme (default) */
+    body {
+      background: #f4fff4;
+      color: #187436;
+    }
+
+                /* Dropdown Styles */
+        nav ul li.dropdown {
+      position: relative;
+    }
+    
+    nav ul li.dropdown .dropdown-menu {
+      display: none;
+      position: relative;
+      left: 0;
+      min-width: 200px;
+      z-index: 1000;
+      padding: 0;
+      margin: 0;
+    }
+    
+    nav ul li.dropdown .dropdown-menu li {
+      padding: 0;
+      list-style: none;
+    }
+    
+    nav ul li.dropdown .dropdown-menu a {
+      color: white;
+      padding: 12px 16px;
+      text-decoration: none;
+      display: block;
+      font-size: 14px;
+      font-family: 'Trebuchet MS';
+    }
+    
+    nav ul li.dropdown .dropdown-menu a:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    border-right: 3px solid #04b032; /* Color accent */
+    border-left: 3px solid #04b032; /* Color accent */
+    margin-right: 15px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    background-color: #0e4301;
+    }
+
+    /* Dark theme */
+    body.dark-theme {
+      background: #101010 !important;
+      color: #f3f3f3 !important;
+    }
+
+    body.dark-theme .settings-label {
+      color: #f3f3f3;
+    }
+
+    body.dark-theme .settings-btn {
+      background: #222;
+      color: #ccc;
+    }
+
+    body.dark-theme .settings-btn.selected {
+      background: #00d34a;
+      color: #101010;
+    }
+
+    body.dark-theme hr {
+      border-top: 6px solid #333;
+    }
+  </style>
 </head>
 <body>
   <div class="header">
