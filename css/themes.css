@@ -1,0 +1,354 @@
+/* Theme Variables */
+:root {
+    /* Light theme colors (default) */
+    --primary-color: #007c2c;
+    --primary-dark: #015f22;
+    --primary-light: #e6f4ea;
+    --accent-color: #04b032;
+    --text-color: #333333;
+    --bg-color: #f4fff4;
+    --card-bg: #ffffff;
+    --border-color: #dddddd;
+    --icon-color: inherit;
+    --input-bg: #ffffff;
+    --input-text: #333333;
+    --button-bg: var(--primary-color);
+    --button-text: #ffffff;
+    --header-bg: #ffffff;
+    --header-text: #333333;
+    
+    /* Credential action button colors - Light theme */
+    --btn-view-bg: #007bff;
+    --btn-view-text: #ffffff;
+    --btn-download-bg: #28a745;
+    --btn-download-text: #ffffff;
+    --btn-delete-bg: #dc3545;
+    --btn-delete-text: #ffffff;
+}
+
+/* Dark theme variables */
+body.dark-theme {
+    --bg-color: #101010;
+    --text-color: #f3f3f3;
+    --card-bg: #1a1a1a;
+    --border-color: #333;
+    --icon-color: #f3f3f3;
+    --input-bg: #222;
+    --input-text: #f3f3f3;
+    --button-bg: #00d34a;
+    --button-text: #101010;
+    --header-bg: var(--primary-color);
+    --header-text: #ffffff;
+    
+    /* Credential action button colors - Dark theme */
+    --btn-view-bg: #0056b3;
+    --btn-view-text: #ffffff;
+    --btn-download-bg: #1e7e34;
+    --btn-download-text: #ffffff;
+    --btn-delete-bg: #bd2130;
+    --btn-delete-text: #ffffff;
+}
+
+/* Base Styles - Applied to both themes */
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+}
+
+/* Header and Navigation - Always Light Theme */
+.header,
+.navigation {
+    background-color: var(--primary-color) !important;
+    color: white !important;
+}
+
+/* Cards and Containers */
+.card,
+.dashboard-card,
+.dashboard-container,
+.pdf-viewer-container,
+.scheduleFile,
+.profile-container,
+.credential-item,   
+.credentials-container {
+    background-color: var(--card-bg);
+    border-color: var(--border-color);
+}
+
+/* Form Elements */
+input,
+select,
+textarea {
+    background-color: var(--input-bg);
+    color: var(--input-text);
+    border-color: var(--border-color);
+}
+
+/* File Input Styling */
+input[type="file"] {
+    background-color: var(--input-bg);
+    color: var(--input-text);
+    border: 2px dashed var(--border-color);
+    padding: 8px;
+    border-radius: 4px;
+}
+
+input[type="file"]::-webkit-file-upload-button {
+    background-color: var(--button-bg);
+    color: var(--button-text);
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 10px;
+}
+
+input[type="file"]::-webkit-file-upload-button:hover {
+    opacity: 0.9;
+}
+
+input::placeholder {
+    color: var(--text-color);
+    opacity: 0.6;
+}
+
+/* Buttons */
+.btn-primary {
+    background-color: var(--button-bg);
+    color: var(--button-text);
+}
+
+.btn-primary:hover {
+    background-color: var(--accent-color);
+    opacity: 0.9;
+}
+
+/* Icons */
+.icon,
+.credential-icon i,
+.fa,
+.fas{
+    color: var(--icon-color);
+}
+
+/* Tables */
+table {
+    border-color: var(--border-color);
+}
+
+th {
+    background-color: var(--card-bg);
+    color: var(--text-color);
+}
+
+td {
+    border-color: var(--border-color);
+    color: var(--text-color);
+}
+
+tr:hover {
+    background-color: var(--border-color);
+}
+
+/* Help Button */
+.help-button {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: var(--button-bg);
+    color: var(--button-text);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+    z-index: 1000;
+}
+
+.help-button:hover {
+    transform: scale(1.1);
+    background-color: var(--accent-color);
+}
+
+/* Help Popout */
+.popout,
+.content-popout {
+    background-color: var(--card-bg);
+    border-color: var(--border-color);
+    color: var(--text-color);
+}
+
+.popout-header {
+    border-color: var(--border-color);
+}
+
+body.dark-theme .help-option {
+    background-color: var(--card-bg);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+}
+
+body.dark-theme .help-option i {
+    color: var(--primary-color);
+}
+
+body.dark-theme .help-option:hover {
+    background-color: var(--primary-color);
+    color: #ffffff;
+}
+
+body.dark-theme .help-option:hover i {
+    color: #ffffff;
+}
+
+/* Settings Page */
+.settings-section {
+    margin: 2em 0;
+}
+
+.settings-label {
+    font-size: 2em;
+    font-weight: bold;
+    margin-bottom: 1em;
+    color: var(--text-color);
+}
+
+.settings-options {
+    display: flex;
+    gap: 1.5em;
+    justify-content: center;
+    align-items: center;
+}
+
+.settings-btn {
+    background-color: var(--card-bg);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+    border-radius: 2em;
+    padding: 0.7em 2em;
+    font-size: 1.5em;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.settings-btn.selected {
+    background-color: var(--button-bg);
+    color: var(--button-text);
+    border-color: transparent;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+    width: 12px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-color);
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: var(--border-color);
+    border-radius: 6px;
+    border: 3px solid var(--bg-color);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: var(--text-color);
+    opacity: 0.7;
+}
+
+/* Credential Action Buttons */
+.credential-actions .btn {
+    padding: 0.375rem 0.75rem;
+    border-radius: 0.25rem;
+    border: none;
+    margin: 0 0.25rem;
+    transition: all 0.2s ease-in-out;
+}
+
+.credential-actions .btn-view {
+    background-color: var(--btn-view-bg);
+    color: var(--btn-view-text);
+}
+
+.credential-actions .btn-download {
+    background-color: var(--btn-download-bg);
+    color: var(--btn-download-text);
+}
+
+.credential-actions .btn-delete {
+    background-color: var(--btn-delete-bg);
+    color: var(--btn-delete-text);
+}
+
+.credential-actions .btn:hover {
+    opacity: 0.85;
+    transform: translateY(-1px);
+}
+
+.credential-actions .btn i {
+    color: inherit;
+    margin-right: 0.25rem;
+}
+
+/* Profile Page Specific Styles */
+.section-header {
+    background-color: var(--primary-color);
+    color: #ffffff;
+    padding: 1rem;
+    border-radius: 4px 4px 0 0;
+    font-weight: bold;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.section-header h2 {
+    color: #ffffff;
+    margin: 0;
+}
+
+body.dark-theme .info-label {
+    color: #ffffff;
+    font-weight: bold;
+}
+
+body.dark-theme .info-value {
+    color: #ffffff;
+}
+
+body.dark-theme .profile-container {
+    background-color: var(--card-bg);
+}
+
+body.dark-theme #specialization,
+body.dark-theme #faculty-id,
+body.dark-theme #college-name {
+    color: #ffffff;
+}
+
+/* Home Page Action Buttons */
+body.dark-theme .action-btn {
+    background-color: var(--card-bg);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+}
+
+body.dark-theme .action-btn i {
+    color: var(--primary-color);
+}
+
+body.dark-theme .action-btn:hover {
+    background-color: var(--primary-color);
+    color: #ffffff;
+}
+
+body.dark-theme .action-btn:hover i {
+    color: #ffffff;
+}

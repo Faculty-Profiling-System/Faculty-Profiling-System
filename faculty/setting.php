@@ -1,11 +1,229 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Settings | Faculty</title>
-    <link rel="stylesheet" href="../css/faculty_style.css??v=<?php echo time(); ?>"/>
+    <link rel="stylesheet" href="../css/faculty_style.css?v=<?php echo time(); ?>"/>
     <link rel="stylesheet" href="../css/help.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="../css/themes.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+    // Initialize states
+    let currentSize = parseInt(localStorage.getItem('plpTextSize')) || 100;
+
+    // Check and apply theme and text size on page load
+    document.addEventListener('DOMContentLoaded', function() {
+      // Apply theme
+      const savedTheme = localStorage.getItem('plpTheme') || 'light';
+      if (savedTheme === 'dark') {
+        document.body.classList.add('dark-theme');
+      }
+      // Apply text size
+      document.documentElement.style.fontSize = currentSize + '%';
+      updateSelected();
+
+      // Initialize collapsible sections
+      var coll = document.getElementsByClassName("collapsible");
+      for (var i = 0; i < coll.length; i++) {
+        coll[i].addEventListener("click", function() {
+          this.classList.toggle("active");
+          var content = this.nextElementSibling;
+          if (content.style.maxHeight) {
+            content.style.maxHeight = null;
+          } else {
+            content.style.maxHeight = content.scrollHeight + "px";
+          }
+        });
+      }
+    });
+
+    function applyTheme(theme) {
+      if (theme === 'dark') {
+        document.body.classList.add('dark-theme');
+      } else {
+        document.body.classList.remove('dark-theme');
+      }
+      localStorage.setItem('plpTheme', theme);
+    }
+
+    function setTextSize(size) {
+      currentSize = size;
+      document.documentElement.style.fontSize = size + '%';
+      localStorage.setItem('plpTextSize', size);
+      updateSelected();
+    }
+
+    function setTheme(theme) {
+      applyTheme(theme);
+      updateSelected();
+    }
+
+    function updateSelected() {
+      // Text size buttons
+      [100, 150, 200].forEach(s => {
+        document.getElementById('size-' + s).classList.toggle('selected', currentSize === s);
+      });
+      // Theme buttons
+      const currentTheme = localStorage.getItem('plpTheme') || 'light';
+      document.getElementById('theme-light').classList.toggle('selected', currentTheme === 'light');
+      document.getElementById('theme-dark').classList.toggle('selected', currentTheme === 'dark');
+    }
+    </script>
+    <style>
+    /* Light theme (default) */
+    body {
+      background: #f4fff4;
+      color: #187436;
+    }
+
+    /* Dark theme */
+    body.dark-theme {
+      background: #101010 !important;
+      color: #f3f3f3 !important;
+    }
+
+    .main-content {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    .settings-section {
+      margin: 2rem 0;
+    }
+
+    .collapsible {
+      background: none;
+      color: inherit;
+      cursor: pointer;
+      width: 100%;
+      border: none;
+      text-align: left;
+      outline: none;
+      font-size: 1.2rem;
+      font-weight: bold;
+      padding: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border: 1px solid #187436;
+      border-radius: 8px;
+      margin-bottom: 0.5rem;
+      transition: all 0.3s ease;
+    }
+
+    body.dark-theme .collapsible {
+      border-color: #333;
+      color: #f3f3f3;
+    }
+
+    .collapsible:hover {
+      background: rgba(0, 211, 74, 0.1);
+    }
+
+    body.dark-theme .collapsible:hover {
+      background: rgba(0, 211, 74, 0.2);
+    }
+
+    .collapsible:after {
+      content: '\002B';
+      font-weight: bold;
+      float: right;
+      margin-left: 5px;
+      transition: transform 0.3s ease;
+    }
+
+    .collapsible.active:after {
+      content: '\2212';
+    }
+
+    .content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease-out;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 0 0 8px 8px;
+      padding: 0 1rem;
+    }
+
+    .content.active {
+      max-height: 500px;
+      padding: 1rem;
+    }
+
+    .settings-options {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .settings-btn {
+      background: #e3f3e3;
+      border: none;
+      border-radius: 8px;
+      padding: 0.7rem 1.5rem;
+      font-size: 1rem;
+      color: #187436;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    body.dark-theme .settings-btn {
+      background: #222;
+      color: #f3f3f3;
+    }
+
+    .settings-btn.selected {
+      background: #00723F;
+      color: #ffffff;
+    }
+
+    body.dark-theme .settings-btn.selected {
+      background: #00d34a;
+      color: #101010;
+    }
+
+    .settings-input {
+      width: 100%;
+      padding: 0.7rem;
+      margin-bottom: 1rem;
+      border: 1px solid #187436;
+      border-radius: 8px;
+      background: #f4fff4;
+      color: #187436;
+    }
+
+    body.dark-theme .settings-input {
+      background: #222;
+      color: #f3f3f3;
+      border-color: #333;
+    }
+
+    .settings-input:focus {
+      outline: none;
+      border-color: #00d34a;
+    }
+
+    hr {
+      border: none;
+      border-top: 1px solid #187436;
+      margin: 2rem 0;
+    }
+
+    body.dark-theme hr {
+      border-color: #333;
+    }
+
+    body.dark-theme .logout-section a {
+      color: #f3f3f3;
+    }
+
+    body.dark-theme .logout-section a:hover {
+      background: #00d34a;
+      color: #101010;
+    }
+    </style>
 </head>
 <body>
     <div class="header">
@@ -99,18 +317,55 @@
               <p><i class="fas fa-map-marker-alt"></i> Admin Building, Room 101</p>
           </div>
       </div>
+
+        <h2>Settings</h2>
+        <hr>
+        <div class="settings-section">
+            <button type="button" class="collapsible">Text Size</button>
+            <div class="content">
+                <div class="settings-options">
+                    <button class="settings-btn" id="size-100" onclick="setTextSize(100)">100%</button>
+                    <button class="settings-btn" id="size-150" onclick="setTextSize(150)">150%</button>
+                    <button class="settings-btn" id="size-200" onclick="setTextSize(200)">200%</button>
+                </div>
+            </div>
+        </div>
+        <hr>
+        <div class="settings-section">
+            <button type="button" class="collapsible">Theme</button>
+            <div class="content">
+                <div class="settings-options">
+                    <button class="settings-btn" id="theme-light" onclick="setTheme('light')">Light</button>
+                    <button class="settings-btn" id="theme-dark" onclick="setTheme('dark')">Dark</button>
+                </div>
+            </div>
+        </div>
+        <hr>
+        <div class="settings-section">
+            <button type="button" class="collapsible">Change Password</button>
+            <div class="content">
+                <div id="passwordMessage" class="message-box" style="display: none; margin-bottom: 1rem; padding: 1rem; border-radius: 4px;"></div>
+                <form id="changePasswordForm" class="settings-options" style="flex-direction: column;">
+                    <input type="password" id="currentPassword" placeholder="Current Password" class="settings-input" required />
+                    <input type="password" id="newPassword" placeholder="New Password" class="settings-input" required />
+                    <input type="password" id="confirmPassword" placeholder="Confirm New Password" class="settings-input" required />
+                    <button type="submit" class="settings-btn" style="align-self: flex-start;">Change Password</button>
+                </form>
+            </div>
+        </div>
+        <hr>
     </div>
     
     <script>
       function confirmLogout() {
       if (confirm('Are you sure you want to logout?')) {
-        // If user confirms, redirect to logout page
         window.location.href = '../landing/index.php';
       }
-      // If user cancels, do nothing
       }
     </script>
+    <script src="js/settings.js"></script>
     <script src="help.js"></script>
+    <script src="change_password.js"></script>
     <script src="../scripts.js"></script>
 </body>
 </html>
