@@ -33,7 +33,6 @@ if (isset($_SESSION['user_id'])) {
   <title>Home | Admin</title>
   <link rel="stylesheet" href="../css/admin_style.css?v=<?php echo time(); ?>" />
   <link rel="stylesheet" href="../css/help.css?v=<?php echo time(); ?>">
-  <link rel="stylesheet" href="../css/themes.css?v=<?php echo time(); ?>">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <script>
     // Check and apply theme and text size on page load
