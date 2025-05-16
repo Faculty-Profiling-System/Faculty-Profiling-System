@@ -16,7 +16,7 @@ $faculty_query = "SELECT f.*, c.college_name
                  FROM faculty f 
                  JOIN colleges c ON f.college_id = c.college_id 
                  WHERE f.faculty_id = ?";
-$stmt = $conn->prepare($faculty_query);
+$stmt = $conn->prepare(query: $faculty_query);
 $stmt->bind_param("s", $faculty_id);
 $stmt->execute();
 $result = $stmt->get_result();
@@ -60,10 +60,12 @@ if ($academic_result->num_rows > 0) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Profile | Faculty</title>
-    <link rel="stylesheet" href="../css/faculty_style.css??v=<?php echo time(); ?>" />
+    <link rel="stylesheet" href="../css/faculty_style.css?v=<?php echo time(); ?>"/>
     <link rel="stylesheet" href="../css/profile.css?v=<?php echo time(); ?>"/>
     <link rel="stylesheet" href="../css/help.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="../css/themes.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <script src="theme.js?v=<?php echo time(); ?>"></script>
 </head>
 <body>
     <div class="header">
