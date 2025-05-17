@@ -249,107 +249,13 @@
     </div> 
 
     <div id="main" class="main-content">
-      <!-- Help Button -->
-      <div class="help-button" onclick="toggleHelpPopout()">
-          <i class="fas fa-question"></i>
-      </div>
-
-      <!-- Main Help Popout -->
-      <div id="helpPopout" class="popout">
-          <div class="popout-header">
-              <h3>Need Help?</h3>
-              <span class="popout-close" onclick="closeHelpPopout()">&times;</span>
-          </div>
-          <div class="help-option" onclick="openFaqPopout()">
-              <i class="fas fa-question-circle"></i> FAQ's
-          </div>
-          <div class="help-option" onclick="openContactPopout()">
-              <i class="fas fa-headset"></i> Still need help?
-          </div>
-      </div>
-
-      <!-- FAQ Popout -->
-      <div id="faqPopout" class="content-popout">
-          <div class="popout-header">
-              <h3>Frequently Asked Questions</h3>
-              <span class="popout-close" onclick="closeFaqPopout()">&times;</span>
-          </div>
-          <div class="faq-item">
-              <div class="faq-question">Q: How do I update my profile information?</div>
-              <p>A: Go to the Profile section and click on the "Edit Profile" button.</p>
-          </div>
-          <div class="faq-item">
-              <div class="faq-question">Q: How do I upload my teaching schedule?</div>
-              <p>A: Navigate to Teaching Load section and use the "Upload Schedule" button.</p>
-          </div>
-          <div class="faq-item">
-              <div class="faq-question">Q: What file formats are accepted?</div>
-              <p>A: We accept PDF, JPG, and PNG files for credential uploads.</p>
-          </div>
-          <div class="faq-item">
-              <div class="faq-question">Q: How do I change my password?</div>
-              <p>A: Go to Settings and use the "Change Password" option.</p>
-          </div>
-      </div>
-
-      <!-- Contact Popout -->
-      <div id="contactPopout" class="content-popout">
-          <div class="popout-header">
-              <h3>Contact Support</h3>
-              <span class="popout-close" onclick="closeContactPopout()">&times;</span>
-          </div>
-          <p>If you need further assistance:</p>
-          <div class="contact-info">
-              <p><i class="fas fa-envelope"></i> support@plpasig.edu.ph</p>
-              <p><i class="fas fa-phone"></i> +63 2 123 4567</p>
-              <p><i class="fas fa-clock"></i> Mon-Fri, 8:00 AM - 5:00 PM</p>
-              <p><i class="fas fa-map-marker-alt"></i> Admin Building, Room 101</p>
-          </div>
-      </div>
-
-        <h2>Settings</h2>
-        <hr>
-        <div class="settings-section">
-            <button type="button" class="collapsible">Text Size</button>
-            <div class="content">
-                <div class="settings-options">
-                    <button class="settings-btn" id="size-100" onclick="setTextSize(100)">100%</button>
-                    <button class="settings-btn" id="size-150" onclick="setTextSize(150)">150%</button>
-                    <button class="settings-btn" id="size-200" onclick="setTextSize(200)">200%</button>
-                </div>
-            </div>
-        </div>
-        <hr>
-        <div class="settings-section">
-            <button type="button" class="collapsible">Theme</button>
-            <div class="content">
-                <div class="settings-options">
-                    <button class="settings-btn" id="theme-light" onclick="setTheme('light')">Light</button>
-                    <button class="settings-btn" id="theme-dark" onclick="setTheme('dark')">Dark</button>
-                </div>
-            </div>
-        </div>
-        <hr>
-        <div class="settings-section">
-            <button type="button" class="collapsible">Change Password</button>
-            <div class="content">
-                <div id="passwordMessage" class="message-box" style="display: none; margin-bottom: 1rem; padding: 1rem; border-radius: 4px;"></div>
-                <form id="changePasswordForm" class="settings-options" style="flex-direction: column;">
-                    <input type="password" id="currentPassword" placeholder="Current Password" class="settings-input" required />
-                    <input type="password" id="newPassword" placeholder="New Password" class="settings-input" required />
-                    <input type="password" id="confirmPassword" placeholder="Confirm New Password" class="settings-input" required />
-                    <button type="submit" class="settings-btn" style="align-self: flex-start;">Change Password</button>
-                </form>
-            </div>
-        </div>
-        <hr>
+        <?php include 'help.php'; ?>
     </div>
     
     <script>
       function confirmLogout() {
       if (confirm('Are you sure you want to logout?')) {
         window.location.href = '../landing/index.php';
-      }
       }
     </script>
     <script src="js/settings.js"></script>
