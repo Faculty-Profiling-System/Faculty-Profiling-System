@@ -86,12 +86,12 @@ require_once('../db_connection.php');
         <?php include 'profile_sections/work_experience.php'; ?>
         <?php include 'profile_sections/training_programs.php'; ?>
         
-        <!-- Download Button 
+        <!-- Download Button -->
         <div style="text-align: center;">
             <a href="download_pds.php" class="download-button">
                 <i class="fas fa-download"></i> Download PDS
             </a>
-        </div>-->
+        </div>
     </div>
 
     <!-- Confirmation Modal -->

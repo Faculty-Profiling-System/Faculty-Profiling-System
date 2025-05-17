@@ -250,6 +250,42 @@
 
     <div id="main" class="main-content">
         <?php include 'help.php'; ?>
+        <h2>Settings</h2>
+        <hr>
+        <div class="settings-section">
+            <button type="button" class="collapsible">Text Size</button>
+            <div class="content">
+                <div class="settings-options">
+                    <button class="settings-btn" id="size-100" onclick="setTextSize(100)">100%</button>
+                    <button class="settings-btn" id="size-150" onclick="setTextSize(150)">150%</button>
+                    <button class="settings-btn" id="size-200" onclick="setTextSize(200)">200%</button>
+                </div>
+            </div>
+        </div>
+        <hr>
+        <div class="settings-section">
+            <button type="button" class="collapsible">Theme</button>
+            <div class="content">
+                <div class="settings-options">
+                    <button class="settings-btn" id="theme-light" onclick="setTheme('light')">Light</button>
+                    <button class="settings-btn" id="theme-dark" onclick="setTheme('dark')">Dark</button>
+                </div>
+            </div>
+        </div>
+        <hr>
+        <div class="settings-section">
+            <button type="button" class="collapsible">Change Password</button>
+            <div class="content">
+                <div id="passwordMessage" class="message-box" style="display: none; margin-bottom: 1rem; padding: 1rem; border-radius: 4px;"></div>
+                <form id="changePasswordForm" class="settings-options" style="flex-direction: column;">
+                    <input type="password" id="currentPassword" placeholder="Current Password" class="settings-input" required />
+                    <input type="password" id="newPassword" placeholder="New Password" class="settings-input" required />
+                    <input type="password" id="confirmPassword" placeholder="Confirm New Password" class="settings-input" required />
+                    <button type="submit" class="settings-btn" style="align-self: flex-start;">Change Password</button>
+                </form>
+            </div>
+        </div>
+        <hr>
     </div>
     
     <script>
@@ -257,6 +293,7 @@
       if (confirm('Are you sure you want to logout?')) {
         window.location.href = '../landing/index.php';
       }
+    }
     </script>
     <script src="js/settings.js"></script>
     <script src="help.js"></script>
