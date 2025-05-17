@@ -14,7 +14,6 @@ if (isset($_SESSION['user_id'])) {
 }
 
 // Get college_id of the logged in admin
-// Get college_id of the logged in admin
 $college_id = null;
 if (isset($_SESSION['user_id'])) {
     $stmt = $conn->prepare("SELECT college_id FROM users WHERE user_id = ?");
@@ -252,7 +251,11 @@ if ($college_id) {
     $stats['total_faculty'] = $row[0];
 
     // Gender counts
-    $stmt = $conn->prepare("SELECT gender, COUNT(*) FROM faculty WHERE college_id = ? GROUP BY gender");
+    $stmt = $conn->prepare("SELECT p.gender, COUNT(*) 
+                       FROM faculty f 
+                       JOIN faculty_personal_info p ON f.faculty_id = p.faculty_id 
+                       WHERE f.college_id = ? 
+                       GROUP BY p.gender");
     $stmt->bind_param("i", $college_id);
     $stmt->execute();
     $result = $stmt->get_result();

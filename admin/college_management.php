@@ -155,10 +155,12 @@ $current_college_id = $current_user['college_id'];
         <tbody>
           <?php
             if ($current_college_id) {
-              $sql = "SELECT faculty_id, full_name, gender, email, employment_type, specialization, contact_number, status 
-                      FROM faculty 
-                      WHERE college_id = ? 
-                      ORDER BY faculty_id";
+              $sql = "SELECT f.faculty_id, f.full_name, p.gender, f.email, f.employment_type, 
+                            f.specialization, f.contact_number, f.status 
+                      FROM faculty f
+                      LEFT JOIN faculty_personal_info p ON f.faculty_id = p.faculty_id
+                      WHERE f.college_id = ? 
+                      ORDER BY f.faculty_id";
               $stmt = $conn->prepare($sql);
               $stmt->bind_param("i", $current_college_id);
               $stmt->execute();

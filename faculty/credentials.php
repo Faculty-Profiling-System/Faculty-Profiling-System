@@ -27,7 +27,7 @@ try {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Credentials | Faculty</title>
-    <link rel="stylesheet" href="../css/faculty_style.css??v=<?php echo time(); ?>"/>
+    <link rel="stylesheet" href="../css/faculty_style.css?v=<?php echo time(); ?>"/>
     <link rel="stylesheet" href="../css/credentials.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="../css/help.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -77,13 +77,13 @@ try {
         
         <div class="card">
             <h1 class="dashboard-title">
-                <i class="fas fa-certificate"></i> My Credentials
+                <i class="fas fa-folder-open"></i> My Credentials
             </h1>
             <h2 class="card-title">
                 <i class="fas fa-cloud-upload-alt"></i> Upload New Credential
             </h2>
             
-            <form id="uploadForm" class="upload-form" enctype="multipart/form-data" action="upload_credential.php" method="POST">
+            <form id="uploadForm" class="upload-form" enctype="multipart/form-data" action="credential_api/upload_credential.php" method="POST">
                 <div class="form-row">
                     <div class="form-group">
                         <label for="credentialType">Credential Type</label>
@@ -254,63 +254,7 @@ try {
         </div>
     </div>
     
-    <!-- Help Button -->
-    <div class="help-button" onclick="toggleHelpPopout()">
-        <i class="fas fa-question"></i>
-    </div>
-
-    <!-- Main Help Popout -->
-    <div id="helpPopout" class="popout">
-        <div class="popout-header">
-            <h3>Need Help?</h3>
-            <span class="popout-close" onclick="closeHelpPopout()">&times;</span>
-        </div>
-        <div class="help-option" onclick="openFaqPopout()">
-            <i class="fas fa-question-circle"></i> FAQ's
-        </div>
-        <div class="help-option" onclick="openContactPopout()">
-            <i class="fas fa-headset"></i> Still need help?
-        </div>
-    </div>
-
-    <!-- FAQ Popout -->
-    <div id="faqPopout" class="content-popout">
-        <div class="popout-header">
-            <h3>Frequently Asked Questions</h3>
-            <span class="popout-close" onclick="closeFaqPopout()">&times;</span>
-        </div>
-        <div class="faq-item">
-            <div class="faq-question">Q: How do I update my profile information?</div>
-            <p>A: Go to the Profile section and click on the "Edit Profile" button.</p>
-        </div>
-        <div class="faq-item">
-            <div class="faq-question">Q: How do I upload my teaching schedule?</div>
-            <p>A: Navigate to Teaching Load section and use the "Upload Schedule" button.</p>
-        </div>
-        <div class="faq-item">
-            <div class="faq-question">Q: What file formats are accepted?</div>
-            <p>A: We accept PDF, JPG, and PNG files for credential uploads.</p>
-        </div>
-        <div class="faq-item">
-            <div class="faq-question">Q: How do I change my password?</div>
-            <p>A: Go to Settings and use the "Change Password" option.</p>
-        </div>
-    </div>
-
-    <!-- Contact Popout -->
-    <div id="contactPopout" class="content-popout">
-        <div class="popout-header">
-            <h3>Contact Support</h3>
-            <span class="popout-close" onclick="closeContactPopout()">&times;</span>
-        </div>
-        <p>If you need further assistance:</p>
-        <div class="contact-info">
-            <p><i class="fas fa-envelope"></i> support@plpasig.edu.ph</p>
-            <p><i class="fas fa-phone"></i> +63 2 123 4567</p>
-            <p><i class="fas fa-clock"></i> Mon-Fri, 8:00 AM - 5:00 PM</p>
-            <p><i class="fas fa-map-marker-alt"></i> Admin Building, Room 101</p>
-        </div>
-    </div>
+    <?php include 'help.php'; ?>
 
     <script>
     // Menu toggle
@@ -353,7 +297,7 @@ try {
 
     // View credential modal
     function viewCredential(id) {
-        fetch(`get_credential.php?id=${id}`)
+        fetch(`credential_api/get_credential.php?id=${id}`)
             .then(response => response.json())
             .then(data => {
                 document.getElementById('modalTitle').textContent = data.credential_name;
@@ -408,7 +352,7 @@ try {
 
     function confirmDelete(id) {
         if (confirm('Are you sure you want to delete this credential? This action cannot be undone.')) {
-            fetch(`delete_credential.php?id=${id}`, { method: 'POST' })
+            fetch(`credential_api/delete_credential.php?id=${id}`, { method: 'POST' })
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
@@ -458,7 +402,7 @@ try {
       // If user cancels, do nothing
     }
     </script>
-    <script src="help.js"></script>
-    <script src="../scripts.js"></script>
+    <script src="help.js?v=<?php echo time(); ?>"></script>
+    <script src="../scripts.js?v=<?php echo time(); ?>"></script>
 </body>
 </html>
