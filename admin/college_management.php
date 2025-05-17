@@ -33,46 +33,7 @@ $current_college_id = $current_user['college_id'];
   <link rel="stylesheet" href="../css/department.css?v=<?php echo time(); ?>" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <link rel="stylesheet" href="../css/help.css?v=<?php echo time(); ?>">
-    <style>
-                    /* Dropdown Styles */
-        nav ul li.dropdown {
-      position: relative;
-    }
-    
-    nav ul li.dropdown .dropdown-menu {
-      display: none;
-      position: relative;
-      left: 0;
-      min-width: 200px;
-      z-index: 1000;
-      padding: 0;
-      margin: 0;
-    }
-    
-    nav ul li.dropdown .dropdown-menu li {
-      padding: 0;
-      list-style: none;
-    }
-    
-    nav ul li.dropdown .dropdown-menu a {
-      color: white;
-      padding: 12px 16px;
-      text-decoration: none;
-      display: block;
-      font-size: 14px;
-      font-family: 'Trebuchet MS';
-    }
-    
-    nav ul li.dropdown .dropdown-menu a:hover {
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-    border-right: 3px solid #04b032; /* Color accent */
-    border-left: 3px solid #04b032; /* Color accent */
-    margin-right: 15px;
-    padding-top: 10px;
-    padding-bottom: 10px;
-    background-color: #0e4301;
-    }
-    </style>
+
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       const savedTheme = localStorage.getItem('plpTheme') || 'light';
@@ -130,82 +91,102 @@ $current_college_id = $current_user['college_id'];
     </div>
     
     <div class="faculty-management-container">
-    <div class="table-controls">
-      <div class="search-box">
-        <i class="fas fa-search"></i>
-        <input type="text" id="searchInput" placeholder="Search faculty...">
-      </div>
+        <div class="management-tabs">
+            <button class="tab-btn active" onclick="switchTab('facultyTab')">List of Faculty</button>
+            <button class="tab-btn" id="credentialsTabBtn" onclick="switchTab('credentialsTab')" style="display:none;">Approved Credentials</button>
+        </div>
+
+        <div id="facultyTab" class="tab-content active">
+            <div class="table-controls">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" placeholder="Search faculty...">
+                </div>
+            </div>
+
+            <div class="faculty-table-container">
+                <table id="facultyTable">
+                    <thead>
+                        <tr>
+                            <th>Faculty ID</th>
+                            <th>Full Name</th>
+                            <th>Gender</th>
+                            <th>Email</th>
+                            <th>Employment Type</th>
+                            <th>Specialization</th>
+                            <th>Contact Number</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php
+                            if ($current_college_id) {
+                                $sql = "SELECT f.faculty_id, f.full_name, p.gender, f.email, f.employment_type, 
+                                        f.specialization, f.contact_number, f.status 
+                                        FROM faculty f
+                                        LEFT JOIN faculty_personal_info p ON f.faculty_id = p.faculty_id
+                                        WHERE f.college_id = ? 
+                                        ORDER BY f.faculty_id";
+                                $stmt = $conn->prepare($sql);
+                                $stmt->bind_param("i", $current_college_id);
+                                $stmt->execute();
+                                $result = $stmt->get_result();
+
+                                if ($result->num_rows > 0) {
+                                    while ($row = $result->fetch_assoc()) {
+                                        $statusClass = $row['status'] === 'Active' ? 'status-active' : 'status-inactive';
+                                        echo '<tr>';
+                                        echo '<td>' . htmlspecialchars($row['faculty_id']) . '</td>';
+                                        echo '<td>' . htmlspecialchars($row['full_name']) . '</td>';
+                                        echo '<td>' . htmlspecialchars($row['gender']) . '</td>';
+                                        echo '<td>' . htmlspecialchars($row['email']) . '</td>';
+                                        echo '<td>' . htmlspecialchars($row['employment_type']) . '</td>';
+                                        echo '<td>' . htmlspecialchars($row['specialization']) . '</td>';
+                                        echo '<td>' . htmlspecialchars($row['contact_number']) . '</td>';
+                                        echo '<td><span class="status-badge ' . $statusClass . '">' . htmlspecialchars($row['status']) . '</span></td>';
+                                        echo '<td class="actions">';
+                                        if ($row['status'] === 'Active') {
+                                            echo '<button class="action-btn deactivate-btn" onclick="changeStatus(\'' . $row['faculty_id'] . '\', \'Inactive\')">
+                                                <i class="fas fa-times-circle"></i> Deactivate
+                                                </button>';
+                                        } else {
+                                            echo '<button class="action-btn activate-btn" onclick="changeStatus(\'' . $row['faculty_id'] . '\', \'Active\')">
+                                                <i class="fas fa-check-circle"></i> Activate
+                                                </button>';
+                                        }
+                                        echo '</td>';
+                                        echo '</tr>';
+                                    }
+                                } else {
+                                    echo '<tr><td colspan="9" class="text-center">No faculty members found</td></tr>';
+                                }
+                                $stmt->close();
+                            } else {
+                                echo '<tr><td colspan="9" class="text-center">Error: College ID not found</td></tr>';
+                            }
+                            $conn->close();
+                        ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div id="credentialsTab" class="tab-content">
+            <div class="credentials-header">
+                <h2 id="credentialsTableTitle">Credentials for Faculty Member</h2>
+                <button onclick="switchTab('facultyTab')" class="back-btn">
+                    <i class="fas fa-arrow-left"></i> Back to Faculty
+                </button>
+            </div>
+            
+            <div class="credentials-container">
+                <div id="credentialsList"></div>
+            </div>
+        </div>
     </div>
-    
-    <div class="faculty-table-container">
-      <table id="facultyTable">
-        <thead>
-          <tr>
-            <th>Faculty ID</th>
-            <th>Full Name</th>
-            <th>Gender</th>
-            <th>Email</th>
-            <th>Employment Type</th>
-            <th>Specialization</th>
-            <th>Contact Number</th>
-            <th>Status</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          <?php
-            if ($current_college_id) {
-              $sql = "SELECT f.faculty_id, f.full_name, p.gender, f.email, f.employment_type, 
-                            f.specialization, f.contact_number, f.status 
-                      FROM faculty f
-                      LEFT JOIN faculty_personal_info p ON f.faculty_id = p.faculty_id
-                      WHERE f.college_id = ? 
-                      ORDER BY f.faculty_id";
-              $stmt = $conn->prepare($sql);
-              $stmt->bind_param("i", $current_college_id);
-              $stmt->execute();
-              $result = $stmt->get_result();
 
-              if ($result->num_rows > 0) {
-                while ($row = $result->fetch_assoc()) {
-                  $statusClass = $row['status'] === 'Active' ? 'status-active' : 'status-inactive';
-                    echo '<tr>';
-                    echo '<td>' . htmlspecialchars($row['faculty_id']) . '</td>';
-                    echo '<td>' . htmlspecialchars($row['full_name']) . '</td>';
-                    echo '<td>' . htmlspecialchars($row['gender']) . '</td>';
-                    echo '<td>' . htmlspecialchars($row['email']) . '</td>';
-                    echo '<td>' . htmlspecialchars($row['employment_type']) . '</td>';
-                    echo '<td>' . htmlspecialchars($row['specialization']) . '</td>';
-                    echo '<td>' . htmlspecialchars($row['contact_number']) . '</td>';
-                    echo '<td><span class="status-badge ' . $statusClass . '">' . htmlspecialchars($row['status']) . '</span></td>';
-                    echo '<td class="actions">';
-                      if ($row['status'] === 'Active') {
-                        echo '<button class="action-btn deactivate-btn" onclick="changeStatus(\'' . $row['faculty_id'] . '\', \'Inactive\')">
-                              <i class="fas fa-times-circle"></i> Deactivate
-                              </button>';
-                        } else {
-                            echo '<button class="action-btn activate-btn" onclick="changeStatus(\'' . $row['faculty_id'] . '\', \'Active\')">
-                                  <i class="fas fa-check-circle"></i> Activate
-                                  </button>';
-                        }
-                        echo '</td>';
-                        echo '</tr>';
-                }
-              } else {
-                    echo '<tr><td colspan="9" class="text-center">No faculty members found</td></tr>';
-                }
-                $stmt->close();
-            } else {
-                echo '<tr><td colspan="9" class="text-center">Error: College ID not found</td></tr>';
-          }
-            $conn->close();
-          ?>
-        </tbody>
-        </table>
-      </div>
-  </div>
-
-        <!-- Help Button -->
+    <!-- Help Button -->
     <div class="help-button" onclick="toggleHelpPopout()">
         <i class="fas fa-question"></i>
     </div>
@@ -267,79 +248,202 @@ $current_college_id = $current_user['college_id'];
   <script>
     // Reports dropdown functionality
     document.addEventListener('DOMContentLoaded', function() {
-    document.getElementById('reportsDropdown').addEventListener('click', function(e) {
-      e.preventDefault();
-      const dropdown = this.parentElement;
-      const menu = dropdown.querySelector('.dropdown-menu');
+        document.getElementById('reportsDropdown').addEventListener('click', function(e) {
+            e.preventDefault();
+            const dropdown = this.parentElement;
+            const menu = dropdown.querySelector('.dropdown-menu');
+            
+            // Toggle only the clicked dropdown
+            if (menu.style.display === 'block') {
+                menu.style.display = 'none';
+            } else {
+                // Close all other dropdowns first
+                document.querySelectorAll('.dropdown-menu').forEach(item => {
+                    if (item !== menu) {
+                        item.style.display = 'none';
+                    }
+                });
+                menu.style.display = 'block';
+            }
+        });
         
-      // Toggle only the clicked dropdown
-      if (menu.style.display === 'block') {
-        menu.style.display = 'none';
-      } else {
-        // Close all other dropdowns first
-        document.querySelectorAll('.dropdown-menu').forEach(item => {
-          if (item !== menu) {
-            item.style.display = 'none';
-          }
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.dropdown')) {
+                document.querySelectorAll('.dropdown-menu').forEach(item => {
+                    item.style.display = 'none';
+                });
+            }
         });
-          menu.style.display = 'block';
-      }
-    });
-      
-    // Close dropdown when clicking outside
-    document.addEventListener('click', function(e) {
-      if (!e.target.closest('.dropdown')) {
-        document.querySelectorAll('.dropdown-menu').forEach(item => {
-          item.style.display = 'none';
-        });
-      }
-    });
 
-      // Search functionality
-      document.getElementById('searchInput').addEventListener('keyup', function() {
-        const input = this.value.toLowerCase();
-        const rows = document.querySelectorAll('#facultyTable tbody tr');
-        
-        rows.forEach(row => {
-          const text = row.textContent.toLowerCase();
-          row.style.display = text.includes(input) ? '' : 'none';
+        // Search functionality
+        document.getElementById('searchInput').addEventListener('keyup', function() {
+            const input = this.value.toLowerCase();
+            const rows = document.querySelectorAll('#facultyTable tbody tr');
+            
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(input) ? '' : 'none';
+            });
         });
-      });
     });
 
     function confirmLogout() {
-      if (confirm('Are you sure you want to logout?')) {
-        window.location.href = '../landing/index.php';
-      }
+        if (confirm('Are you sure you want to logout?')) {
+            window.location.href = '../landing/index.php';
+        }
     }
 
     function changeStatus(facultyId, newStatus) {
-      if (confirm(`Are you sure you want to ${newStatus === 'Active' ? 'activate' : 'deactivate'} this faculty member?`)) {
-        fetch('change_status.php', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            faculty_id: facultyId,
-            status: newStatus
-          })
-        })
+        if (confirm(`Are you sure you want to ${newStatus === 'Active' ? 'activate' : 'deactivate'} this faculty member?`)) {
+            fetch('change_status.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    faculty_id: facultyId,
+                    status: newStatus
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(`Faculty member ${newStatus === 'Active' ? 'activated' : 'deactivated'} successfully`);
+                    location.reload();
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error updating faculty status');
+            });
+        }
+    }
+
+    // Tab switching function
+    function switchTab(tabId) {
+        // Hide all tab contents
+        document.querySelectorAll('.tab-content').forEach(tab => {
+            tab.classList.remove('active');
+        });
+        
+        // Deactivate all tab buttons
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        
+        // Activate the selected tab
+        document.getElementById(tabId).classList.add('active');
+        document.querySelector(`.tab-btn[onclick="switchTab('${tabId}')"]`).classList.add('active');
+        
+        // Special handling for credentials tab
+        if (tabId === 'facultyTab') {
+            document.getElementById('credentialsTabBtn').style.display = 'none';
+        }
+    }
+
+  function showFacultyCredentials(facultyId, facultyName) {
+    // Update the title
+    document.getElementById('credentialsTableTitle').textContent = `Credentials for ${facultyName}`;
+    
+    // Show loading state
+    document.getElementById('credentialsList').innerHTML = `
+        <div class="loading-message">Loading credentials...</div>
+    `;
+    
+    // Show the credentials tab button
+    document.getElementById('credentialsTabBtn').style.display = 'inline-block';
+    
+    // Switch to the credentials tab
+    switchTab('credentialsTab');
+    
+    // Fetch credentials via AJAX
+    fetch(`get_faculty_credentials.php?faculty_id=${facultyId}`)
         .then(response => response.json())
         .then(data => {
-          if (data.success) {
-            alert(`Faculty member ${newStatus === 'Active' ? 'activated' : 'deactivated'} successfully`);
-            location.reload();
-          } else {
-            alert('Error: ' + data.message);
-          }
+            if (data.success) {
+                if (data.credentials.length > 0) {
+                    let html = `
+                        <div class="credentials-table">
+                            <div class="credentials-table-header">
+                                <div class="credential-name">Credential Name</div>
+                                <div class="credential-type">Type</div>
+                                <div class="issue-date">Issue Date</div>
+                                <div class="expiry-date">Expiry Date</div>
+                                <div class="credential-actions">Actions</div>
+                            </div>
+                    `;
+                    
+                    data.credentials.forEach(credential => {
+                        const issueDate = credential.issued_date ? 
+                            new Date(credential.issued_date).toLocaleDateString() : 'N/A';
+                        const expiryDate = credential.expiry_date ? 
+                            new Date(credential.expiry_date).toLocaleDateString() : 'No expiration';
+                        
+                        html += `
+                            <div class="credential-row">
+                                <div class="credential-name" data-label="Name">
+                                    ${credential.credential_name || 'N/A'}
+                                </div>
+                                <div class="credential-type" data-label="Type">
+                                    ${credential.credential_type || 'N/A'}
+                                </div>
+                                <div class="issue-date" data-label="Issued">
+                                    ${issueDate}
+                                </div>
+                                <div class="expiry-date" data-label="Expires">
+                                    ${expiryDate}
+                                </div>
+                                <div class="credential-actions" data-label="Actions">
+                                    <a href="${credential.file_path}" target="_blank" class="action-btn view-btn">
+                                        <i class="fas fa-eye"></i> View
+                                    </a>
+                                    <a href="${credential.file_path}" download class="action-btn download-btn">
+                                        <i class="fas fa-download"></i> Download
+                                    </a>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    
+                    html += `</div>`; // Close credentials-table
+                    document.getElementById('credentialsList').innerHTML = html;
+                } else {
+                    document.getElementById('credentialsList').innerHTML = `
+                        <div class="no-credentials">No credentials found for this faculty member</div>
+                    `;
+                }
+            } else {
+                alert('Error: ' + data.message);
+            }
         })
         .catch(error => {
-          console.error('Error:', error);
-          alert('Error updating faculty status');
+            console.error('Error:', error);
+            document.getElementById('credentialsList').innerHTML = `
+                <div class="error-message">Error loading credentials</div>
+            `;
         });
-      }
-    }
+}
+
+    // Modify the faculty table rows to be clickable
+    document.addEventListener('DOMContentLoaded', function() {
+        const facultyRows = document.querySelectorAll('#facultyTable tbody tr');
+        facultyRows.forEach(row => {
+            const facultyId = row.cells[0].textContent;
+            const facultyName = row.cells[1].textContent;
+            
+            row.style.cursor = 'pointer';
+            row.addEventListener('click', (e) => {
+                // Don't trigger if clicking on action buttons
+                if (!e.target.closest('.action-btn')) {
+                    showFacultyCredentials(facultyId, facultyName);
+                }
+            });
+        });
+    });
+
   </script>
   <script src="../faculty/help.js?v=<?php echo time(); ?>"></script>
 </body>

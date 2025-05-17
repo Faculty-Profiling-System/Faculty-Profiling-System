@@ -107,42 +107,91 @@
 .actions .reject-btn:hover {
   background-color: #c82333;
 }
-
-/* Dropdown Styles */
-nav ul li.dropdown {
-    position: relative;
-}
-
-nav ul li.dropdown .dropdown-menu {
-    display: none;
-    position: relative;
-    left: 0;
-    background-color: #015f22;
-    min-width: 200px;
-    z-index: 1000;
-    border: 1px solid #024117;
-    box-shadow: 0px 8px 16px rgba(0,0,0,0.2);
-    padding: 0;
-    margin: 0;
-}
-
-nav ul li.dropdown .dropdown-menu li {
-    padding: 0;
-    list-style: none;
-}
-
-nav ul li.dropdown .dropdown-menu a {
-    color: white;
-    padding: 12px 16px;
-    text-decoration: none;
-    display: block;
-    font-size: 14px;
-    font-family: 'Trebuchet MS';
-}
-
-nav ul li.dropdown .dropdown-menu a:hover {
-    background-color: #04b032;
-}
+    /* Dropdown Styles */
+    nav ul li.dropdown {
+      position: relative;
+    }
+    
+    nav ul li.dropdown .dropdown-menu {
+      display: none;
+      position: relative;
+      left: 0;
+      min-width: 200px;
+      z-index: 1000;
+      padding: 0;
+      margin: 0;
+    }
+    
+    nav ul li.dropdown .dropdown-menu li {
+      padding: 0;
+      list-style: none;
+    }
+    
+    nav ul li.dropdown .dropdown-menu a {
+      color: white;
+      padding: 12px 16px;
+      text-decoration: none;
+      display: block;
+      font-size: 14px;
+      font-family: 'Trebuchet MS';
+    }
+    
+    nav ul li.dropdown .dropdown-menu a:hover {
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      border-right: 3px solid #04b032;
+      border-left: 3px solid #04b032;
+      margin-right: 15px;
+      padding-top: 10px;
+      padding-bottom: 10px;
+      background-color: #0e4301;
+    }
+    
+    /* Tab Styles */
+    .log-tabs {
+      display: flex;
+      margin-bottom: 20px;
+      border-bottom: 1px solid #ddd;
+    }
+    
+    .log-tab {
+      padding: 10px 20px;
+      color: #5c5d5e;
+      cursor: pointer;
+      background-color: #f1f1f1;
+      border: 1px solid #ddd;
+      border-bottom: none;
+      margin-right: 5px;
+      border-radius: 5px 5px 0 0;
+      transition: all 0.3s ease;
+      font-family: "Tahoma";
+    }
+    
+    
+    .log-tab:hover {
+      background-color: #e0e0e0;
+    }
+    
+    .log-tab.active {
+      background-color: #fff;
+      border-bottom: 1px solid #fff;
+      margin-bottom: -1px;
+      font-weight: bold;
+      color: #04b032;
+      border-top: 3px solid #04b032;
+    }
+    
+    .log-content {
+      display: none;
+    }
+    
+    .log-content.active {
+      display: block;
+    }
+    
+    .session-duration {
+      text-align: center;
+    }
+    
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
@@ -154,4 +203,85 @@ nav ul li.dropdown .dropdown-menu a:hover {
     display: block;
     overflow-x: auto;
   }
+}
+
+/* Search and Add Container */
+.search-add-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    gap: 1rem;
+}
+
+.search-box {
+    position: relative;
+    flex-grow: 1;
+    max-width: 250px;
+}
+
+.search-box i {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6c757d;
+}
+
+.search-box input {
+    width: 100%;
+    padding: 0.6rem 1rem 0.6rem 2.5rem;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+}
+
+.search-box input:focus {
+    border-color: #28a745;
+    outline: none;
+    box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+}
+
+.log-tabs {
+  display: flex;
+  align-items: center;      /* Vertically center the tabs */
+  justify-content: flex-start; /* Align all tabs to the left */
+  margin-bottom: 20px;
+  border-bottom: 1px solid #ddd;
+}
+
+.log-search-box {
+  margin-left: 720px;
+  min-width: 250px;
+}
+
+@media (max-width: 768px) {
+  .log-tabs {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .log-search-box {
+    margin: 10px 0 0 0;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+  }
+}
+
+/* Add these styles to make the login-logs table scrollable */
+#login-logs {
+  max-height: calc(100vh - 250px); /* Adjust based on your header height */
+  overflow-y: auto;
+  margin-bottom: 20px;
+}
+
+#login-logs .report-table {
+  margin-bottom: 0;
+}
+
+/* Prevent body scrolling when table is scrollable */
+body.report-page {
+  overflow: hidden;
+  height: 100vh;
 }
