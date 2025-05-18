@@ -61,6 +61,7 @@ $users = $stmt->get_result();
   <title>User Management | Admin</title>
   <link rel="stylesheet" href="../css/admin_style.css?v=<?php echo time(); ?>" />
   <link rel="stylesheet" href="../css/user.css?v=<?php echo time(); ?>" />
+  <link rel="stylesheet" href="../css/help.css?v=<?php echo time(); ?>">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
 </head>
 <body>
@@ -264,6 +265,9 @@ $users = $stmt->get_result();
       <input type="hidden" name="faculty_id" id="delete_faculty_id">
   </form>
 
+  
+  <?php include '../faculty/help.php'; ?>
+
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       const savedTheme = localStorage.getItem('plpTheme') || 'light';
@@ -319,6 +323,7 @@ $users = $stmt->get_result();
   </script>
   <script src="scripts.js?v=<?php echo time(); ?>"></script>
   <script src="users.js?v=<?php echo time(); ?>"></script>
+  <script src="../faculty/help.js?v=<?php echo time(); ?>"></script>
   <?php if (isset($conn)) $conn->close(); ?>
 </body>
 </html>

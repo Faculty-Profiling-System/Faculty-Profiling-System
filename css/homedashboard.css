@@ -29,7 +29,7 @@
 
 .dashboard-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: 2fr 1fr 1fr;
     gap: 30px;
 }
 
@@ -85,8 +85,9 @@
 
 .info-label {
     font-weight: 600;
-    width: 120px;
+    width: 150px;
     color: #555;
+    white-space: nowrap;
 }
 
 .info-value {
@@ -94,31 +95,46 @@
     color: #333;
 }
 
-.credentials-list {
-    margin-bottom: 20px;
+.credentials-summary {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 15px 0;
+    flex: 1;
 }
 
-.credential-item {
+.credentials-count {
     display: flex;
     align-items: center;
-    padding: 12px 0;
-    border-bottom: 1px solid #eee;
-    gap: 15px;
+    margin-bottom: 15px;
 }
 
-.credential-item i {
-    color: #e74c3c;
-    font-size: 20px;
+.credentials-count i {
+    font-size: 2.5rem;
+    color: #4CAF50;
+    margin-right: 15px;
 }
 
-.credential-name {
-    flex: 1;
-    font-weight: 500;
+.credentials-count .count-number {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #2c3e50;
 }
 
-.credential-date {
-    font-size: 13px;
-    color: #777;
+.credentials-count .count-label {
+    font-size: 1rem;
+    color: #7f8c8d;
+    margin-left: 5px;
+}
+
+.credentials-info {
+    margin-bottom: 15px;
+}
+
+.credentials-info p {
+    margin: 5px 0;
+    color: #555;
 }
 
 .btn {
@@ -142,7 +158,6 @@
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* Schedule Card Specific Styles */
 .schedule-summary {
     display: flex;
     flex-direction: column;

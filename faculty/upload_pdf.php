@@ -1,191 +1,115 @@
 <?php
 session_start();
-require_once '../db_connection.php';
+require_once('../db_connection.php');
 
-// Security headers
-header("X-Frame-Options: DENY");
-header("X-Content-Type-Options: nosniff");
-header("X-XSS-Protection: 1; mode=block");
-header("Content-Type: application/json");
-
-// Configure upload directory (secure location)
-$uploadDir = __DIR__ . '/uploads/';
-$publicDir = 'uploads/';
-
-// Create directory if needed with strict permissions
-if (!file_exists($uploadDir)) {
-    if (!mkdir($uploadDir, 0750, true)) { // Restrict permissions
-        http_response_code(500);
-        die(json_encode(['success' => false, 'message' => 'Failed to create upload directory']));
-    }
-}
-
-// Initialize response
-$response = [
-    'success' => false,
-    'message' => 'Invalid request',
-    'filepath' => null,
-    'db_record_id' => null
-];
-
-// Only accept POST requests
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    http_response_code(405);
-    $response['message'] = 'Method not allowed';
-    echo json_encode($response);
-    exit;
-}
-
-// Validate faculty session
 if (!isset($_SESSION['faculty_id'])) {
-    http_response_code(401);
-    $response['message'] = 'Unauthorized access';
-    echo json_encode($response);
-    exit;
+    echo json_encode(['success' => false, 'message' => 'Unauthorized access']);
+    exit();
 }
 
-/**
- * Get human-readable upload error message
- */
-function getUploadError($errorCode) {
-    $errors = [
-        UPLOAD_ERR_INI_SIZE => 'File exceeds server size limit',
-        UPLOAD_ERR_FORM_SIZE => 'File exceeds form size limit',
-        UPLOAD_ERR_PARTIAL => 'File partially uploaded',
-        UPLOAD_ERR_NO_FILE => 'No file selected',
-        UPLOAD_ERR_NO_TMP_DIR => 'Missing temporary folder',
-        UPLOAD_ERR_CANT_WRITE => 'Failed to write file',
-        UPLOAD_ERR_EXTENSION => 'File type not allowed',
-    ];
-    return $errors[$errorCode] ?? 'Unknown upload error';
+// Check if file was uploaded
+if (!isset($_FILES['scheduleFile']) || $_FILES['scheduleFile']['error'] !== UPLOAD_ERR_OK) {
+    echo json_encode(['success' => false, 'message' => 'No file uploaded or upload error']);
+    exit();
 }
 
+// Validate file type and size
+$file = $_FILES['scheduleFile'];
+$allowedTypes = ['application/pdf'];
+$maxSize = 5 * 1024 * 1024; // 5MB
+
+if (!in_array($file['type'], $allowedTypes)) {
+    echo json_encode(['success' => false, 'message' => 'Only PDF files are allowed']);
+    exit();
+}
+
+if ($file['size'] > $maxSize) {
+    echo json_encode(['success' => false, 'message' => 'File size exceeds 5MB limit']);
+    exit();
+}
+
+// Validate form data
+$requiredFields = ['fileName', 'semester', 'startYear', 'endYear', 'totalLoad'];
+foreach ($requiredFields as $field) {
+    if (empty($_POST[$field])) {
+        echo json_encode(['success' => false, 'message' => 'All fields are required']);
+        exit();
+    }
+}
+
+$semester = $_POST['semester'];
+
+// Validate year format
+$startYear = (int)$_POST['startYear'];
+$endYear = (int)$_POST['endYear'];
+if ($startYear < 2000 || $startYear > 2099 || $endYear < 2000 || $endYear > 2099) {
+    echo json_encode(['success' => false, 'message' => 'Year must be between 2000-2099']);
+    exit();
+}
+
+// Validate total loads is numeric
+if (!is_numeric($_POST['totalLoad'])) {
+    echo json_encode(['success' => false, 'message' => 'Total loads must be a number']);
+    exit();
+}
+
+// Create upload directory if it doesn't exist
+$uploadDir = 'uploads/teaching_loads/';
+if (!file_exists($uploadDir)) {
+    mkdir($uploadDir, 0777, true);
+}
+
+// Generate unique filename
+$fileName = preg_replace('/[^a-zA-Z0-9\-\._]/', '', $_POST['fileName']);
+$extension = pathinfo($file['name'], PATHINFO_EXTENSION);
+$newFilename = 'teachingload_' . $_SESSION['faculty_id'] . '_' . time() . '.' . $extension;
+$filePath = $uploadDir . $newFilename;
+
+// Move uploaded file
+if (!move_uploaded_file($file['tmp_name'], $filePath)) {
+    echo json_encode(['success' => false, 'message' => 'Failed to save file']);
+    exit();
+}
+
+// Insert into database
 try {
-    // Validate file upload
-    if (!isset($_FILES['scheduleFile']) || $_FILES['scheduleFile']['error'] !== UPLOAD_ERR_OK) {
-        throw new RuntimeException(getUploadError($_FILES['scheduleFile']['error'] ?? UPLOAD_ERR_NO_FILE));
-    }
-
-    $file = $_FILES['scheduleFile'];
-    $facultyId = $_SESSION['faculty_id'];
-
-    // Security checks
-    if ($file['size'] === 0) {
-        throw new RuntimeException('Empty file uploaded');
-    }
-
-    // Verify PDF using multiple methods
-    $finfo = new finfo(FILEINFO_MIME_TYPE);
-    $mimeType = $finfo->file($file['tmp_name']);
+    $stmt = $conn->prepare("INSERT INTO teaching_load 
+        (faculty_id, file_name, semester, start_year, end_year, total_loads, file_path, status) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, 'Pending')");
     
-    $allowedMimeTypes = ['application/pdf', 'application/x-pdf'];
-    if (!in_array($mimeType, $allowedMimeTypes)) {
-        throw new RuntimeException('Only PDF files are allowed');
-    }
-
-    // Check file extension
-    $fileExt = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
-    if ($fileExt !== 'pdf') {
-        throw new RuntimeException('Invalid file extension');
-    }
-
-    // Check file size (5MB max)
-    if ($file['size'] > 5 * 1024 * 1024) {
-        throw new RuntimeException('File exceeds 5MB limit');
-    }
-
-    // Generate secure filename
-    $filename = sprintf(
-        'schedule_%d_%d_%s.pdf',
-        $facultyId,
-        time(),
-        bin2hex(random_bytes(4))
+    $stmt->bind_param("ssssiis", 
+        $_SESSION['faculty_id'],
+        $_POST['fileName'],
+        $semester,
+        $startYear,
+        $endYear,
+        $_POST['totalLoad'],
+        $filePath
     );
-    $destination = $uploadDir . $filename;
-
-    // Sanitize filename
-    $filename = preg_replace("/[^a-zA-Z0-9._-]/", "", $filename);
-    $destination = $uploadDir . $filename;
-
-    // Check for existing file
-    if (file_exists($destination)) {
-        throw new RuntimeException('File already exists');
-    }
-
-    // Move uploaded file
-    if (!move_uploaded_file($file['tmp_name'], $destination)) {
-        throw new RuntimeException('Failed to save file');
-    }
-
-    // Verify file was saved
-    if (!file_exists($destination)) {
-        throw new RuntimeException('File verification failed');
-    }
-
-    // Clean up previous file
-    if (!empty($_SESSION['last_pdf']) && file_exists($uploadDir . basename($_SESSION['last_pdf']))) {
-        @unlink($uploadDir . basename($_SESSION['last_pdf']));
-    }
-
-    // Store public path
-    $publicPath = $publicDir . $filename;
-    $_SESSION['last_pdf'] = $publicPath;
-
-    // Database transaction
-    $conn->begin_transaction();
-
-    try {
-        // Insert into teaching_loads table
-        $stmt = $conn->prepare("
-            INSERT INTO teaching_load 
-            (faculty_id, file_path, status, created_at) 
-            VALUES (?, ?, 'successful', NOW())
-        ");
-        $stmt->bind_param("is", $facultyId, $publicPath);
-        
-        if (!$stmt->execute()) {
-            throw new RuntimeException('Database insert failed');
-        }
-
-        $recordId = $conn->insert_id;
-        $conn->commit();
-
-        // Successful response
-        $response = [
+    
+    if ($stmt->execute()) {
+        echo json_encode([
             'success' => true,
-            'message' => 'Schedule uploaded successfully',
-            'filepath' => $publicPath,
-            'db_record_id' => $recordId
-        ];
-
-    } catch (Exception $e) {
-        $conn->rollback();
-        throw $e; // Re-throw for outer catch block
+            'message' => 'Teaching load uploaded successfully',
+            'filepath' => $filePath,
+            'fileName' => $_POST['fileName'],
+            'semester' => $semester,
+            'startYear' => $startYear,
+            'endYear' => $endYear,
+            'totalLoad' => $_POST['totalLoad']
+        ]);
+    } else {
+        // Delete the uploaded file if database insert failed
+        unlink($filePath);
+        echo json_encode(['success' => false, 'message' => 'Database error: ' . $stmt->error]);
     }
-
-} catch (RuntimeException $e) {
-    // Log failed attempt
-    if (isset($facultyId)) {
-        try {
-            $stmt = $conn->prepare("
-                INSERT INTO teaching_load 
-                (faculty_id, file_path, status, created_at) 
-                VALUES (?, ?, 'failed', NOW())
-            ");
-            $path = isset($publicPath) ? $publicPath : 'upload_failed';
-            $stmt->bind_param("is", $facultyId, $path);
-            $stmt->execute();
-        } catch (Exception $dbError) {
-            error_log("Failed to log error: " . $dbError->getMessage());
-        }
+    
+    $stmt->close();
+} catch (Exception $e) {
+    // Delete the uploaded file if there was an error
+    if (file_exists($filePath)) {
+        unlink($filePath);
     }
-
-    http_response_code(400);
-    $response['message'] = $e->getMessage();
-    error_log("Upload Error [Faculty {$facultyId}]: " . $e->getMessage());
+    echo json_encode(['success' => false, 'message' => 'Database error: ' . $e->getMessage()]);
 }
-
-// Clean output buffer and send response
-ob_end_clean();
-echo json_encode($response);
-exit;
+?>

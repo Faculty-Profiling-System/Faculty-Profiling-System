@@ -33,7 +33,7 @@ $college_row = $college_result->fetch_assoc();
 $current_college_name = $college_row['college_name'];
 
 // Fetch credentials from the same college
-$sql = "SELECT * FROM vw_credentials_report WHERE college_name = ? ORDER BY full_name";
+$sql = "SELECT * FROM vw_credentials_report WHERE college_name = ? ORDER BY full_name, credential_type ASC";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("s", $current_college_name);
 $stmt->execute();
@@ -143,12 +143,13 @@ $credentials_result = $stmt->get_result();
         <div class="filter-box">
           <select id="typeFilter" onchange="applyFilters()">
             <option value="">All Types</option>
+            <option value="PDS">PDS</option>
+            <option value="SALN">SALN</option>
+            <option value="TOR">TOR</option>
             <option value="Diploma">Diploma</option>
-            <option value="Certificate">Certificate</option>
-            <option value="Professional License">Professional License</option>
-            <option value="Training Certificate">Training Certificate</option>
-            <option value="Award">Award</option>
-            <option value="Other">Other</option>
+            <option value="Teaching Load">Teaching Load</option>
+            <option value="Certificates">Certificates</option>
+            <option value="Evaluation">Evaluation</option>
           </select>
         </div>
       </div>
@@ -160,88 +161,43 @@ $credentials_result = $stmt->get_result();
             <th>NAME</th>
             <th>CREDENTIAL TYPE</th>
             <th>CREDENTIAL NAME</th>
+            <th>SEMESTER</th>
+            <th>SCHOOL YEAR</th>
+            <th>TOTAL LOADS</th>
             <th>FILE</th>
             <th>ACTIONS</th>
           </tr>
         </thead>
         <tbody>
           <?php while ($row = $credentials_result->fetch_assoc()): ?>
-          <tr>
-            <td><?= htmlspecialchars($row['faculty_id']) ?></td>
-            <td><?= htmlspecialchars($row['full_name']) ?></td>
-            <td><?= htmlspecialchars($row['credential_type']) ?></td>
-            <td><?= htmlspecialchars($row['credential_name']) ?></td>
-            <td>
-              <a href="<?= htmlspecialchars($row['file_path']) ?>" target="_blank" class="view-file">VIEW FILE</a>
-            </td>
-            <td class="actions">
-              <button onclick="approveCredential('<?= $row['credential_id'] ?>')" class="approve-btn">Approve</button>
-              <button onclick="rejectCredential('<?= $row['credential_id'] ?>')" class="reject-btn">Reject</button>
-            </td>
-          </tr>
+            <tr>
+              <td><?= htmlspecialchars($row['faculty_id']) ?></td>
+              <td><?= htmlspecialchars($row['full_name']) ?></td>
+              <td><?= htmlspecialchars($row['credential_type']) ?></td>
+              <td><?= htmlspecialchars($row['credential_name']) ?></td>
+              <td><?= htmlspecialchars($row['semester'] ?? 'N/A') ?></td>
+              <td><?= htmlspecialchars($row['school_year'] ?? 'N/A') ?></td>
+              <td><?= htmlspecialchars($row['total_loads'] ?? 'N/A') ?></td>
+              <td>
+                <button onclick="viewCredentialFile('<?= htmlspecialchars($row['file_path']) ?>')" class="view-file">VIEW FILE</button>
+              </td>
+              <td class="actions">
+                <?php if ($row['source_type'] === 'Credential'): ?>
+                  <button onclick="approveCredential('<?= $row['credential_id'] ?>')" class="approve-btn">Approve</button>
+                  <button onclick="rejectCredential('<?= $row['credential_id'] ?>')" class="reject-btn">Reject</button>
+                <?php elseif ($row['source_type'] === 'TeachingLoad'): ?>
+                  <button onclick="approveTeachingLoad('<?= $row['load_id'] ?>')" class="approve-btn">Approve</button>
+                  <button onclick="rejectTeachingLoad('<?= $row['load_id'] ?>')" class="reject-btn">Reject</button>
+                <?php endif; ?>
+              </td>
+            </tr>
           <?php endwhile; ?>
         </tbody>
       </table>
     </div>
   </div>
 
-        <!-- Help Button -->
-    <div class="help-button" onclick="toggleHelpPopout()">
-        <i class="fas fa-question"></i>
-    </div>
-
-    <!-- Main Help Popout -->
-    <div id="helpPopout" class="popout">
-        <div class="popout-header">
-            <h3>Need Help?</h3>
-            <span class="popout-close" onclick="closeHelpPopout()">&times;</span>
-        </div>
-        <div class="help-option" onclick="openFaqPopout()">
-            <i class="fas fa-question-circle"></i> FAQ's
-        </div>
-        <div class="help-option" onclick="openContactPopout()">
-            <i class="fas fa-headset"></i> Still need help?
-        </div>
-    </div>
-
-    <!-- FAQ Popout -->
-    <div id="faqPopout" class="content-popout">
-        <div class="popout-header">
-            <h3>Frequently Asked Questions</h3>
-            <span class="popout-close" onclick="closeFaqPopout()">&times;</span>
-        </div>
-        <div class="faq-item">
-            <div class="faq-question">Q: How do I update my profile information?</div>
-            <p>A: Go to the Profile section and click on the "Edit Profile" button.</p>
-        </div>
-        <div class="faq-item">
-            <div class="faq-question">Q: How do I upload my teaching schedule?</div>
-            <p>A: Navigate to Teaching Load section and use the "Upload Schedule" button.</p>
-        </div>
-        <div class="faq-item">
-            <div class="faq-question">Q: What file formats are accepted?</div>
-            <p>A: We accept PDF, JPG, and PNG files for credential uploads.</p>
-        </div>
-        <div class="faq-item">
-            <div class="faq-question">Q: How do I change my password?</div>
-            <p>A: Go to Settings and use the "Change Password" option.</p>
-        </div>
-    </div>
-
-    <!-- Contact Popout -->
-    <div id="contactPopout" class="content-popout">
-        <div class="popout-header">
-            <h3>Contact Support</h3>
-            <span class="popout-close" onclick="closeContactPopout()">&times;</span>
-        </div>
-        <p>If you need further assistance:</p>
-        <div class="contact-info">
-            <p><i class="fas fa-envelope"></i> support@plpasig.edu.ph</p>
-            <p><i class="fas fa-phone"></i> +63 2 123 4567</p>
-            <p><i class="fas fa-clock"></i> Mon-Fri, 8:00 AM - 5:00 PM</p>
-            <p><i class="fas fa-map-marker-alt"></i> Admin Building, Room 101</p>
-        </div>
-    </div>
+  <?php include '../faculty/help.php'; ?>
 
   <script src="report.js?v=<?php echo time(); ?>"></script>
   <script src="scripts.js?v=<?php echo time(); ?>"></script>

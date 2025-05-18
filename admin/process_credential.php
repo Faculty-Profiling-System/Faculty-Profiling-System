@@ -79,12 +79,12 @@ try {
                 $mail->Host = 'smtp-relay.brevo.com';  // Brevo SMTP server
                 $mail->SMTPAuth = true;
                 $mail->Username = '8cc35a002@smtp-brevo.com';  // Your Brevo SMTP Username
-                $mail->Password = 'xsmtpsib-437784d0788f1667e9fd368e2c8ffed56846c7f464b08f405f8fb1d1622f46e8-XMqnFNrSp1GahgzD';  // Your Brevo SMTP Password
+                $mail->Password = 'JSh1qV4zbR7DWaI0';  // Your Brevo SMTP Password
                 $mail->SMTPSecure = \PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS;  // Use TLS
                 $mail->Port = 587;  // TLS Port
 
                 // Set the email details
-                $mail->setFrom('plp.no.reply1@gmail.com', 'FACULTY PROFILING SYSTEM');
+                $mail->setFrom('plp.no.reply1@gmail.com', 'NO REPLY');
                 $mail->addAddress($facultyEmail);  // Add the faculty's email
 
                 $mail->Subject = 'Credential Rejection Notification';
