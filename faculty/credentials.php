@@ -1,19 +1,128 @@
 <?php
-
 session_start();
-require_once '../db_connection.php';
-if (!isset($_SESSION['user_id'])) {
+if (!isset($_SESSION['faculty_id'])) {
     header('Location: ../landing/index.php');
     exit();
 }
 
+if (isset($_SESSION['upload_success'])) {
+    $success = $_SESSION['upload_success'];
+    unset($_SESSION['upload_success']);
+}
+
+if (isset($_SESSION['error'])) {
+    $error = $_SESSION['error'];
+    unset($_SESSION['error']);
+}   
+
+require_once '../db_connection.php';
+
 $faculty_id = $_SESSION['faculty_id'];
 $credentials = [];
 $error = null;
+$success = null;
+
+// Handle file upload
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['credential_file'])) {
+    $credentialType = $_POST['credential_type'];
+    $credentialName = $_POST['credential_name'];
+    $issuedBy = $_POST['issued_by'];
+    $issuedDate = $_POST['issued_date'];
+    $expiryDate = !empty($_POST['expiry_date']) ? $_POST['expiry_date'] : null;
+    
+    $file = $_FILES['credential_file'];
+    $originalFileName = $file['name'];
+    $fileTmpName = $file['tmp_name'];
+    $fileSize = $file['size'];
+    $fileError = $file['error'];
+
+    // Validate issued date is not in the future
+    $currentDate = date('Y-m-d');
+    if ($issuedDate > $currentDate) {
+        $_SESSION['upload_alert'] = 'error';
+        $_SESSION['error_message'] = "Issued date cannot be in the future";
+        header('Location: credentials.php');
+        exit();
+    }
+
+    // Validate expiry date is after issued date if provided
+    if ($expiryDate && $expiryDate < $issuedDate) {
+        $_SESSION['upload_alert'] = 'error';
+        $_SESSION['error_message'] = "Expiry date must be after issued date";
+        header('Location: credentials.php');
+        exit();
+    }
+    
+    // Validate file (PDF only, max 5MB)
+    $fileExt = strtolower(pathinfo($originalFileName, PATHINFO_EXTENSION));
+    $allowed = ['pdf'];
+    
+    if (in_array($fileExt, $allowed)) {
+        if ($fileError === 0) {
+            if ($fileSize < 5000000) { // 5MB
+                $newFileName = uniqid('', true) . '.' . $fileExt;
+                $fileDestination = 'uploads/credentials/' . $newFileName;
+                
+                if (move_uploaded_file($fileTmpName, $fileDestination)) {
+                    try {
+                        $stmt = $conn->prepare("INSERT INTO credentials (faculty_id, credential_type, credential_name, issued_by, issued_date, expiry_date, file_path) VALUES (?, ?, ?, ?, ?, ?, ?)");
+                        $stmt->bind_param("sssssss", $faculty_id, $credentialType, $credentialName, $issuedBy, $issuedDate, $expiryDate, $fileDestination);
+                        $stmt->execute();
+                        $stmt->close();
+                        
+                        // Set success flag and redirect
+                        $_SESSION['upload_alert'] = 'success';
+                        header('Location: credentials.php');
+                        exit();
+                    } catch (Exception $e) {
+                        // Set error flag and redirect
+                        $_SESSION['upload_alert'] = 'error';
+                        $_SESSION['error_message'] = "Database error: " . $e->getMessage();
+                        unlink($fileDestination);
+                        header('Location: credentials.php');
+                        exit();
+                    }
+                } else {
+                    $_SESSION['upload_alert'] = 'error';
+                    $_SESSION['error_message'] = "There was an error uploading your file.";
+                    header('Location: credentials.php');
+                    exit();
+                }
+            } else {
+                $error = "File is too large. Maximum size is 5MB.";
+            }
+        } else {
+            $error = "There was an error uploading your file.";
+        }
+    } else {
+        $error = "You can only upload PDF files.";
+    }
+}
+
+// Build the base query
+$query = "SELECT * FROM credentials WHERE faculty_id = ?";
+$params = [$faculty_id];
+$types = "s";
+
+// Add filters if they exist in GET parameters
+if (isset($_GET['status']) && !empty($_GET['status'])) {
+    $query .= " AND status = ?";
+    $params[] = $_GET['status'];
+    $types .= "s";
+}
+
+if (isset($_GET['credential_type']) && !empty($_GET['credential_type'])) {
+    $query .= " AND credential_type = ?";
+    $params[] = $_GET['credential_type'];
+    $types .= "s";
+}
+
+// Add sorting
+$query .= " ORDER BY issued_date DESC";
 
 try {
-    $stmt = $conn->prepare("SELECT * FROM credentials WHERE faculty_id = ? ORDER BY issued_date DESC");
-    $stmt->bind_param("s", $faculty_id);
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param($types, ...$params);
     $stmt->execute();
     $result = $stmt->get_result();
     $credentials = $result->fetch_all(MYSQLI_ASSOC);
@@ -64,345 +173,235 @@ try {
     </nav>
 
     <div class="logout-section">
-        <a href="#" onclick="confirmLogout()"><img src="../images/logout.png" alt="Logout Icon" class="menu-icon">LOGOUT</a>
-      </div>
-  </div>        
+            <a href="#" onclick="confirmLogout()"><img src="../images/logout.png" alt="Logout Icon" class="menu-icon">LOGOUT</a>
+        </div>
+    </div>        
 
-    
-    <div class="dashboard-container">
-        
-        <?php if (isset($error)): ?>
-            <div class="alert alert-danger">
-                <i class="fas fa-exclamation-circle"></i> <?php echo htmlspecialchars($error); ?>
-            </div>
-        <?php endif; ?>
-        
-        <div class="card">
-            <h1 class="dashboard-title">
-                <i class="fas fa-folder-open"></i> My Credentials
-            </h1>
-            <h2 class="card-title">
-                <i class="fas fa-cloud-upload-alt"></i> Upload New Credential
-            </h2>
-            
-            <form id="uploadForm" class="upload-form" enctype="multipart/form-data" action="credential_api/upload_credential.php" method="POST">
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="credentialType">Credential Type</label>
-                        <select id="credentialType" name="credentialType" class="form-control" required>
-                            <option value="">Select credential type</option>
-                            <option value="Diploma">Diploma</option>
-                            <option value="Certificate">Certificate</option>
-                            <option value="Professional License">Professional License</option>
-                            <option value="Training Certificate">Training Certificate</option>
-                            <option value="Award">Award</option>
-                            <option value="Other">Other</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="credentialName">Credential Name</label>
-                        <input type="text" id="credentialName" name="credentialName" class="form-control" 
-                               placeholder="e.g., Bachelor of Science in Education" required>
-                    </div>
+    <div class="main-content">
+        <div class="header-content">
+            <h2><i class="fas fa-folder-open"></i> My Credentials</h2>
+        </div>
+
+        <!-- Upload Card -->
+        <div class="card upload-card">
+            <h2><i class="fas fa-upload"></i> Upload Credential</h2>
+            <form action="credentials.php" method="POST" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="credential_type">Credential Type:</label>
+                    <select id="credential_type" name="credential_type" required>
+                        <option value="">Select Type</option>
+                        <option value="PDS">PDS</option>
+                        <option value="SALN">SALN</option>
+                        <option value="TOR">TOR</option>
+                        <option value="Diploma">Diploma</option>
+                        <option value="Certificates">Certificates</option>
+                        <option value="Evaluation">Evaluation</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="credential_name">Credential Name:</label>
+                    <input type="text" id="credential_name" name="credential_name" placeholder="e.g. Bachelor of Science in Computer Science" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="issued_by">Issued By:</label>
+                    <input type="text" id="issued_by" name="issued_by" placeholder="e.g. Pamantasan ng Lungsod ng Pasig" required>
                 </div>
                 
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="issuedBy">Issued By</label>
-                        <input type="text" id="issuedBy" name="issuedBy" class="form-control" 
-                               placeholder="e.g., Pamantasan ng Lungsod ng Pasig" required>
+                        <label for="issued_date">Issued Date:</label>
+                        <input type="date" id="issued_date" name="issued_date" max="<?php echo date('Y-m-d'); ?>" required>
                     </div>
                     
                     <div class="form-group">
-                        <label for="issuedDate">Issue Date</label>
-                        <input type="date" id="issuedDate" name="issuedDate" class="form-control" required>
+                        <label for="expiry_date">Expiry Date (if applicable):</label>
+                        <input type="date" id="expiry_date" name="expiry_date">
                     </div>
                 </div>
                 
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="expiryDate">Expiry Date (if applicable)</label>
-                        <input type="date" id="expiryDate" name="expiryDate" class="form-control">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="credentialFile">Upload File</label>
-                        <div class="file-upload-wrapper">
-                            <input type="file" id="credentialFile" name="credentialFile" 
-                                   class="file-input" accept=".pdf,.jpg,.jpeg,.png" required>
-                            <label for="credentialFile" class="file-upload-label">
-                                <i class="fas fa-file-upload"></i> Choose File
-                            </label>
-                            <span class="file-name">No file chosen</span>
-                        </div>
-                        <small class="form-text">Accepted formats: PDF, JPG, PNG (Max 5MB)</small>
+                <div class="form-group file-upload">
+                    <label for="credential_file">Upload PDF File (max 5MB):</label>
+                    <div class="file-upload-wrapper">
+                        <input type="file" id="credential_file" name="credential_file" accept=".pdf" required>
+                        <label for="credential_file" class="file-upload-label">
+                            <i class="fas fa-cloud-upload"></i>
+                            <span class="file-upload-text">Choose a file</span>
+                            <span class="file-upload-filename" id="file-name">No file chosen</span>
+                        </label>
                     </div>
                 </div>
                 
-                <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-upload"></i> Upload Credential
-                </button>
-                
-                <div id="loadingIndicator" class="loading">
-                    <div class="spinner"></div>
-                    <p>Processing your credential...</p>
-                </div>
-                
-                <div id="statusMessage" class="status-message"></div>
+                <button type="submit" class="btn-upload"><i class="fas fa-cloud-upload"></i> Upload</button>
             </form>
         </div>
         
-        <div class="card">
-            <h2 class="card-title">
-                <i class="fas fa-folder-open"></i> My Credentials
-            </h2>
+        <!-- List of Uploaded Files Card -->
+        <div class="card list-card">
+            <h2><i class="fas fa-list"></i> Uploaded Credentials</h2>
             
-            <div class="credentials-controls">
-                <div class="search-box">
-                    <i class="fas fa-search"></i>
-                    <input type="text" id="searchCredentials" placeholder="Search credentials...">
-                </div>
-                
-                <select id="filterType" class="form-control">
-                    <option value="all">All Types</option>
-                    <option value="Diploma">Diplomas</option>
-                    <option value="Certificate">Certificates</option>
-                    <option value="Professional License">Licenses</option>
-                    <option value="Training Certificate">Trainings</option>
-                    <option value="Award">Awards</option>
-                </select>
-            </div>
-            
-            <div class="credentials-list">
-                <?php if (empty($credentials)): ?>
-                    <div class="empty-state">
-                        <i class="fas fa-folder-open"></i>
-                        <p>No credentials found</p>
-                        <p class="empty-state-help">
-                            You haven't uploaded any credentials yet. Use the form above to add your first credential.
-                        </p>
-                    </div>
-                <?php else: ?>
-                    <?php foreach ($credentials as $credential): ?>
-                        <div class="credential-item" 
-                        data-id="<?= $credential['credential_id'] ?>" 
-                        data-type="<?= htmlspecialchars($credential['credential_type']) ?>">
-                            <div class="credential-icon">
-                                <?php switch($credential['credential_type']):
-                                    case 'Diploma': ?>
-                                        <i class="fas fa-graduation-cap"></i>
-                                        <?php break; ?>
-                                    <?php case 'Professional License': ?>
-                                        <i class="fas fa-id-card"></i>
-                                        <?php break; ?>
-                                    <?php case 'Certificate': ?>
-                                        <i class="fas fa-certificate"></i>
-                                        <?php break; ?>
-                                    <?php case 'Training Certificate': ?>
-                                        <i class="fas fa-chalkboard-teacher"></i>
-                                        <?php break; ?>
-                                    <?php case 'Award': ?>
-                                        <i class="fas fa-trophy"></i>
-                                        <?php break; ?>
-                                    <?php default: ?>
-                                        <i class="fas fa-file-alt"></i>
-                                <?php endswitch; ?>
-                            </div>
-                            
-                            <div class="credential-details">
-                                <h3><?= htmlspecialchars($credential['credential_name']) ?></h3>
-                                <p class="credential-meta">
-                                    <span><i class="fas fa-building"></i> <?= htmlspecialchars($credential['issued_by']) ?></span>
-                                    <span><i class="fas fa-calendar-alt"></i> <?= date('F j, Y', strtotime($credential['issued_date'])) ?></span>
-                                    <?php if ($credential['expiry_date']): ?>
-                                        <span><i class="fas fa-clock"></i> Expires: <?= date('F j, Y', strtotime($credential['expiry_date'])) ?></span>
-                                    <?php endif; ?>
-                                    <span class="status-badge <?= strtolower($credential['status']) ?>">
-                                        <i class="fas fa-<?= 
-                                            $credential['status'] === 'Verified' ? 'check-circle' : 
-                                            ($credential['status'] === 'Rejected' ? 'times-circle' : 'clock') 
-                                        ?>"></i> 
-                                        <?= htmlspecialchars($credential['status']) ?>
-                                    </span>
-                                </p>
-                            </div>
-                            
-                            <div class="credential-actions">
-                                <button class="btn btn-sm btn-view" onclick="viewCredential(<?= $credential['credential_id'] ?>)">
-                                    <i class="fas fa-eye"></i> View
-                                </button>
-                                <a href="<?= htmlspecialchars($credential['file_path']) ?>" download class="btn btn-sm btn-download">
-                                    <i class="fas fa-download"></i> Download
-                                </a>
-                                <button class="btn btn-sm btn-delete" onclick="confirmDelete(<?= $credential['credential_id'] ?>)">
-                                    <i class="fas fa-trash"></i> Delete
-                                </button>
-                            </div>
+            <!-- Filter Section -->
+            <div class="filters">
+                <form method="GET" class="filter-form">
+                    <div class="filter-row">
+                        <div class="filter-group">
+                            <label for="status_filter">Status:</label>
+                            <select id="status_filter" name="status" onchange="this.form.submit()">
+                                <option value="">All Statuses</option>
+                                <option value="Pending" <?php echo (isset($_GET['status']) && $_GET['status'] == 'Pending') ? 'selected' : ''; ?>>Pending</option>
+                                <option value="Verified" <?php echo (isset($_GET['status']) && $_GET['status'] == 'Verified') ? 'selected' : ''; ?>>Verified</option>
+                                <option value="Rejected" <?php echo (isset($_GET['status']) && $_GET['status'] == 'Rejected') ? 'selected' : ''; ?>>Rejected</option>
+                            </select>
                         </div>
-                    <?php endforeach; ?>
-                <?php endif; ?>
+                        
+                        <div class="filter-group">
+                            <label for="credential_type_filter">Credential Type:</label>
+                            <select id="credential_type_filter" name="credential_type" onchange="this.form.submit()">
+                                <option value="">All Types</option>
+                                <option value="PDS" <?php echo (isset($_GET['credential_type']) && $_GET['credential_type'] == 'PDS') ? 'selected' : ''; ?>>PDS</option>
+                                <option value="SALN" <?php echo (isset($_GET['credential_type']) && $_GET['credential_type'] == 'SALN') ? 'selected' : ''; ?>>SALN</option>
+                                <option value="TOR" <?php echo (isset($_GET['credential_type']) && $_GET['credential_type'] == 'TOR') ? 'selected' : ''; ?>>TOR</option>
+                                <option value="Diploma" <?php echo (isset($_GET['credential_type']) && $_GET['credential_type'] == 'Diploma') ? 'selected' : ''; ?>>Diploma</option>
+                                <option value="Certificates" <?php echo (isset($_GET['credential_type']) && $_GET['credential_type'] == 'Certificates') ? 'selected' : ''; ?>>Certificates</option>
+                                <option value="Evaluation" <?php echo (isset($_GET['credential_type']) && $_GET['credential_type'] == 'Evaluation') ? 'selected' : ''; ?>>Evaluation</option>
+                            </select>
+                        </div>
+                    </div>
+                </form>
             </div>
-        </div>
-    </div>
-
-    <!-- Credential View Modal -->
-    <div id="credentialModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal()">&times;</span>
-            <h2 id="modalTitle">Credential Details</h2>
-            <div id="modalContent">
-            </div>
+            
+            <?php if (empty($credentials)): ?>
+                <div class="empty-state">
+                    <i class="fas fa-folder-open"></i>
+                    <p>No credentials found matching your criteria.</p>
+                </div>
+            <?php else: ?>
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Credential Name</th>
+                                <th>Type</th>
+                                <th>Issued By</th>
+                                <th>Issued Date</th>
+                                <th>Expiry Date</th>
+                                <th>Status</th>
+                                <th>Date Uploaded</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($credentials as $credential): ?>
+                                <tr data-id="<?php echo $credential['credential_id']; ?>">
+                                    <td><?php echo htmlspecialchars($credential['credential_name']); ?></td>
+                                    <td><?php echo htmlspecialchars($credential['credential_type']); ?></td>
+                                    <td><?php echo htmlspecialchars($credential['issued_by']); ?></td>
+                                    <td><?php echo date('M d, Y', strtotime($credential['issued_date'])); ?></td>
+                                    <td><?php echo $credential['expiry_date'] ? date('M d, Y', strtotime($credential['expiry_date'])) : 'N/A'; ?></td>
+                                    <td>
+                                        <span class="status-badge <?php echo strtolower($credential['status']); ?>">
+                                            <?php echo htmlspecialchars($credential['status']); ?>
+                                        </span>
+                                        <?php if ($credential['status'] === 'Rejected' && !empty($credential['reason'])): ?>
+                                            <span class="reason-tooltip" title="<?php echo htmlspecialchars($credential['reason']); ?>">
+                                                <i class="fas fa-info-circle"></i>
+                                            </span>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td><?php echo date('M d, Y h:i A', strtotime($credential['uploaded_at'])); ?></td>
+                                    <td class="actions">
+                                        <a href="<?php echo $credential['file_path']; ?>" target="_blank" class="btn-view" title="View"><i class="fas fa-eye"></i></a>
+                                        <a href="<?php echo $credential['file_path']; ?>" download class="btn-download" title="Download"><i class="fas fa-download"></i></a>
+                                        <?php if ($credential['status'] === 'Pending' || $credential['status'] === 'Rejected'): ?>
+                                            <a href="#" class="btn-delete" title="Delete" onclick="confirmDelete(<?php echo $credential['credential_id']; ?>)"><i class="fas fa-trash-alt"></i></a>
+                                        <?php endif; ?>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            <?php endif; ?>
         </div>
     </div>
     
     <?php include 'help.php'; ?>
 
     <script>
-    // Menu toggle
-    function toggleMenu() {
-        const navigation = document.querySelector('.navigation');
-        const hamburger = document.querySelector('.hamburger');
-        navigation.classList.toggle('active');
-        hamburger.classList.toggle('open');
-    }
-
-    // File input display
-    document.getElementById('credentialFile').addEventListener('change', function(e) {
-        const fileName = e.target.files[0] ? e.target.files[0].name : 'No file chosen';
-        document.querySelector('.file-name').textContent = fileName;
-    });
-
-    // Search and filter functionality
-    document.addEventListener('DOMContentLoaded', function() {
-        const searchInput = document.getElementById('searchCredentials');
-        const filterSelect = document.getElementById('filterType');
-        
-        searchInput.addEventListener('input', filterCredentials);
-        filterSelect.addEventListener('change', filterCredentials);
-        
-        function filterCredentials() {
-            const searchTerm = searchInput.value.toLowerCase();
-            const filterValue = filterSelect.value;
+        window.onload = function() {
+            <?php if (isset($_SESSION['upload_alert'])): ?>
+                <?php if ($_SESSION['upload_alert'] === 'success'): ?>
+                    alert('Credential uploaded successfully!');
+                <?php elseif ($_SESSION['upload_alert'] === 'error'): ?>
+                    alert('<?php echo isset($_SESSION['error_message']) ? addslashes($_SESSION['error_message']) : "Error uploading file"; ?>');
+                <?php endif; ?>
+                <?php 
+                unset($_SESSION['upload_alert']);
+                unset($_SESSION['error_message']);
+                ?>
+            <?php endif; ?>
             
-            document.querySelectorAll('.credential-item').forEach(item => {
-                const itemType = item.getAttribute('data-type').toLowerCase();
-                const itemText = item.textContent.toLowerCase();
-                
-                const matchesSearch = searchTerm === '' || itemText.includes(searchTerm);
-                const matchesFilter = filterValue === 'all' || itemType === filterValue.toLowerCase();
-                
-                item.style.display = (matchesSearch && matchesFilter) ? 'flex' : 'none';
+            // Update file name display when a file is selected
+            document.getElementById('credential_file').addEventListener('change', function(e) {
+                const fileName = e.target.files[0] ? e.target.files[0].name : 'No file chosen';
+                document.getElementById('file-name').textContent = fileName;
             });
+        };
+
+        // Prevent form resubmission
+        if (window.history.replaceState) {
+            window.history.replaceState(null, null, window.location.href);
         }
-    });
 
-    // View credential modal
-    function viewCredential(id) {
-        fetch(`credential_api/get_credential.php?id=${id}`)
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('modalTitle').textContent = data.credential_name;
+        function confirmDelete(credentialId) {
+            if (confirm('Are you sure you want to delete this credential?')) {
+                // Show loading indicator if you have one
+                const row = document.querySelector(`tr[data-id="${credentialId}"]`);
+                if (row) row.classList.add('deleting');
                 
-                let html = `
-                    <div class="modal-credential-info">
-                        <p><strong>Type:</strong> ${data.credential_type}</p>
-                        <p><strong>Issued by:</strong> ${data.issued_by}</p>
-                        <p><strong>Issue Date:</strong> ${new Date(data.issued_date).toLocaleDateString()}</p>
-                        ${data.expiry_date ? `<p><strong>Expiry Date:</strong> ${new Date(data.expiry_date).toLocaleDateString()}</p>` : ''}
-                        <p><strong>Status:</strong> <span class="status-badge ${data.status.toLowerCase()}">${data.status}</span></p>
-                    </div>
-                    <div class="modal-preview">
-                `;
-                
-                // Check if file exists
-                if (data.file_path) {
-                    if (data.file_path.toLowerCase().endsWith('.pdf')) {
-                        html += `<iframe src="${data.file_path}#toolbar=0&navpanes=0" frameborder="0"></iframe>`;
-                    } else {
-                        html += `<img src="${data.file_path}" alt="Credential Document" style="max-width:100%;">`;
-                    }
-                } else {
-                    html += `
-                        <div class="file-missing">
-                            <i class="fas fa-file-exclamation"></i>
-                            <p>File not found</p>
-                            <small>The uploaded file could not be located.</small>
-                        </div>
-                    `;
-                }
-                
-                html += `
-                        <div class="modal-actions">
-                            ${data.file_path ? `<a href="${data.file_path}" download class="btn btn-primary">
-                                <i class="fas fa-download"></i> Download
-                            </a>` : ''}
-                            <button class="btn btn-accent" onclick="toggleFullscreen()">
-                                <i class="fas fa-expand"></i> Fullscreen
-                            </button>
-                        </div>
-                    </div>
-                `;
-                
-                document.getElementById('modalContent').innerHTML = html;
-                document.getElementById('credentialModal').style.display = 'block';
-            })
-            .catch(error => {
-                alert('Error loading credential: ' + error.message);
-            });
-    }
-
-    function confirmDelete(id) {
-        if (confirm('Are you sure you want to delete this credential? This action cannot be undone.')) {
-            fetch(`credential_api/delete_credential.php?id=${id}`, { method: 'POST' })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        // Remove from UI
-                        document.querySelector(`.credential-item[data-id="${id}"]`).remove();
-                        // Show success message
-                        alert('Credential deleted successfully');
-                        // Reload if no credentials left
-                        if (document.querySelectorAll('.credential-item').length === 0) {
-                            location.reload();
+                fetch(`credential_api/delete_credential.php?id=${credentialId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Remove the row from the table
+                            const row = document.querySelector(`tr[data-id="${credentialId}"]`);
+                            if (row) row.remove();
+                            
+                            // Show success message
+                            alert(data.message || 'Credential deleted successfully');
+                            
+                            // If table is empty now, show empty state
+                            if (document.querySelectorAll('tbody tr').length === 0) {
+                                document.querySelector('.empty-state').style.display = 'flex';
+                            }
+                        } else {
+                            alert(data.message || 'Error deleting credential');
                         }
-                    } else {
-                        alert('Error: ' + data.message);
-                    }
-                })
-                .catch(error => {
-                    alert('Error: ' + error.message);
-                });
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('An error occurred while deleting the credential');
+                    })
+                    .finally(() => {
+                        // Hide loading indicator if you have one
+                        const row = document.querySelector(`tr[data-id="${credentialId}"]`);
+                        if (row) row.classList.remove('deleting');
+                    });
+            }
         }
-    }
 
-    function closeModal() {
-        document.getElementById('credentialModal').style.display = 'none';
-    }
+        document.querySelector('.main-content').addEventListener('click', function() {
+            if (document.querySelector('.navigation.active')) {
+                document.querySelector('.hamburger').click();
+            }
+        });
 
-    function toggleFullscreen() {
-        const elem = document.querySelector('#credentialModal iframe, #credentialModal img');
-        if (!document.fullscreenElement) {
-            elem?.requestFullscreen().catch(err => {
-                alert(`Fullscreen error: ${err.message}`);
-            });
-        } else {
-            document.exitFullscreen();
+        function confirmLogout() {
+            if (confirm('Are you sure you want to logout?')) {
+                window.location.href = '../landing/index.php';
+            }
         }
-    }
-    // Close modal when clicking outside
-    window.onclick = function(event) {
-        if (event.target == document.getElementById('credentialModal')) {
-            closeModal();
-        }
-    }
-    function confirmLogout() {
-      if (confirm('Are you sure you want to logout?')) {
-        // If user confirms, redirect to logout page
-        window.location.href = '../landing/index.php';
-      }
-      // If user cancels, do nothing
-    }
     </script>
     <script src="help.js?v=<?php echo time(); ?>"></script>
     <script src="../scripts.js?v=<?php echo time(); ?>"></script>

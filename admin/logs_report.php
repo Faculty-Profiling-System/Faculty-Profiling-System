@@ -173,59 +173,7 @@ $login_logs_result = $stmt->get_result();
     </div>
   </div>
 
-  <!-- Help Button -->
-  <div class="help-button" onclick="toggleHelpPopout()">
-      <i class="fas fa-question"></i>
-  </div>
-
-  <!-- Main Help Popout -->
-  <div id="helpPopout" class="popout">
-      <div class="popout-header">
-          <h3>Need Help?</h3>
-          <span class="popout-close" onclick="closeHelpPopout()">&times;</span>
-      </div>
-      <div class="help-option" onclick="openFaqPopout()">
-          <i class="fas fa-question-circle"></i> FAQ's
-      </div>
-      <div class="help-option" onclick="openContactPopout()">
-          <i class="fas fa-headset"></i> Still need help?
-      </div>
-  </div>
-
-  <!-- FAQ Popout -->
-  <div id="faqPopout" class="content-popout">
-      <div class="popout-header">
-          <h3>Frequently Asked Questions</h3>
-          <span class="popout-close" onclick="closeFaqPopout()">&times;</span>
-      </div>
-      <div class="faq-item">
-          <div class="faq-question">Q: How do I filter the logs by date?</div>
-          <p>A: Currently, logs are displayed in chronological order. Date filtering will be added in a future update.</p>
-      </div>
-      <div class="faq-item">
-          <div class="faq-question">Q: Why are some session durations missing?</div>
-          <p>A: Session duration is only calculated for login events when the user has logged out. Active sessions show the current duration.</p>
-      </div>
-      <div class="faq-item">
-          <div class="faq-question">Q: Can I export these logs to a file?</div>
-          <p>A: Export functionality will be available in the next system update.</p>
-      </div>
-  </div>
-
-  <!-- Contact Popout -->
-  <div id="contactPopout" class="content-popout">
-      <div class="popout-header">
-          <h3>Contact Support</h3>
-          <span class="popout-close" onclick="closeContactPopout()">&times;</span>
-      </div>
-      <p>If you need further assistance:</p>
-      <div class="contact-info">
-          <p><i class="fas fa-envelope"></i> support@plpasig.edu.ph</p>
-          <p><i class="fas fa-phone"></i> +63 2 123 4567</p>
-          <p><i class="fas fa-clock"></i> Mon-Fri, 8:00 AM - 5:00 PM</p>
-          <p><i class="fas fa-map-marker-alt"></i> Admin Building, Room 101</p>
-      </div>
-  </div>
+  <?php include '../faculty/help.php'; ?>
 
   <script src="report.js?v=<?php echo time(); ?>"></script>
   <script src="scripts.js?v=<?php echo time(); ?>"></script>
