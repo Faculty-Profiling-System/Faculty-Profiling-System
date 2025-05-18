@@ -45,11 +45,7 @@
     transition: all 0.2s;
 }
 
-.search-box input:focus {
-    border-color: #28a745;
-    outline: none;
-    box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
-}
+
 
 .add-user-btn {
     background-color: #28a745;
@@ -110,11 +106,6 @@
     transition: all 0.2s;
 }
 
-.user-table tbody tr:hover {
-    background-color: #e9f5ee;
-    transform: translateX(2px);
-}
-
 .no-results {
     text-align: center;
     padding: 1.5rem;
@@ -137,14 +128,28 @@
 }
 
 .edit-btn {
-    background-color: #007bff;
-    color: white;
+    background-color: #1e90ff;
+    color: #fff;
     margin-right: 0.5rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    border: none;
+    border-radius: 4px;
+    padding: 0.4rem 0.9rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    box-shadow: 0 2px 6px rgba(30, 144, 255, 0.08);
+    transition: background 0.2s, transform 0.2s;
+}
+
+.edit-btn i {
+    font-size: 12px;
 }
 
 .edit-btn:hover {
-    background-color: #0069d9;
-    transform: translateY(-1px);
+    background-color: #156ec0;
+    transform: translateY(-1px) scale(1.04);
 }
 
 .delete-btn {
@@ -317,42 +322,83 @@
 }
 
 /* Dropdown Styles */
-nav ul li.dropdown {
-    position: relative;
+.down-icon {
+  position: absolute;
+  width: 13px;
+  height: 13px;
+  margin-left: 220px;
+  vertical-align: left;
+  transition: transform 0.3s;
+  font-size: 1em;
 }
 
-nav ul li.dropdown .dropdown-menu {
-    display: none;
-    position: relative;
-    left: 0;
-    background-color: #015f22;
-    min-width: 200px;
-    z-index: 1000;
-    border: 1px solid #024117;
-    box-shadow: 0px 8px 16px rgba(0,0,0,0.2);
-    padding: 0;
-    margin: 0;
+.dropdown.open .down-icon {
+    transform: rotate(180deg);
 }
 
-nav ul li.dropdown .dropdown-menu li {
-    padding: 0;
-    list-style: none;
+.navigation ul {
+  margin-top: 80px;
+  padding: 0;
+}
+
+.navigation ul li {
+  color: #fff;
+  text-align: left;
+  list-style-type: none;
+  font-size: 1.5em;
+  padding: 15px 5px;
+  font-family: 'Trebuchet MS';
 }
 
 nav ul li.dropdown .dropdown-menu a {
     color: white;
     padding: 12px 16px;
     text-decoration: none;
-    display: block;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-left: 18px;
     font-size: 14px;
     font-family: 'Trebuchet MS';
+    transition: none; /* Remove transition */
+}
+
+nav ul li.dropdown .dropdown-menu a i {
+    min-width: 20px;
+    text-align: center;
+    font-size: 1em;
 }
 
 nav ul li.dropdown .dropdown-menu a:hover {
-    background-color: #04b032;
+    nav ul li.dropdown .dropdown-menu a {
+      color: white;
+      padding: 12px 16px;
+      text-decoration: none;
+      display: block;
+      font-size: 14px;
+      font-family: 'Trebuchet MS';
+    }
 }
 
-/* Status badge styles */
+    nav ul li.dropdown {
+      position: relative;
+    }
+    
+    nav ul li.dropdown .dropdown-menu {
+      display: none;
+      position: relative;
+      left: 0;
+      min-width: 200px;
+      z-index: 1000;
+      padding: 0;
+      margin-top: 7px;
+    }
+    
+    nav ul li.dropdown .dropdown-menu li {
+      padding: 0;
+      list-style: none;
+    }
+
 .status-badge {
     padding: 5px 10px;
     border-radius: 20px;
@@ -362,13 +408,13 @@ nav ul li.dropdown .dropdown-menu a:hover {
 }
 
 .status-active {
-    background-color: #28a745;
-    color: #ffffff;
+    background-color: #d4edda;
+    color: #155724;
 }
 
 .status-inactive {
-    background-color: #dc3545;
-    color: #fbfbfb;
+    background-color: #f8d7da;
+    color: #721c24;
 }
 
 .password-buttons {
@@ -414,6 +460,61 @@ nav ul li.dropdown .dropdown-menu a:hover {
     background-color: #8a1717;
 }
 
+/* User Table Container Styles */
+.table-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: 20px 0;
+    width: 100%;
+}
+
+.user-table {
+    border-collapse: separate;
+    border-spacing: 0;
+    width: 100%;
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    margin: 0 auto;
+}
+
+.user-table th, 
+.user-table td {
+    border-right: 1px solid #d0e6d6;
+    padding: 12px 10px;
+    text-align: center;
+}
+
+.user-table th:last-child, 
+.user-table td:last-child {
+    border-right: none;
+}
+
+/* Unique header design */
+.user-table thead th {
+    background: linear-gradient(90deg, #049129 60%, #04b032 100%);
+    color: #fff;
+    font-size: 1.08em;
+    font-weight: bold;
+    letter-spacing: 1px;
+    border-top: 2px solid #04b032;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    box-shadow: 0 2px 6px #4a835a inset;
+}
+
+.user-table thead th::after {
+    content: '';
+    display: block;
+    margin: 6px auto 0;
+    width: 30%;
+    height: 3px;
+    background: #fff3;
+    border-radius: 2px;
+}
+
 /* Responsive Adjustments */
 @media (max-width: 768px) {
     .search-add-container {
@@ -440,4 +541,60 @@ nav ul li.dropdown .dropdown-menu a:hover {
         margin: 10% auto;
         padding: 1.5rem;
     }
+}
+
+/* Add Modal Specific Styles */
+#addModal .modal-content {
+    border-top: 6px solid #04b032;
+    background: linear-gradient(135deg, #f6fff6 70%, #e8fbe8 100%);
+    box-shadow: 0 8px 32px rgba(24, 116, 54, 0.10), 0 1.5px 0 #04b032 inset;
+    position: relative;
+    padding-top: 2.5rem;
+}
+
+#addModal .modal-content h2 {
+    color: #04b032;
+    text-align: center;
+    margin-bottom: 1.5rem;
+    letter-spacing: 1px;
+    font-weight: 700;
+    position: relative;
+}
+
+#addModal .modal-content h2::after {
+    content: '';
+    display: block;
+    margin: 10px auto 0;
+    width: 40px;
+    height: 4px;
+    background: #04b032;
+    border-radius: 2px;
+}
+
+/* Edit Modal Specific Styles - Same as Add Modal */
+#editModal .modal-content {
+    border-top: 6px solid #04b032;
+    background: linear-gradient(135deg, #f6fff6 70%, #e8fbe8 100%);
+    box-shadow: 0 8px 32px rgba(24, 116, 54, 0.10), 0 1.5px 0 #04b032 inset;
+    position: relative;
+    padding-top: 2.5rem;
+}
+
+#editModal .modal-content h2 {
+    color: #04b032;
+    text-align: center;
+    margin-bottom: 1.5rem;
+    letter-spacing: 1px;
+    font-weight: 700;
+    position: relative;
+}
+
+#editModal .modal-content h2::after {
+    content: '';
+    display: block;
+    margin: 10px auto 0;
+    width: 40px;
+    height: 4px;
+    background: #04b032;
+    border-radius: 2px;
 }

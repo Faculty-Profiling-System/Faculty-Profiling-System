@@ -33,14 +33,22 @@ $college_row = $college_result->fetch_assoc();
 $current_college_name = $college_row['college_name'];
 
 // Modified query to better handle login/logout pairs
-// Modified query in logs_report.php
 $login_logs_query = "SELECT 
                         u.faculty_id, 
                         f.full_name AS name, 
                         l.login_time AS login_time,
                         l.logout_time AS logout_time,
-                        IF(l.session_status = 'active', 'LOG IN (Active)', 'LOG IN') AS login_action,
-                        'LOG OUT' AS logout_action,
+                        CASE 
+                            WHEN l.session_status = 'active' THEN 'LOG IN (Active)'
+                            WHEN l.session_status = 'completed' THEN 'LOG IN'
+                            WHEN l.session_status = 'timeout' THEN 'LOG IN (Timeout)'
+                            ELSE 'LOG IN'
+                        END AS login_action,
+                        CASE 
+                            WHEN l.session_status = 'completed' THEN 'LOG OUT'
+                            WHEN l.session_status = 'timeout' THEN 'TIMEOUT'
+                            ELSE NULL
+                        END AS logout_action,
                         TIMESTAMPDIFF(MINUTE, l.login_time, IFNULL(l.logout_time, NOW())) AS session_duration,
                         l.ip_address,
                         l.session_status
@@ -93,10 +101,22 @@ $login_logs_result = $stmt->get_result();
           <li><a href="college_management.php"><img src="../images/department.png" alt="Department Icon" class="menu-icon">COLLEGE MANAGEMENT</a></li>
           <li><a href="user.php"><img src="../images/user.png" alt="User Icon" class="menu-icon">USER MANAGEMENT</a></li>
           <li class="dropdown">
-            <a href="javascript:void(0)" id="reportsDropdown" class="active"><img src="../images/reports.png" alt="Reports Icon" class="menu-icon">REPORTS<img src="../images/dropdown.png" alt="Dropdown Icon" class="down-icon"></a>
+            <a href="javascript:void(0)" id="reportsDropdown" class="active">
+                <img src="../images/reports.png" alt="Reports Icon" class="menu-icon">
+                REPORTS
+                <i class="fas fa-chevron-down down-icon" id="dropdownArrow"></i>
+            </a>
             <ul class="dropdown-menu">
-              <li><a href="files_report.php">CREDENTIAL FILES</a></li>
-              <li><a href="logs_report.php" class="active">USER LOGS</a></li>
+                <li>
+                    <a href="files_report.php">
+                        <i class="fas fa-file-alt"></i> CREDENTIAL FILES
+                    </a>
+                </li>
+                <li>
+                    <a href="logs_report.php" class="active">
+                        <i class="fas fa-user-clock"></i> USER LOGS
+                    </a>
+                </li>
             </ul>
           </li>
           <li><a href="setting.php"><img src="../images/setting.png" alt="Settings Icon" class="menu-icon">SETTINGS</a></li>
@@ -130,13 +150,13 @@ $login_logs_result = $stmt->get_result();
         <table class="report-table">
             <thead>
                 <tr>
-                    <th>FACULTY ID</th>
-                    <th>NAME</th>
-                    <th>LOGIN TIME</th>
-                    <th>LOGOUT TIME</th>
-                    <th>ACTION</th>
-                    <th>SESSION DURATION (MINUTES)</th>
-                    <th>STATUS</th>
+                    <th>Faculty ID</th>
+                    <th>Name</th>
+                    <th>Lgin Time</th>
+                    <th>Logtime Time</th>
+                    <th>Action</th>
+                    <th>Session Duration (Minutes)</th>
+                    <th>Status</th>
                 </tr>
             </thead>
             <tbody>
@@ -156,7 +176,16 @@ $login_logs_result = $stmt->get_result();
                     <td class="session-duration">
                         <?= htmlspecialchars($row['session_duration']) ?>
                     </td>
-                    <td><?= htmlspecialchars($row['session_status']) ?></td>
+                    <td>
+                      <span class="session-status-badge 
+                        <?php
+                          if ($row['session_status'] === 'active') echo 'session-status-active';
+                          elseif ($row['session_status'] === 'completed') echo 'session-status-completed';
+                          elseif ($row['session_status'] === 'timeout') echo 'session-status-timeout';
+                        ?>">
+                        <?= htmlspecialchars(strtoupper($row['session_status'])) ?>
+                      </span>
+                    </td>
                 </tr>
                 <?php endwhile; ?>
             </tbody>
@@ -234,10 +263,10 @@ $login_logs_result = $stmt->get_result();
     document.addEventListener('DOMContentLoaded', function() {
       document.getElementById('reportsDropdown').addEventListener('click', function(e) {
         e.preventDefault();
-        const dropdown = this.parentElement;
+        const dropdown = this.closest('.dropdown');
         const menu = dropdown.querySelector('.dropdown-menu');
-        
-        // Toggle only the clicked dropdown
+        dropdown.classList.toggle('open');
+        // Toggle menu display
         if (menu.style.display === 'block') {
           menu.style.display = 'none';
         } else {
@@ -245,28 +274,19 @@ $login_logs_result = $stmt->get_result();
           document.querySelectorAll('.dropdown-menu').forEach(item => {
             if (item !== menu) {
               item.style.display = 'none';
+              item.closest('.dropdown').classList.remove('open');
             }
           });
           menu.style.display = 'block';
         }
       });
 
-            // Search functionality
-      document.getElementById('searchInput').addEventListener('keyup', function() {
-        const input = this.value.toLowerCase();
-        const rows = document.querySelectorAll('.user-table tbody tr');
-        
-        rows.forEach(row => {
-          const text = row.textContent.toLowerCase();
-          row.style.display = text.includes(input) ? '' : 'none';
-        });
-      });
-      
       // Close dropdown when clicking outside
       document.addEventListener('click', function(e) {
         if (!e.target.closest('.dropdown')) {
           document.querySelectorAll('.dropdown-menu').forEach(item => {
             item.style.display = 'none';
+            item.closest('.dropdown').classList.remove('open');
           });
         }
       });

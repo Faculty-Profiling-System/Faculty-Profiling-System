@@ -117,10 +117,22 @@ $credentials_result = $stmt->get_result();
           <li><a href="college_management.php"><img src="../images/department.png" alt="Department Icon" class="menu-icon">COLLEGE MANAGEMENT</a></li>
           <li><a href="user.php"><img src="../images/user.png" alt="User Icon" class="menu-icon">USER MANAGEMENT</a></li>
           <li class="dropdown">
-            <a href="javascript:void(0)" id="reportsDropdown" class="active"><img src="../images/reports.png" alt="Reports Icon" class="menu-icon">REPORTS<img src="../images/dropdown.png" alt="Dropdown Icon" class="down-icon"></a>
+            <a href="javascript:void(0)" id="reportsDropdown" class="active">
+                <img src="../images/reports.png" alt="Reports Icon" class="menu-icon">
+                REPORTS
+                <i class="fas fa-chevron-down down-icon" id="dropdownArrow"></i>
+            </a>
             <ul class="dropdown-menu">
-              <li><a href="files_report.php" class="active">CREDENTIAL FILES</a></li>
-              <li><a href="logs_report.php">USER LOGS</a></li>
+                <li>
+                    <a href="files_report.php" class="active">
+                        <i class="fas fa-file-alt"></i> CREDENTIAL FILES
+                    </a>
+                </li>
+                <li>
+                    <a href="logs_report.php">
+                        <i class="fas fa-user-clock"></i> USER LOGS
+                    </a>
+                </li>
             </ul>
           </li>
           <li><a href="setting.php"><img src="../images/setting.png" alt="Settings Icon" class="menu-icon">SETTINGS</a></li>
@@ -156,12 +168,12 @@ $credentials_result = $stmt->get_result();
       <table class="report-table">
         <thead>
           <tr>
-            <th>FACULTY ID</th>
-            <th>NAME</th>
-            <th>CREDENTIAL TYPE</th>
-            <th>CREDENTIAL NAME</th>
-            <th>FILE</th>
-            <th>ACTIONS</th>
+            <th>Faculty ID</th>
+            <th>Name</th>
+            <th>Credential Type</th>
+            <th>Credential Name</th>
+            <th>File</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -172,12 +184,18 @@ $credentials_result = $stmt->get_result();
             <td><?= htmlspecialchars($row['credential_type']) ?></td>
             <td><?= htmlspecialchars($row['credential_name']) ?></td>
             <td>
-              <a href="<?= htmlspecialchars($row['file_path']) ?>" target="_blank" class="view-file">VIEW FILE</a>
+            <a href="<?= htmlspecialchars($row['file_path']) ?>" target="_blank" class="btn btn-sm btn-view">
+                <i class="fas fa-eye"></i> VIEW FILE
+            </a>
             </td>
-            <td class="actions">
-              <button onclick="approveCredential('<?= $row['credential_id'] ?>')" class="approve-btn">Approve</button>
-              <button onclick="rejectCredential('<?= $row['credential_id'] ?>')" class="reject-btn">Reject</button>
-            </td>
+              <td class="actions">
+                  <button onclick="approveCredential('<?= $row['credential_id'] ?>')" class="btn btn-sm btn-approve">
+                      <i class="fas fa-check"></i> Approve
+                  </button>
+                  <button onclick="rejectCredential('<?= $row['credential_id'] ?>')" class="btn btn-sm btn-reject">
+                      <i class="fas fa-times"></i> Reject
+                  </button>
+              </td>
           </tr>
           <?php endwhile; ?>
         </tbody>
@@ -248,34 +266,36 @@ $credentials_result = $stmt->get_result();
   <script>
       // Reports dropdown functionality
       document.addEventListener('DOMContentLoaded', function() {
-      document.getElementById('reportsDropdown').addEventListener('click', function(e) {
-      e.preventDefault();
-      const dropdown = this.parentElement;
-      const menu = dropdown.querySelector('.dropdown-menu');
-      
-      // Toggle only the clicked dropdown
-      if (menu.style.display === 'block') {
-        menu.style.display = 'none';
-      } else {
-        // Close all other dropdowns first
-        document.querySelectorAll('.dropdown-menu').forEach(item => {
-          if (item !== menu) {
-            item.style.display = 'none';
-          }
-        });
-        menu.style.display = 'block';
-      }
-    });
-    
-    // Close dropdown when clicking outside
-    document.addEventListener('click', function(e) {
-      if (!e.target.closest('.dropdown')) {
-        document.querySelectorAll('.dropdown-menu').forEach(item => {
+  document.getElementById('reportsDropdown').addEventListener('click', function(e) {
+    e.preventDefault();
+    const dropdown = this.closest('.dropdown');
+    const menu = dropdown.querySelector('.dropdown-menu');
+    dropdown.classList.toggle('open');
+    // Toggle menu display
+    if (menu.style.display === 'block') {
+      menu.style.display = 'none';
+    } else {
+      // Close all other dropdowns first
+      document.querySelectorAll('.dropdown-menu').forEach(item => {
+        if (item !== menu) {
           item.style.display = 'none';
-        });
-      }
-    });
-        })
+          item.closest('.dropdown').classList.remove('open');
+        }
+      });
+      menu.style.display = 'block';
+    }
+  });
+
+  // Close dropdown when clicking outside
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('.dropdown')) {
+      document.querySelectorAll('.dropdown-menu').forEach(item => {
+        item.style.display = 'none';
+        item.closest('.dropdown').classList.remove('open');
+      });
+    }
+  });
+});
     
     function confirmLogout() {
       if (confirm('Are you sure you want to logout?')) {

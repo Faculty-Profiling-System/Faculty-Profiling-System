@@ -87,10 +87,22 @@ $users = $stmt->get_result();
           <li><a href="college_management.php"><img src="../images/department.png" alt="Department Icon" class="menu-icon">COLLEGE MANAGEMENT</a></li>
           <li><a href="user.php" class="active"><img src="../images/user.png" alt="User Icon" class="menu-icon">USER MANAGEMENT</a></li>
           <li class="dropdown">
-            <a href="javascript:void(0)" id="reportsDropdown"><img src="../images/reports.png" alt="Reports Icon" class="menu-icon">REPORTS</a>
+            <a href="javascript:void(0)" id="reportsDropdown">
+                <img src="../images/reports.png" alt="Reports Icon" class="menu-icon">
+                REPORTS
+                <i class="fas fa-chevron-down down-icon" id="dropdownArrow"></i>
+            </a>
             <ul class="dropdown-menu">
-              <li><a href="files_report.php">CREDENTIAL FILES</a></li>
-              <li><a href="logs_report.php">USER LOGS</a></li>
+                <li>
+                    <a href="files_report.php">
+                        <i class="fas fa-file-alt"></i> CREDENTIAL FILES
+                    </a>
+                </li>
+                <li>
+                    <a href="logs_report.php">
+                        <i class="fas fa-user-clock"></i> USER LOGS
+                    </a>
+                </li>
             </ul>
           </li>
           <li><a href="setting.php"><img src="../images/setting.png" alt="Settings Icon" class="menu-icon">SETTINGS</a></li>
@@ -154,7 +166,7 @@ $users = $stmt->get_result();
                                           '<?= htmlspecialchars($user['faculty_id']) ?>',
                                           '<?= htmlspecialchars($user['username']) ?>'
                                       )">
-                                          Edit
+                                          <i class="fas fa-pen"></i> Edit
                                       </button>
                                     <?php else: ?>
                                       <button class="action-btn edit-btn" disabled style="opacity: 0.5; cursor: not-allowed;">
@@ -288,14 +300,19 @@ $users = $stmt->get_result();
       // Reports dropdown functionality
       document.getElementById('reportsDropdown').addEventListener('click', function(e) {
         e.preventDefault();
-        const dropdown = this.parentElement;
+        const dropdown = this.closest('.dropdown');
         const menu = dropdown.querySelector('.dropdown-menu');
-
+        dropdown.classList.toggle('open');
+        // Toggle menu display
         if (menu.style.display === 'block') {
           menu.style.display = 'none';
         } else {
+          // Close all other dropdowns first
           document.querySelectorAll('.dropdown-menu').forEach(item => {
-            if (item !== menu) item.style.display = 'none';
+            if (item !== menu) {
+              item.style.display = 'none';
+              item.closest('.dropdown').classList.remove('open');
+            }
           });
           menu.style.display = 'block';
         }
@@ -306,6 +323,7 @@ $users = $stmt->get_result();
         if (!e.target.closest('.dropdown')) {
           document.querySelectorAll('.dropdown-menu').forEach(item => {
             item.style.display = 'none';
+            item.closest('.dropdown').classList.remove('open');
           });
         }
       });
