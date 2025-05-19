@@ -88,10 +88,22 @@ $users = $stmt->get_result();
           <li><a href="college_management.php"><img src="../images/department.png" alt="Department Icon" class="menu-icon">COLLEGE MANAGEMENT</a></li>
           <li><a href="user.php" class="active"><img src="../images/user.png" alt="User Icon" class="menu-icon">USER MANAGEMENT</a></li>
           <li class="dropdown">
-            <a href="javascript:void(0)" id="reportsDropdown"><img src="../images/reports.png" alt="Reports Icon" class="menu-icon">REPORTS</a>
+            <a href="javascript:void(0)" id="reportsDropdown">
+                <img src="../images/reports.png" alt="Reports Icon" class="menu-icon">
+                REPORTS
+                <i class="fas fa-chevron-down down-icon" id="dropdownArrow"></i>
+            </a>
             <ul class="dropdown-menu">
-              <li><a href="files_report.php">CREDENTIAL FILES</a></li>
-              <li><a href="logs_report.php">USER LOGS</a></li>
+                <li>
+                    <a href="files_report.php">
+                        <i class="fas fa-file-alt"></i> DOCUMENT FILES
+                    </a>
+                </li>
+                <li>
+                    <a href="logs_report.php">
+                        <i class="fas fa-user-clock"></i> USER LOGS
+                    </a>
+                </li>
             </ul>
           </li>
           <li><a href="setting.php"><img src="../images/setting.png" alt="Settings Icon" class="menu-icon">SETTINGS</a></li>
@@ -104,10 +116,12 @@ $users = $stmt->get_result();
     </div>
   </div>
 
-  <div id="main" class="main-content">
-      <div class="header-user-management">
-        <h1>User Management - <?php echo htmlspecialchars($current_college_name); ?></h1>
-      </div>
+        <div class="header-user-management">
+            <h1 class="user-management-title">
+                <i class="fas fa-users"></i>
+                User Management<?php if (!empty($current_college_name)) echo ' - ' . htmlspecialchars($current_college_name); ?>
+            </h1>
+        </div>
       <div class="user-management-container">
           <div class="search-add-container">
               <div class="search-box">
@@ -116,9 +130,7 @@ $users = $stmt->get_result();
               </div>
               
               <button class="add-user-btn" onclick="openAddModal()">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <path d="M12 5v14M5 12h14"></path>
-                  </svg>
+                    <i class="fas fa-user-plus"></i>
                   Add User
               </button>
           </div>
@@ -155,11 +167,11 @@ $users = $stmt->get_result();
                                           '<?= htmlspecialchars($user['faculty_id']) ?>',
                                           '<?= htmlspecialchars($user['username']) ?>'
                                       )">
-                                          Edit
+                                          <i class="fas fa-pen"></i> Edit
                                       </button>
                                     <?php else: ?>
                                       <button class="action-btn edit-btn" disabled style="opacity: 0.5; cursor: not-allowed;">
-                                          Edit
+                                          <i class="fas fa-pen"></i> Edit
                                       </button>
                                     <?php endif; ?>
                                   </td>
@@ -178,8 +190,14 @@ $users = $stmt->get_result();
 
   <!-- ADD NEW USER MODAL -->
   <div id="addModal" class="modal">
-      <div class="modal-content">
-          <h2>Add New Faculty User</h2>
+    <div class="modal-content">
+        <button class="modal-close-btn" onclick="closeAndRefreshAddModal()" title="Close">
+            <i class="fas fa-times"></i>
+        </button>
+        <h2 class="add-faculty-title">
+            <i class="fas fa-user-plus"></i>
+            Add New Faculty User
+        </h2>
           <form id="addUserForm" method="POST" onsubmit="return validateFacultyID()">
               <input type="text" name="faculty_id" id="faculty_id" placeholder="Enter Faculty ID" required>
               <input type="hidden" name="college_id" value="<?= $current_college_id ?>">
@@ -230,7 +248,10 @@ $users = $stmt->get_result();
   <!-- EDIT USER MODAL -->
   <div id="editModal" class="modal">
       <div class="modal-content">
-          <h2>Edit User</h2>
+          <h2 class="update-account-title">
+              <i class="fas fa-user-edit"></i>
+              Update Faculty User Account
+          </h2>
           <form id="editUserForm" method="POST">
               <input type="text" name="faculty_id" id="edit_faculty_id" readonly>
               <input type="hidden" name="college_id" value="<?= $current_college_id ?>">
@@ -265,7 +286,7 @@ $users = $stmt->get_result();
       <input type="hidden" name="faculty_id" id="delete_faculty_id">
   </form>
 
-  
+    
   <?php include '../faculty/help.php'; ?>
 
   <script>
@@ -292,14 +313,19 @@ $users = $stmt->get_result();
       // Reports dropdown functionality
       document.getElementById('reportsDropdown').addEventListener('click', function(e) {
         e.preventDefault();
-        const dropdown = this.parentElement;
+        const dropdown = this.closest('.dropdown');
         const menu = dropdown.querySelector('.dropdown-menu');
-
+        dropdown.classList.toggle('open');
+        // Toggle menu display
         if (menu.style.display === 'block') {
           menu.style.display = 'none';
         } else {
+          // Close all other dropdowns first
           document.querySelectorAll('.dropdown-menu').forEach(item => {
-            if (item !== menu) item.style.display = 'none';
+            if (item !== menu) {
+              item.style.display = 'none';
+              item.closest('.dropdown').classList.remove('open');
+            }
           });
           menu.style.display = 'block';
         }
@@ -310,6 +336,7 @@ $users = $stmt->get_result();
         if (!e.target.closest('.dropdown')) {
           document.querySelectorAll('.dropdown-menu').forEach(item => {
             item.style.display = 'none';
+            item.closest('.dropdown').classList.remove('open');
           });
         }
       });
@@ -320,10 +347,15 @@ $users = $stmt->get_result();
         window.location.href = '../landing/index.php';
       }
     }
+
+    function closeAndRefreshAddModal() {
+        document.getElementById('addModal').style.display = 'none';
+        window.location.href = 'user.php'; // Refresh the page
+    }
   </script>
   <script src="scripts.js?v=<?php echo time(); ?>"></script>
   <script src="users.js?v=<?php echo time(); ?>"></script>
-  <script src="../faculty/help.js?v=<?php echo time(); ?>"></script>
+    <script src="../faculty/help.js?v=<?php echo time(); ?>"></script>
   <?php if (isset($conn)) $conn->close(); ?>
 </body>
 </html>

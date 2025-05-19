@@ -82,7 +82,7 @@
     <li class="dropdown">
       <a href="javascript:void(0)" id="reportsDropdown" class="active"><img src="../images/reports.png" alt="Reports Icon" class="menu-icon">REPORTS<img src="../images/dropdown.png" alt="Dropdown Icon" class="down-icon"></a>
       <ul class="dropdown-menu" style="display: block;">
-              <li><a href="files_report.php">CREDENTIAL FILES</a></li>
+              <li><a href="files_report.php">DOCUMENT FILES</a></li>
               <li><a href="logs_report.php">USER LOGS</a></li>
       </ul>
     </li>

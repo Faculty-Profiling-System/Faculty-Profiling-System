@@ -8,12 +8,6 @@
     max-width: 98%;
 }
 
-.page-header h1 {
-    color: #187436;
-    font-size: 32px;
-    margin-bottom: 20px;
-}
-
 table {
     width: 100%;
     border: 1px solid #ddd;
@@ -87,19 +81,23 @@ tbody tr:hover {
 .activate-btn {
     background-color: #28a745;
     color: white;
+    transition: background 0.2s, transform 0.2s;
 }
 
 .activate-btn:hover {
     background-color: #218838;
+    transform: translateY(-1px) scale(1.04);
 }
 
 .deactivate-btn {
     background-color: #dc3545;
     color: white;
+    transition: background 0.2s, transform 0.2s;
 }
 
 .deactivate-btn:hover {
     background-color: #c82333;
+    transform: translateY(-1px) scale(1.04);
 }
 
 /* Table controls */
@@ -110,61 +108,83 @@ tbody tr:hover {
     align-items: center;
 }
 
-.search-box {
-    position: relative;
-    width: 300px;
+
+.down-icon {
+  position: absolute;
+  width: 13px;
+  height: 13px;
+  margin-left: 220px;
+  vertical-align: left;
+  transition: transform 0.3s;
+  font-size: 1em;
 }
 
-.search-box input {
-    width: 100%;
-    padding: 8px 15px 8px 35px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
+.dropdown.open .down-icon {
+    transform: rotate(180deg);
 }
 
-.search-box i {
-    position: absolute;
-    left: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #777;
+.navigation ul {
+  margin-top: 80px;
+  padding: 0;
 }
 
-/* Dropdown Styles */
-nav ul li.dropdown {
-    position: relative;
-}
-
-nav ul li.dropdown .dropdown-menu {
-    display: none;
-    position: relative;
-    left: 0;
-    background-color: #015f22;
-    min-width: 200px;
-    z-index: 1000;
-    border: 1px solid #024117;
-    box-shadow: 0px 8px 16px rgba(0,0,0,0.2);
-    padding: 0;
-    margin: 0;
-}
-
-nav ul li.dropdown .dropdown-menu li {
-    padding: 0;
-    list-style: none;
+.navigation ul li {
+  color: #fff;
+  text-align: left;
+  list-style-type: none;
+  font-size: 1.5em;
+  padding: 15px 5px;
+  font-family: 'Trebuchet MS';
 }
 
 nav ul li.dropdown .dropdown-menu a {
     color: white;
     padding: 12px 16px;
     text-decoration: none;
-    display: block;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-left: 18px;
     font-size: 14px;
     font-family: 'Trebuchet MS';
+    transition: none; /* Remove transition */
+}
+
+nav ul li.dropdown .dropdown-menu a i {
+    min-width: 20px;
+    text-align: center;
+    font-size: 1em;
 }
 
 nav ul li.dropdown .dropdown-menu a:hover {
-    background-color: #04b032;
+    nav ul li.dropdown .dropdown-menu a {
+      color: white;
+      padding: 12px 16px;
+      text-decoration: none;
+      display: block;
+      font-size: 14px;
+      font-family: 'Trebuchet MS';
+    }
 }
+
+    nav ul li.dropdown {
+      position: relative;
+    }
+    
+    nav ul li.dropdown .dropdown-menu {
+      display: none;
+      position: relative;
+      left: 0;
+      min-width: 200px;
+      z-index: 1000;
+      padding: 0;
+      margin-top: 7px;
+    }
+    
+    nav ul li.dropdown .dropdown-menu li {
+      padding: 0;
+      list-style: none;
+    }
 
 /* Dark theme styles */
 body.dark-theme .card {
@@ -235,15 +255,36 @@ body.dark-theme tr:hover {
         width: 100%;
     }
 }
+
 /* Additional styles for the tab system - Updated to match log-tabs design */
 .faculty-management-container {
-    margin: 20px;
+    margin: 20px auto;
+    background-color: white;
+    padding: 24px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    max-width: 2000px; 
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .management-tabs {
     display: flex;
+    align-items: center;
+    justify-content: space-between;
     margin-bottom: 20px;
     border-bottom: 1px solid #ddd;
+    width: 100%;
+}
+
+.management-tabs .tab-btn {
+    margin-right: 5px;
+}
+
+.management-tabs .search-box {
+    margin-left: auto;
+    width: 300px;
+    position: relative;
 }
 
 .tab-btn {
@@ -311,16 +352,44 @@ body.dark-theme tr:hover {
 
 .credentials-table {
     width: 100%;
-    border-collapse: collapse;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
 }
 
-.credentials-table-header {
-    display: flex;
-    background-color: #187436;
+.credentials-table th, .credentials-table td {
+    border-right: 1px solid #d0e6d6;
+    padding: 12px 10px;
+    text-align: center;
+}
+
+.credentials-table th:last-child, .credentials-table td:last-child {
+    border-right: none;
+}
+
+/* Unique header design */
+.credentials-table thead th {
+    background: linear-gradient(90deg, #049129 60%, #04b032 100%);
+    color: #fff;
+    font-size: 1.08em;
     font-weight: bold;
-    padding: 12px 15px;
-    color: white;
-    border-bottom: 1px solid #ddd;
+    letter-spacing: 1px;
+    border-top: 2px solid #04b032;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    box-shadow: 0 2px 6px #4a835a inset;
+}
+
+.credentials-table thead th::after {
+    content: '';
+    display: block;
+    margin: 6px auto 0;
+    width: 30%;
+    height: 3px;
+    background: #fff3;
+    border-radius: 2px;
 }
 
 .credential-row {
@@ -347,72 +416,276 @@ body.dark-theme tr:hover {
 }
 
 .credential-actions {
-    flex: 1;
     display: flex;
-    gap: 10px;
+    gap: 0.5rem;
+    justify-content: center;
+    align-items: center;
 }
 
-.view-btn {
-    background-color: #009d34;
-    color: rgb(255, 253, 253);
-    text-decoration: none;
-    padding: 5px 10px;
+.btn {
+    padding: 5px 12px;
+    border: none;
     border-radius: 4px;
-    font-size: 12px;
-    display: flex;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
     align-items: center;
     gap: 5px;
-}
-
-.download-btn {
-    background-color: #009d34;
-    color: rgb(255, 255, 255);
+    transition: background 0.2s, color 0.2s;
     text-decoration: none;
-    padding: 5px 10px;
-    border-radius: 4px;
-    font-size: 12px;
-    display: flex;
-    align-items: center;
-    gap: 5px;
 }
 
-.loading-message, .no-credentials, .error-message {
+.btn-sm {
+    font-size: 13px;
+    padding: 5px 10px;
+}
+
+.btn-view {
+    background-color: #28a745;
+    color: #ffffff;
+    transition: background 0.2s, transform 0.2s;
+}
+
+.btn-view:hover {
+    background-color: #015d2f;
+    color: #ffffff;
+    transform: translateY(-1px) scale(1.04);
+}
+
+.btn-download {
+    background-color: #007bff;
+    color: #ffffff;
+    transition: background 0.2s, transform 0.2s;
+}
+
+.btn-download:hover {
+    background-color: #005fc5;
+    color: #ffffff;
+    transform: translateY(-1px) scale(1.04);
+}
+
+/* Faculty Table Container Styles */
+.faculty-table-container {
+    margin: 20px 0;
+    margin-top: -20px;
+    width: 100%;
+    overflow-y: auto;
+    margin-bottom: 20px;
+    background: #fff;
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+    max-height: 60vh;
+    scrollbar-width: none; /* Firefox */
+}
+
+/* Hide scrollbar for Chrome, Safari, and Opera */
+.faculty-table-container::-webkit-scrollbar {
+    display: none;
+}
+
+/* Make thead sticky */
+.faculty-table-container th, 
+.faculty-table-container td {
+    padding: 12px 15px;
+    border-bottom: 1px solid #ddd;
+}
+
+.faculty-table-container th {
+    background-color: #187436;
+    color: white;
+    font-weight: bold;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    border-bottom: 2px solid #04b032; /* Border at the bottom of the header */
+    background-clip: padding-box;
     text-align: center;
-    padding: 20px;
-    font-style: italic;
-    color: #666;
 }
 
-.error-message {
-    color: #e74c3c;
+.faculty-table-container table {
+    margin: 0 auto;
 }
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
-    .credentials-table-header {
-        display: none
-    }
-    
-    .credential-row {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 10px;
-        padding: 15px;
-    }
-    
-    .credential-row > div {
-        width: 100%;
-    }
-    
-    .credential-row > div::before {
-        content: attr(data-label);
-        font-weight: bold;
-        display: inline-block;
-        width: 100px;
-    }
-    
-    .credential-actions {
-        justify-content: flex-start;
-        margin-top: 10px;
-    }
+.faculty-table-container table {
+    border-collapse: separate;
+    border-spacing: 0;
+    width: 100%;
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+
+}
+
+.faculty-table-container th, 
+.faculty-table-container td {
+    border-right: 1px solid #d0e6d6;
+    padding: 12px 10px;
+    text-align: center;
+}
+
+.faculty-table-container th:last-child, 
+.faculty-table-container td:last-child {
+    border-right: none;
+}
+
+/* Unique header design */
+.faculty-table-container thead th {
+    background: linear-gradient(90deg, #049129 60%, #04b032 100%);
+    color: #fff;
+    font-size: 1.08em;
+    font-weight: bold;
+    letter-spacing: 1px;
+    border-top: 2px solid #04b032;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    box-shadow: 0 2px 6px #4a835a inset;
+}
+
+.faculty-table-container thead th::after {
+    content: '';
+    display: block;
+    margin: 6px auto 0;
+    width: 30%;
+    height: 3px;
+    background: #fff3;
+    border-radius: 2px;
+}
+
+/* Credentials Table Container Styles */
+.credentials-table-container {
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: 20px 0;
+    margin-top: -20px;
+    width: 100%;
+    max-height: 60vh; 
+    overflow-y: auto;
+    margin-bottom: 20px;
+    background: #fff;
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+    scrollbar-width: none;
+}
+
+.credentials-table-container::-webkit-scrollbar {
+    display: none;
+}
+
+.credentials-table-container table {
+    margin: 0 auto;
+    border-collapse: separate;
+    border-spacing: 0;
+    width: 100%;
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.credentials-table-container th,
+.credentials-table-container td {
+    border-right: 1px solid #d0e6d6;
+    padding: 12px 10px;
+    text-align: center;
+}
+
+.credentials-table-container th:last-child,
+.credentials-table-container td:last-child {
+    border-right: none;
+}
+
+/* Unique header design */
+.credentials-table-container thead th {
+    background: linear-gradient(90deg, #049129 60%, #04b032 100%);
+    color: #fff;
+    font-size: 1.08em;
+    font-weight: bold;
+    letter-spacing: 1px;
+    border-top: 2px solid #04b032;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    box-shadow: 0 2px 6px #4a835a inset;
+}
+
+.credentials-table-container thead th::after {
+    content: '';
+    display: block;
+    margin: 6px auto 0;
+    width: 30%;
+    height: 3px;
+    background: #fff3;
+    border-radius: 2px;
+}
+
+.search-box input {
+    width: 80%;
+    padding: 8px 15px 8px 35px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+
+.search-box i {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #777;
+}
+
+/* College Management Title Styles */
+.college-management-title {
+    color: #017a2b;
+    font-size: 1.8em;
+    display: flex;
+    align-items: center;
+    gap: -5px; 
+    margin-bottom: 25px;
+    font-weight: 700;
+}
+
+.college-management-title .fa-building-columns,
+.college-management-title .fa-building {
+    color: #017a2b;
+    font-size: 1.1em;
+    vertical-align: middle;
+    margin-right: 8px;
+}
+
+/* Sticky header and scrollable container for credentials table */
+.credentials-table-container {
+    max-height: 60vh; /* or any height you want */
+    overflow-y: auto;
+    margin-bottom: 20px;
+    background: #fff;
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+}
+
+.credentials-table {
+    width: 100%;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin-bottom: 20px;
+    table-layout: auto;
+}
+
+.credentials-table th, 
+.credentials-table td {
+    padding: 12px 15px;
+    border-bottom: 1px solid #ddd;
+}
+
+.credentials-table th {
+    background-color: #007c2c;
+    text-align: center;
+    color: white;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    border-bottom: 2px solid #04b032; /* Border at the bottom of the header */
+    background-clip: padding-box;
 }

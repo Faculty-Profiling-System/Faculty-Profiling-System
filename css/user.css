@@ -8,10 +8,6 @@
     max-width: 98%;
 }
 
-.header-user-management h1 {
-    color: #017a2b;
-    margin-bottom: 1.5rem;
-}
 
 /* Search and Add Container */
 .search-add-container {
@@ -45,11 +41,7 @@
     transition: all 0.2s;
 }
 
-.search-box input:focus {
-    border-color: #28a745;
-    outline: none;
-    box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
-}
+
 
 .add-user-btn {
     background-color: #28a745;
@@ -84,35 +76,46 @@
     border-radius: 10px;
     border-collapse: separate;
     border-spacing: 0;
-    margin-bottom: 20px;
-    table-layout: auto;
-    overflow: hidden;
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    margin-bottom: 0;
 }
 
-.user-table thead tr {
-    background-color: #187436;
-    color: white;
-    text-align: left;
-}
-
-.user-table th {
-    padding: 1rem;
-    font-weight: 600;
-}
-
+.user-table th, 
 .user-table td {
-    padding: 0.8rem 1rem;
-    border-bottom: 1px solid #e9ecef;
-    vertical-align: middle;
+    border-right: 1px solid #d0e6d6;
+    padding: 12px 10px;
+    text-align: center;
+    border-bottom: 1px solid #e0e0e0;
 }
 
-.user-table tbody tr {
-    transition: all 0.2s;
+.user-table th:last-child, 
+.user-table td:last-child {
+    border-right: none;
 }
 
-.user-table tbody tr:hover {
-    background-color: #e9f5ee;
-    transform: translateX(2px);
+/* Sticky and styled header */
+.user-table thead th {
+    background: linear-gradient(90deg, #049129 60%, #04b032 100%);
+    color: #fff;
+    font-size: 1.08em;
+    font-weight: bold;
+    letter-spacing: 1px;
+    border-top: 2px solid #04b032;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    box-shadow: 0 2px 6px #4a835a inset;
+}
+
+.user-table thead th::after {
+    content: '';
+    display: block;
+    margin: 6px auto 0;
+    width: 30%;
+    height: 3px;
+    background: #fff3;
+    border-radius: 2px;
 }
 
 .no-results {
@@ -137,14 +140,28 @@
 }
 
 .edit-btn {
-    background-color: #007bff;
-    color: white;
+    background-color: #1e90ff;
+    color: #fff;
     margin-right: 0.5rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    border: none;
+    border-radius: 4px;
+    padding: 0.4rem 0.9rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    box-shadow: 0 2px 6px rgba(30, 144, 255, 0.08);
+    transition: background 0.2s, transform 0.2s;
+}
+
+.edit-btn i {
+    font-size: 12px;
 }
 
 .edit-btn:hover {
-    background-color: #0069d9;
-    transform: translateY(-1px);
+    background-color: #156ec0;
+    transform: translateY(-1px) scale(1.04);
 }
 
 .delete-btn {
@@ -317,42 +334,83 @@
 }
 
 /* Dropdown Styles */
-nav ul li.dropdown {
-    position: relative;
+.down-icon {
+  position: absolute;
+  width: 13px;
+  height: 13px;
+  margin-left: 220px;
+  vertical-align: left;
+  transition: transform 0.3s;
+  font-size: 1em;
 }
 
-nav ul li.dropdown .dropdown-menu {
-    display: none;
-    position: relative;
-    left: 0;
-    background-color: #015f22;
-    min-width: 200px;
-    z-index: 1000;
-    border: 1px solid #024117;
-    box-shadow: 0px 8px 16px rgba(0,0,0,0.2);
-    padding: 0;
-    margin: 0;
+.dropdown.open .down-icon {
+    transform: rotate(180deg);
 }
 
-nav ul li.dropdown .dropdown-menu li {
-    padding: 0;
-    list-style: none;
+.navigation ul {
+  margin-top: 80px;
+  padding: 0;
+}
+
+.navigation ul li {
+  color: #fff;
+  text-align: left;
+  list-style-type: none;
+  font-size: 1.5em;
+  padding: 15px 5px;
+  font-family: 'Trebuchet MS';
 }
 
 nav ul li.dropdown .dropdown-menu a {
     color: white;
     padding: 12px 16px;
     text-decoration: none;
-    display: block;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-left: 18px;
     font-size: 14px;
     font-family: 'Trebuchet MS';
+    transition: none; /* Remove transition */
+}
+
+nav ul li.dropdown .dropdown-menu a i {
+    min-width: 20px;
+    text-align: center;
+    font-size: 1em;
 }
 
 nav ul li.dropdown .dropdown-menu a:hover {
-    background-color: #04b032;
+    nav ul li.dropdown .dropdown-menu a {
+      color: white;
+      padding: 12px 16px;
+      text-decoration: none;
+      display: block;
+      font-size: 14px;
+      font-family: 'Trebuchet MS';
+    }
 }
 
-/* Status badge styles */
+    nav ul li.dropdown {
+      position: relative;
+    }
+    
+    nav ul li.dropdown .dropdown-menu {
+      display: none;
+      position: relative;
+      left: 0;
+      min-width: 200px;
+      z-index: 1000;
+      padding: 0;
+      margin-top: 7px;
+    }
+    
+    nav ul li.dropdown .dropdown-menu li {
+      padding: 0;
+      list-style: none;
+    }
+
 .status-badge {
     padding: 5px 10px;
     border-radius: 20px;
@@ -362,13 +420,13 @@ nav ul li.dropdown .dropdown-menu a:hover {
 }
 
 .status-active {
-    background-color: #28a745;
-    color: #ffffff;
+    background-color: #d4edda;
+    color: #155724;
 }
 
 .status-inactive {
-    background-color: #dc3545;
-    color: #fbfbfb;
+    background-color: #f8d7da;
+    color: #721c24;
 }
 
 .password-buttons {
@@ -414,6 +472,70 @@ nav ul li.dropdown .dropdown-menu a:hover {
     background-color: #8a1717;
 }
 
+/* User Table Container Styles */
+.table-container {
+    margin: 20px 0;
+    width: 100%;
+    max-height: 60vh;
+    overflow-y: auto;
+    background: #fff;
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+    scrollbar-width: none; /* Firefox */
+}
+
+/* Hide scrollbar for Chrome, Safari, Opera */
+.table-container::-webkit-scrollbar {
+    display: none;
+}
+
+.user-table {
+    width: 100%;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    margin-bottom: 0;
+}
+
+.user-table th, 
+.user-table td {
+    border-right: 1px solid #d0e6d6;
+    padding: 12px 10px;
+    text-align: center;
+}
+
+.user-table th:last-child, 
+.user-table td:last-child {
+    border-right: none;
+}
+
+/* Sticky and styled header */
+.user-table thead th {
+    background: linear-gradient(90deg, #049129 60%, #04b032 100%);
+    color: #fff;
+    font-size: 1.08em;
+    font-weight: bold;
+    letter-spacing: 1px;
+    border-top: 2px solid #04b032;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    box-shadow: 0 2px 6px #4a835a inset;
+}
+
+.user-table thead th::after {
+    content: '';
+    display: block;
+    margin: 6px auto 0;
+    width: 30%;
+    height: 3px;
+    background: #fff3;
+    border-radius: 2px;
+}
+
 /* Responsive Adjustments */
 @media (max-width: 768px) {
     .search-add-container {
@@ -441,3 +563,95 @@ nav ul li.dropdown .dropdown-menu a:hover {
         padding: 1.5rem;
     }
 }
+
+/* Add Modal Specific Styles */
+#addModal .modal-content {
+    border-top: 6px solid #04b032;
+    background: linear-gradient(135deg, #f6fff6 70%, #e8fbe8 100%);
+    box-shadow: 0 8px 32px rgba(24, 116, 54, 0.10), 0 1.5px 0 #04b032 inset;
+    position: relative;
+    padding-top: 2.5rem;
+}
+
+#addModal .modal-content h2 {
+    color: #04b032;
+    text-align: center;
+    margin-bottom: 1.5rem;
+    letter-spacing: 1px;
+    font-weight: 700;
+    position: relative;
+}
+
+#addModal .modal-content h2::after {
+    content: '';
+    display: block;
+    margin: 10px auto 0;
+    width: 40px;
+    height: 4px;
+    background: #04b032;
+    border-radius: 2px;
+}
+
+/* Edit Modal Specific Styles - Same as Add Modal */
+#editModal .modal-content {
+    border-top: 6px solid #04b032;
+    background: linear-gradient(135deg, #f6fff6 70%, #e8fbe8 100%);
+    box-shadow: 0 8px 32px rgba(24, 116, 54, 0.10), 0 1.5px 0 #04b032 inset;
+    position: relative;
+    padding-top: 2.5rem;
+}
+
+#editModal .modal-content h2 {
+    color: #04b032;
+    text-align: center;
+    margin-bottom: 1.5rem;
+    letter-spacing: 1px;
+    font-weight: 700;
+    position: relative;
+}
+
+#editModal .modal-content h2::after {
+    content: '';
+    display: block;
+    margin: 10px auto 0;
+    width: 40px;
+    height: 4px;
+    background: #04b032;
+    border-radius: 2px;
+}
+
+/* User Management Title Styles */
+.user-management-title {
+    color: #017a2b;
+    font-size: 1.8em;
+    display: flex;
+    align-items: center;
+    gap: -5px; 
+    margin-bottom: 25px;
+    font-weight: 700;
+}
+
+.user-management-title .fa-users {
+    color: #017a2b;
+    font-size: 1.1em;
+    vertical-align: middle;
+    margin-right: 8px;
+}
+
+.modal-close-btn {
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    background: transparent;
+    border: none;
+    font-size: 1.3rem;
+    color: #888;
+    cursor: pointer;
+    z-index: 10;
+    transition: color 0.2s;
+}
+.modal-close-btn:hover {
+    color: #d72b2b;
+}
+
+

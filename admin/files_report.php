@@ -45,51 +45,11 @@ $credentials_result = $stmt->get_result();
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Credentials Report | PLP</title>
+  <title>Documents Report | Admin</title>
   <link rel="stylesheet" href="../css/admin_style.css?v=<?php echo time(); ?>"/>
   <link rel="stylesheet" href="../css/report.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="../css/help.css?v=<?php echo time(); ?>">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-  <style>
-                    /* Dropdown Styles */
-        nav ul li.dropdown {
-      position: relative;
-    }
-    
-    nav ul li.dropdown .dropdown-menu {
-      display: none;
-      position: relative;
-      left: 0;
-      min-width: 200px;
-      z-index: 1000;
-      padding: 0;
-      margin: 0;
-    }
-    
-    nav ul li.dropdown .dropdown-menu li {
-      padding: 0;
-      list-style: none;
-    }
-    
-    nav ul li.dropdown .dropdown-menu a {
-      color: white;
-      padding: 12px 16px;
-      text-decoration: none;
-      display: block;
-      font-size: 14px;
-      font-family: 'Trebuchet MS';
-    }
-    
-    nav ul li.dropdown .dropdown-menu a:hover {
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-    border-right: 3px solid #04b032; /* Color accent */
-    border-left: 3px solid #04b032; /* Color accent */
-    margin-right: 15px;
-    padding-top: 10px;
-    padding-bottom: 10px;
-    background-color: #0e4301;
-    }
-    </style>
 </head>
 <body>
 
@@ -119,7 +79,7 @@ $credentials_result = $stmt->get_result();
           <li class="dropdown">
             <a href="javascript:void(0)" id="reportsDropdown" class="active"><img src="../images/reports.png" alt="Reports Icon" class="menu-icon">REPORTS<img src="../images/dropdown.png" alt="Dropdown Icon" class="down-icon"></a>
             <ul class="dropdown-menu">
-              <li><a href="files_report.php" class="active">CREDENTIAL FILES</a></li>
+              <li><a href="files_report.php" class="active">DOCUMENT FILES</a></li>
               <li><a href="logs_report.php">USER LOGS</a></li>
             </ul>
           </li>
@@ -134,8 +94,7 @@ $credentials_result = $stmt->get_result();
 
   <div id="main" class="main-content">
     <div class="report-header">
-      <h1>Credentials Pending Verification Report - <?= htmlspecialchars($current_college_name) ?></h1>
-      <h3>List of Pending Faculty Credentials for Verification</h3>
+      <h1>Documents Pending Verification Report - <?= htmlspecialchars($current_college_name) ?></h1>
     </div>
 
     <div class="report-container">
@@ -159,8 +118,8 @@ $credentials_result = $stmt->get_result();
           <tr>
             <th>FACULTY ID</th>
             <th>NAME</th>
-            <th>CREDENTIAL TYPE</th>
-            <th>CREDENTIAL NAME</th>
+            <th>DOCUMENT TYPE</th>
+            <th>DOCUMENT NAME</th>
             <th>SEMESTER</th>
             <th>SCHOOL YEAR</th>
             <th>TOTAL LOADS</th>
@@ -202,36 +161,36 @@ $credentials_result = $stmt->get_result();
   <script src="report.js?v=<?php echo time(); ?>"></script>
   <script src="scripts.js?v=<?php echo time(); ?>"></script>
   <script>
-      // Reports dropdown functionality
-      document.addEventListener('DOMContentLoaded', function() {
-      document.getElementById('reportsDropdown').addEventListener('click', function(e) {
-      e.preventDefault();
-      const dropdown = this.parentElement;
-      const menu = dropdown.querySelector('.dropdown-menu');
-      
-      // Toggle only the clicked dropdown
-      if (menu.style.display === 'block') {
-        menu.style.display = 'none';
-      } else {
-        // Close all other dropdowns first
-        document.querySelectorAll('.dropdown-menu').forEach(item => {
-          if (item !== menu) {
-            item.style.display = 'none';
-          }
-        });
-        menu.style.display = 'block';
-      }
-    });
+// Reports dropdown functionality
+document.addEventListener('DOMContentLoaded', function() {
+  document.getElementById('reportsDropdown').addEventListener('click', function(e) {
+    e.preventDefault();
+    const dropdown = this.parentElement;
+    const menu = dropdown.querySelector('.dropdown-menu');
     
-    // Close dropdown when clicking outside
-    document.addEventListener('click', function(e) {
-      if (!e.target.closest('.dropdown')) {
-        document.querySelectorAll('.dropdown-menu').forEach(item => {
+    // Toggle only the clicked dropdown
+    if (menu.style.display === 'block') {
+      menu.style.display = 'none';
+    } else {
+      // Close all other dropdowns first
+      document.querySelectorAll('.dropdown-menu').forEach(item => {
+        if (item !== menu) {
           item.style.display = 'none';
-        });
-      }
-    });
-        })
+        }
+      });
+      menu.style.display = 'block';
+    }
+  });
+  
+  // Close dropdown when clicking outside
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('.dropdown')) {
+      document.querySelectorAll('.dropdown-menu').forEach(item => {
+        item.style.display = 'none';
+      });
+    }
+  });
+});
     
     function confirmLogout() {
       if (confirm('Are you sure you want to logout?')) {

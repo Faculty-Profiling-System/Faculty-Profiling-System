@@ -70,13 +70,25 @@ $current_college_id = $current_user['college_id'];
         <li><a href="home.php"><img src="../images/home.png" alt="Home Icon" class="menu-icon">HOME</a></li>
         <li><a href="college_management.php" class="active"><img src="../images/department.png" alt="Department Icon" class="menu-icon">COLLEGE MANAGEMENT</a></li>
         <li><a href="user.php"><img src="../images/user.png" alt="User Icon" class="menu-icon">USER MANAGEMENT</a></li>
-        <li class="dropdown">
-          <a href="javascript:void(0)" id="reportsDropdown"><img src="../images/reports.png" alt="Reports Icon" class="menu-icon">REPORTS<img src="../images/dropdown.png" alt="Dropdown Icon" class="down-icon"></a>
-          <ul class="dropdown-menu">
-              <li><a href="files_report.php">CREDENTIAL FILES</a></li>
-              <li><a href="logs_report.php">USER LOGS</a></li>
-          </ul>
-        </li>
+          <li class="dropdown">
+            <a href="javascript:void(0)" id="reportsDropdown">
+                <img src="../images/reports.png" alt="Reports Icon" class="menu-icon">
+                REPORTS
+                <i class="fas fa-chevron-down down-icon" id="dropdownArrow"></i>
+            </a>
+            <ul class="dropdown-menu">
+                <li>
+                    <a href="files_report.php">
+                        <i class="fas fa-file-alt"></i> DOCUMENT FILES
+                    </a>
+                </li>
+                <li>
+                    <a href="logs_report.php">
+                        <i class="fas fa-user-clock"></i> USER LOGS
+                    </a>
+                </li>
+            </ul>
+          </li>
         <li><a href="setting.php"><img src="../images/setting.png" alt="Settings Icon" class="menu-icon">SETTINGS</a></li>
       </ul>
     </nav>
@@ -87,23 +99,26 @@ $current_college_id = $current_user['college_id'];
     </div>
       
     <div class="page-header">
-      <h1>College Management</h1>
+        <h1 class="college-management-title">
+        <i class="fas fa-building-columns"></i>
+        College Management<?php if (!empty($current_college_name)) echo ' - ' . htmlspecialchars($current_college_name); ?>
+    </h1>
     </div>
     
     <div class="faculty-management-container">
         <div class="management-tabs">
             <button class="tab-btn active" onclick="switchTab('facultyTab')">List of Faculty</button>
-            <button class="tab-btn" id="credentialsTabBtn" onclick="switchTab('credentialsTab')" style="display:none;">Approved Credentials</button>
+            <button class="tab-btn" id="credentialsTabBtn" onclick="switchTab('credentialsTab')" style="display:none;">Approved Documents</button>
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="Search faculty...">
+            </div>
         </div>
-
+        
         <div id="facultyTab" class="tab-content active">
             <div class="table-controls">
-                <div class="search-box">
-                    <i class="fas fa-search"></i>
-                    <input type="text" id="searchInput" placeholder="Search faculty...">
-                </div>
             </div>
-
+            
             <div class="faculty-table-container">
                 <table id="facultyTable">
                     <thead>
@@ -174,18 +189,13 @@ $current_college_id = $current_user['college_id'];
         
         <div id="credentialsTab" class="tab-content">
             <div class="credentials-header">
-                <h2 id="credentialsTableTitle">Credentials for Faculty Member</h2>
-                <button onclick="switchTab('facultyTab')" class="back-btn">
-                    <i class="fas fa-arrow-left"></i> Back to Faculty
-                </button>
+                <h2 id="credentialsTableTitle">Documents for Faculty Member</h2>
             </div>
             
-            <div class="credentials-container">
                 <div id="credentialsList"></div>
             </div>
-        </div>
     </div>
-    
+
     <?php include '../faculty/help.php'; ?>
 
   <script src="scripts.js?v=<?php echo time(); ?>"></script>
@@ -194,44 +204,50 @@ $current_college_id = $current_user['college_id'];
     document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('reportsDropdown').addEventListener('click', function(e) {
             e.preventDefault();
-            const dropdown = this.parentElement;
+            const dropdown = this.closest('.dropdown');
             const menu = dropdown.querySelector('.dropdown-menu');
-            
-            // Toggle only the clicked dropdown
+            dropdown.classList.toggle('open');
+            // Toggle menu display
             if (menu.style.display === 'block') {
-                menu.style.display = 'none';
+              menu.style.display = 'none';
             } else {
-                // Close all other dropdowns first
-                document.querySelectorAll('.dropdown-menu').forEach(item => {
-                    if (item !== menu) {
-                        item.style.display = 'none';
-                    }
-                });
-                menu.style.display = 'block';
+              // Close all other dropdowns first
+              document.querySelectorAll('.dropdown-menu').forEach(item => {
+                if (item !== menu) {
+                  item.style.display = 'none';
+                  item.closest('.dropdown').classList.remove('open');
+                }
+              });
+              menu.style.display = 'block';
             }
-        });
-        
-        // Close dropdown when clicking outside
-        document.addEventListener('click', function(e) {
+          });
+          
+          // Close dropdown when clicking outside
+          document.addEventListener('click', function(e) {
             if (!e.target.closest('.dropdown')) {
-                document.querySelectorAll('.dropdown-menu').forEach(item => {
-                    item.style.display = 'none';
-                });
+              document.querySelectorAll('.dropdown-menu').forEach(item => {
+                item.style.display = 'none';
+                item.closest('.dropdown').classList.remove('open');
+              });
             }
+          });
         });
 
-        // Search functionality
-        document.getElementById('searchInput').addEventListener('keyup', function() {
-            const input = this.value.toLowerCase();
-            const rows = document.querySelectorAll('#facultyTable tbody tr');
-            
-            rows.forEach(row => {
-                const text = row.textContent.toLowerCase();
-                row.style.display = text.includes(input) ? '' : 'none';
+            // Search functionality
+            document.getElementById('searchInput').addEventListener('keyup', function() {
+                const input = this.value.toLowerCase();
+                // Select rows from both tables, if they exist
+                const facultyRows = document.querySelectorAll('#facultyTable tbody tr');
+                const credentialsRows = document.querySelectorAll('.credentials-table tbody tr');
+                // Combine NodeLists into one array
+                const rows = [...facultyRows, ...credentialsRows];
+
+                rows.forEach(row => {
+                    const text = row.textContent.toLowerCase();
+                    row.style.display = text.includes(input) ? '' : 'none';
+                });
             });
-        });
-    });
-
+        
     function confirmLogout() {
         if (confirm('Are you sure you want to logout?')) {
             window.location.href = '../landing/index.php';
@@ -288,13 +304,13 @@ $current_college_id = $current_user['college_id'];
         }
     }
 
-  function showFacultyCredentials(facultyId, facultyName) {
+function showFacultyCredentials(facultyId, facultyName) {
     // Update the title
     document.getElementById('credentialsTableTitle').textContent = `Credentials for ${facultyName}`;
     
     // Show loading state
     document.getElementById('credentialsList').innerHTML = `
-        <div class="loading-message">Loading credentials...</div>
+        <div class="loading-message">Loading documents...</div>
     `;
     
     // Show the credentials tab button
@@ -310,53 +326,55 @@ $current_college_id = $current_user['college_id'];
             if (data.success) {
                 if (data.credentials.length > 0) {
                     let html = `
-                        <div class="credentials-table">
-                            <div class="credentials-table-header">
-                                <div class="credential-name">Credential Name</div>
-                                <div class="credential-type">Type</div>
-                                <div class="issue-date">Issue Date</div>
-                                <div class="expiry-date">Expiry Date</div>
-                                <div class="credential-actions">Actions</div>
-                            </div>
+                        <div class="credentials-table-container">
+                            <table class="credentials-table">
+                                <thead>
+                                    <tr>
+                                        <th>Document Name</th>
+                                        <th>Document Type</th>
+                                        <th>Issue Date</th>
+                                        <th>Expiry Date</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
                     `;
                     
-                    data.credentials.forEach(credential => {
-                        const issueDate = credential.issued_date ? 
-                            new Date(credential.issued_date).toLocaleDateString() : 'N/A';
-                        const expiryDate = credential.expiry_date ? 
-                            new Date(credential.expiry_date).toLocaleDateString() : 'No expiration';
+                    data.credentials.forEach(doc => {
+                        const issueDate = doc.issued_date ? 
+                            new Date(doc.issued_date).toLocaleDateString() : 'N/A';
+                        const expiryDate = doc.expiry_date ? 
+                            new Date(doc.expiry_date).toLocaleDateString() : 'No expiration';
                         
                         html += `
-                            <div class="credential-row">
-                                <div class="credential-name" data-label="Name">
-                                    ${credential.credential_name || 'N/A'}
-                                </div>
-                                <div class="credential-type" data-label="Type">
-                                    ${credential.credential_type || 'N/A'}
-                                </div>
-                                <div class="issue-date" data-label="Issued">
-                                    ${issueDate}
-                                </div>
-                                <div class="expiry-date" data-label="Expires">
-                                    ${expiryDate}
-                                </div>
-                                <div class="credential-actions" data-label="Actions">
-                                    <a href="${credential.file_path}" target="_blank" class="action-btn view-btn">
-                                        <i class="fas fa-eye"></i> View
-                                    </a>
-                                    <a href="${credential.file_path}" download class="action-btn download-btn">
-                                        <i class="fas fa-download"></i> Download
-                                    </a>
-                                </div>
-                            </div>
+                            <tr>
+                                <td>${doc.name || 'N/A'}</td>
+                                <td>${doc.type || 'N/A'}</td>
+                                <td>${issueDate}</td>
+                                <td>${expiryDate}</td>
+                                <td>
+                                    <div class="credential-actions">
+                                        <button class="btn btn-sm btn-view" onclick="window.open('${doc.file_path}', '_blank')">
+                                            <i class="fas fa-eye"></i> View
+                                        </button>
+                                        <a href="${doc.file_path}" download class="btn btn-sm btn-download">
+                                            <i class="fas fa-download"></i> Download
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
                         `;
                     });
                     
-                    html += `</div>`; // Close credentials-table
+                    html += `
+                                </tbody>
+                            </table>
+                        </div>
+                    `;
                     document.getElementById('credentialsList').innerHTML = html;
                 } else {
                     document.getElementById('credentialsList').innerHTML = `
-                        <div class="no-credentials">No credentials found for this faculty member</div>
+                        <div class="no-credentials">No verified documents found for this faculty member</div>
                     `;
                 }
             } else {
@@ -366,7 +384,7 @@ $current_college_id = $current_user['college_id'];
         .catch(error => {
             console.error('Error:', error);
             document.getElementById('credentialsList').innerHTML = `
-                <div class="error-message">Error loading credentials</div>
+                <div class="error-message">Error loading documents</div>
             `;
         });
 }
@@ -387,6 +405,11 @@ $current_college_id = $current_user['college_id'];
             });
         });
     });
+
+    function closeAndRefreshAddModal() {
+    document.getElementById('addModal').style.display = 'none';
+    window.location.href = 'user.php'; // Refresh the page
+}
 
   </script>
   <script src="../faculty/help.js?v=<?php echo time(); ?>"></script>
