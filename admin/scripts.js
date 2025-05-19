@@ -141,3 +141,4 @@ function confirmLogout() {
     window.location.href = '../landing/index.php';
   }
 }
+

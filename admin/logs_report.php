@@ -33,14 +33,22 @@ $college_row = $college_result->fetch_assoc();
 $current_college_name = $college_row['college_name'];
 
 // Modified query to better handle login/logout pairs
-// Modified query in logs_report.php
 $login_logs_query = "SELECT 
                         u.faculty_id, 
                         f.full_name AS name, 
                         l.login_time AS login_time,
                         l.logout_time AS logout_time,
-                        IF(l.session_status = 'active', 'LOG IN (Active)', 'LOG IN') AS login_action,
-                        'LOG OUT' AS logout_action,
+                        CASE 
+                            WHEN l.session_status = 'active' THEN 'LOG IN (Active)'
+                            WHEN l.session_status = 'completed' THEN 'LOG IN'
+                            WHEN l.session_status = 'timeout' THEN 'LOG IN (Timeout)'
+                            ELSE 'LOG IN'
+                        END AS login_action,
+                        CASE 
+                            WHEN l.session_status = 'completed' THEN 'LOG OUT'
+                            WHEN l.session_status = 'timeout' THEN 'TIMEOUT'
+                            ELSE NULL
+                        END AS logout_action,
                         TIMESTAMPDIFF(MINUTE, l.login_time, IFNULL(l.logout_time, NOW())) AS session_duration,
                         l.ip_address,
                         l.session_status
@@ -54,6 +62,52 @@ $stmt = $conn->prepare($login_logs_query);
 $stmt->bind_param("i", $current_college_id);
 $stmt->execute();
 $login_logs_result = $stmt->get_result();
+
+// Credential logs query
+$document_logs_query = "SELECT 
+                            'credential' AS doc_category,
+                            c.credential_id AS doc_id,
+                            f.faculty_id,
+                            f.full_name AS name,
+                            c.credential_name AS doc_name,
+                            c.credential_type AS doc_type,
+                            c.uploaded_at,
+                            c.status,
+                            c.verified_at,
+                            c.reason,
+                            NULL AS semester,
+                            NULL AS academic_year,
+                            NULL AS total_loads
+                        FROM credentials c
+                        JOIN faculty f ON c.faculty_id = f.faculty_id
+                        WHERE f.college_id = ?
+                        
+                        UNION ALL
+                        
+                        SELECT 
+                            'teaching_load' AS doc_category,
+                            t.load_id AS doc_id,
+                            f.faculty_id,
+                            f.full_name AS name,
+                            t.file_name AS doc_name,
+                            'Teaching Load' AS doc_type,
+                            t.created_at AS uploaded_at,
+                            t.status,
+                            t.verified_at,
+                            t.reason,
+                            t.semester,
+                            CONCAT(t.start_year, '-', t.end_year) AS academic_year,
+                            t.total_loads
+                        FROM teaching_load t
+                        JOIN faculty f ON t.faculty_id = f.faculty_id
+                        WHERE f.college_id = ?
+                        
+                        ORDER BY uploaded_at DESC";
+
+$stmt = $conn->prepare($document_logs_query);
+$stmt->bind_param("ii", $current_college_id, $current_college_id);
+$stmt->execute();
+$document_logs_result = $stmt->get_result();
 ?>
 
 <!DOCTYPE html>
@@ -93,10 +147,22 @@ $login_logs_result = $stmt->get_result();
           <li><a href="college_management.php"><img src="../images/department.png" alt="Department Icon" class="menu-icon">COLLEGE MANAGEMENT</a></li>
           <li><a href="user.php"><img src="../images/user.png" alt="User Icon" class="menu-icon">USER MANAGEMENT</a></li>
           <li class="dropdown">
-            <a href="javascript:void(0)" id="reportsDropdown" class="active"><img src="../images/reports.png" alt="Reports Icon" class="menu-icon">REPORTS<img src="../images/dropdown.png" alt="Dropdown Icon" class="down-icon"></a>
+            <a href="javascript:void(0)" id="reportsDropdown" class="active">
+                <img src="../images/reports.png" alt="Reports Icon" class="menu-icon">
+                REPORTS
+                <i class="fas fa-chevron-down down-icon" id="dropdownArrow"></i>
+            </a>
             <ul class="dropdown-menu">
-              <li><a href="files_report.php">CREDENTIAL FILES</a></li>
-              <li><a href="logs_report.php" class="active">USER LOGS</a></li>
+                <li>
+                    <a href="files_report.php">
+                        <i class="fas fa-file-alt"></i> DOCUMENT FILES
+                    </a>
+                </li>
+                <li>
+                    <a href="logs_report.php" class="active">
+                        <i class="fas fa-user-clock"></i> USER LOGS
+                    </a>
+                </li>
             </ul>
           </li>
           <li><a href="setting.php"><img src="../images/setting.png" alt="Settings Icon" class="menu-icon">SETTINGS</a></li>
@@ -112,13 +178,16 @@ $login_logs_result = $stmt->get_result();
 
   <div id="main" class="main-content">
     <div class="report-header">
-      <h1>User Activity Logs - <?= htmlspecialchars($current_college_name) ?></h1>
+        <h1 class="activity-logs-title">
+            <i class="fas fa-history"></i>
+            User Activity Logs - <?= htmlspecialchars($current_college_name) ?>
+        </h1>
     </div>
 
 <div class="report-container">
   <div class="log-tabs">
     <div class="log-tab active" onclick="switchTab('login-logs')">Login/Logout Logs</div>
-    <div class="log-tab" onclick="switchTab('credential-logs')">Credentials Logs</div>
+    <div class="log-tab" onclick="switchTab('credential-logs')">Document Upload Logs</div>
     <div class="search-box log-search-box">
       <i class="fas fa-search"></i>
       <input type="text" id="searchInput" placeholder="Search faculty...">
@@ -130,13 +199,13 @@ $login_logs_result = $stmt->get_result();
         <table class="report-table">
             <thead>
                 <tr>
-                    <th>FACULTY ID</th>
-                    <th>NAME</th>
-                    <th>LOGIN TIME</th>
-                    <th>LOGOUT TIME</th>
-                    <th>ACTION</th>
-                    <th>SESSION DURATION (MINUTES)</th>
-                    <th>STATUS</th>
+                    <th>Faculty ID</th>
+                    <th>Name</th>
+                    <th>Login Time</th>
+                    <th>Logout Time</th>
+                    <th>Action</th>
+                    <th>Session Duration (Minutes)</th>
+                    <th>Status</th>
                 </tr>
             </thead>
             <tbody>
@@ -156,22 +225,72 @@ $login_logs_result = $stmt->get_result();
                     <td class="session-duration">
                         <?= htmlspecialchars($row['session_duration']) ?>
                     </td>
-                    <td><?= htmlspecialchars($row['session_status']) ?></td>
+                    <td>
+                      <span class="session-status-badge 
+                        <?php
+                          if ($row['session_status'] === 'active') echo 'session-status-active';
+                          elseif ($row['session_status'] === 'completed') echo 'session-status-completed';
+                          elseif ($row['session_status'] === 'timeout') echo 'session-status-timeout';
+                        ?>">
+                        <?= htmlspecialchars(strtoupper($row['session_status'])) ?>
+                      </span>
+                    </td>
                 </tr>
                 <?php endwhile; ?>
             </tbody>
         </table>
       </div>
 
-      <!-- Credentials Status Logs (Placeholder) -->
-      <div id="credential-logs" class="log-content">
-        <div class="coming-soon">
-          <p>Credential Logs feature is coming soon!</p>
-          <p>This section will display detailed records of credentials status logs.</p>
-        </div>
-      </div>
-    </div>
-  </div>
+      <!-- Credentials Status Logs -->
+<div id="credential-logs" class="log-content">
+    <table class="report-table">
+        <thead>
+            <tr>
+                <th>Faculty ID</th>
+                <th>Name</th>
+                <th>Document Category</th>
+                <th>Document Name</th>
+                <th>Document Type</th>
+                <th>Semester</th>
+                <th>Academic Year</th>
+                <th>Loads</th>
+                <th>Date Submitted</th>
+                <th>Status</th>
+                <th>Date Verified</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php while ($row = $document_logs_result->fetch_assoc()): ?>
+            <tr>
+                <td><?= htmlspecialchars($row['faculty_id']) ?></td>
+                <td><?= htmlspecialchars($row['name']) ?></td>
+                <td><?= htmlspecialchars(ucfirst(str_replace('_', ' ', $row['doc_category']))) ?></td>
+                <td><?= htmlspecialchars($row['doc_name']) ?></td>
+                <td><?= htmlspecialchars($row['doc_type']) ?></td>
+                <td><?= $row['semester'] ? htmlspecialchars($row['semester']) : 'N/A' ?></td>
+                <td><?= $row['academic_year'] ? htmlspecialchars($row['academic_year']) : 'N/A' ?></td>
+                <td><?= $row['total_loads'] ? htmlspecialchars($row['total_loads']) : 'N/A' ?></td>
+                <td><?= htmlspecialchars(date('d/m/Y h:iA', strtotime($row['uploaded_at']))) ?></td>
+                <td>
+                    <span class="status-badge <?= strtolower($row['status']) ?>">
+                        <?= htmlspecialchars($row['status']) ?>
+                    </span>
+                    <?php if ($row['status'] === 'Rejected' && !empty($row['reason'])): ?>
+                        <span class="reason-tooltip" title="<?= htmlspecialchars($row['reason']) ?>">
+                            <i class="fas fa-info-circle"></i>
+                        </span>
+                    <?php endif; ?>
+                </td>
+                <td>
+                    <?= $row['verified_at'] ? 
+                        htmlspecialchars(date('d/m/Y h:iA', strtotime($row['verified_at']))) : 
+                        'Not verified yet' ?>
+                </td>
+            </tr>
+            <?php endwhile; ?>
+        </tbody>
+    </table>
+</div>
 
   <?php include '../faculty/help.php'; ?>
 
@@ -182,10 +301,10 @@ $login_logs_result = $stmt->get_result();
     document.addEventListener('DOMContentLoaded', function() {
       document.getElementById('reportsDropdown').addEventListener('click', function(e) {
         e.preventDefault();
-        const dropdown = this.parentElement;
+        const dropdown = this.closest('.dropdown');
         const menu = dropdown.querySelector('.dropdown-menu');
-        
-        // Toggle only the clicked dropdown
+        dropdown.classList.toggle('open');
+        // Toggle menu display
         if (menu.style.display === 'block') {
           menu.style.display = 'none';
         } else {
@@ -193,32 +312,34 @@ $login_logs_result = $stmt->get_result();
           document.querySelectorAll('.dropdown-menu').forEach(item => {
             if (item !== menu) {
               item.style.display = 'none';
+              item.closest('.dropdown').classList.remove('open');
             }
           });
           menu.style.display = 'block';
         }
       });
 
-            // Search functionality
-      document.getElementById('searchInput').addEventListener('keyup', function() {
-        const input = this.value.toLowerCase();
-        const rows = document.querySelectorAll('.user-table tbody tr');
-        
-        rows.forEach(row => {
-          const text = row.textContent.toLowerCase();
-          row.style.display = text.includes(input) ? '' : 'none';
-        });
-      });
-      
       // Close dropdown when clicking outside
       document.addEventListener('click', function(e) {
         if (!e.target.closest('.dropdown')) {
           document.querySelectorAll('.dropdown-menu').forEach(item => {
             item.style.display = 'none';
+            item.closest('.dropdown').classList.remove('open');
           });
         }
       });
     });
+
+              // Search functionality
+          document.getElementById('searchInput').addEventListener('keyup', function() {
+              const input = this.value.toLowerCase();
+              const rows = document.querySelectorAll('.report-table tbody tr');
+              
+              rows.forEach(row => {
+                  const text = row.textContent.toLowerCase();
+                  row.style.display = text.includes(input) ? '' : 'none';
+              });
+          });
     
 function confirmLogout() {
     if (confirm("Are you sure you want to logout?")) {

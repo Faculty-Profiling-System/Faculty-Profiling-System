@@ -150,13 +150,25 @@ session_start();
     <nav>
         <ul>
           <li><a href="home.php"><img src="../images/home.png" alt="Home Icon" class="menu-icon">HOME</a></li>
-          <li><a href="college_management.php"><img src="../images/department.png" alt="Department Icon" class="menu-icon">COLLEGE MANAGEMENT</a></li>
+          <li><a href="college_management.php"><img src="../images/department.png" alt="Department Icon" class="menu-icon">DEPARTMENT MANAGEMENT</a></li>
           <li><a href="user.php"><img src="../images/user.png" alt="User Icon" class="menu-icon">USER MANAGEMENT</a></li>
           <li class="dropdown">
-            <a href="javascript:void(0)" id="reportsDropdown"><img src="../images/reports.png" alt="Reports Icon" class="menu-icon">REPORTS<img src="../images/dropdown.png" alt="Dropdown Icon" class="down-icon"></a>
+            <a href="javascript:void(0)" id="reportsDropdown">
+                <img src="../images/reports.png" alt="Reports Icon" class="menu-icon">
+                REPORTS
+                <i class="fas fa-chevron-down down-icon" id="dropdownArrow"></i>
+            </a>
             <ul class="dropdown-menu">
-              <li><a href="files_report.php">CREDENTIAL FILES</a></li>
-              <li><a href="logs_report.php">USER LOGS</a></li>
+                <li>
+                    <a href="files_report.php">
+                        <i class="fas fa-file-alt"></i> DOCUMENT FILES
+                    </a>
+                </li>
+                <li>
+                    <a href="logs_report.php">
+                        <i class="fas fa-user-clock"></i> USER LOGS
+                    </a>
+                </li>
             </ul>
           </li>
           <li><a href="setting.php" class="active"><img src="../images/setting.png" alt="Settings Icon" class="menu-icon">SETTINGS</a></li>
@@ -260,35 +272,37 @@ session_start();
   <script>
         // Reports dropdown functionality
         document.addEventListener('DOMContentLoaded', function() {
-        document.getElementById('reportsDropdown').addEventListener('click', function(e) {
-      e.preventDefault();
-      const dropdown = this.parentElement;
-      const menu = dropdown.querySelector('.dropdown-menu');
-      
-      // Toggle only the clicked dropdown
-      if (menu.style.display === 'block') {
-        menu.style.display = 'none';
-      } else {
-        // Close all other dropdowns first
-        document.querySelectorAll('.dropdown-menu').forEach(item => {
-          if (item !== menu) {
-            item.style.display = 'none';
-          }
-        });
-        menu.style.display = 'block';
-      }
-    });
-    
-    // Close dropdown when clicking outside
-    document.addEventListener('click', function(e) {
-      if (!e.target.closest('.dropdown')) {
-        document.querySelectorAll('.dropdown-menu').forEach(item => {
+  document.getElementById('reportsDropdown').addEventListener('click', function(e) {
+    e.preventDefault();
+    const dropdown = this.closest('.dropdown');
+    const menu = dropdown.querySelector('.dropdown-menu');
+    dropdown.classList.toggle('open');
+    // Toggle menu display
+    if (menu.style.display === 'block') {
+      menu.style.display = 'none';
+    } else {
+      // Close all other dropdowns first
+      document.querySelectorAll('.dropdown-menu').forEach(item => {
+        if (item !== menu) {
           item.style.display = 'none';
-        });
-      }
-    });
-        })
-    
+          item.closest('.dropdown').classList.remove('open');
+        }
+      });
+      menu.style.display = 'block';
+    }
+  });
+
+  // Close dropdown when clicking outside
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('.dropdown')) {
+      document.querySelectorAll('.dropdown-menu').forEach(item => {
+        item.style.display = 'none';
+        item.closest('.dropdown').classList.remove('open');
+      });
+    }
+  });
+});
+
     function confirmLogout() {
       if (confirm('Are you sure you want to logout?')) {
         window.location.href = '../landing/index.php';
@@ -297,4 +311,4 @@ session_start();
   </script>
   <script src="../faculty/help.js?v=<?php echo time(); ?>"></script>
 </body>
-</html> 
+</html>
