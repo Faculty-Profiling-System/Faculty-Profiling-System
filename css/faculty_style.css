@@ -371,3 +371,20 @@ body {
       }
   }
   
+  .settings-title {
+  display: flex;
+  align-items: center;
+  font-size: 2rem;
+  gap: 12px;
+  color: #187436;
+  margin-bottom: 0.5em;
+}
+.faculty-settings-icon {
+  color: #187436;
+  font-size: 1.3em;
+  margin-right: 8px;
+}
+
+body.dark-theme .faculty-settings-icon {
+  color: #00d34a;
+}

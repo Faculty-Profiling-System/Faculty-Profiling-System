@@ -1,0 +1,276 @@
+/* Add Faculty User Form Styles */
+.main-content {
+  max-width: 800px;
+  margin: 0.1rem auto;
+  padding: 1.5rem 1.5rem;
+  background: none;
+  box-shadow: none;
+    font-size: 1.3rem;
+}
+
+#addFacultyForm {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  background: rgba(244, 255, 244, 0.85);
+  border-radius: 10px;
+  padding: 1.5rem 1.5rem 1rem 1.5rem;
+  box-shadow: 0 2px 12px rgba(24, 116, 54, 0.07);
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+#addFacultyForm .settings-input,
+#addFacultyForm select.settings-input {
+  font-size: 1rem;
+  padding: 0.7rem 1rem;
+  border: 1.5px solid #187436;
+  border-radius: 7px;
+  background: #fff;
+  color: #187436;
+  transition: border 0.2s, box-shadow 0.2s;
+  margin-bottom: 0.5rem;
+}
+
+#addFacultyForm .settings-input:focus,
+#addFacultyForm select.settings-input:focus {
+  border-color: #00d34a;
+  outline: none;
+  box-shadow: 0 0 0 2px #c8e6c9;
+}
+
+#addFacultyForm .settings-btn {
+  background: #187436;
+  color: #fff;
+  border: none;
+  border-radius: 7px;
+  padding: 0.7rem 2rem;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 0.5rem;
+  transition: background 0.2s, color 0.2s;
+}
+
+#addFacultyForm .settings-btn:hover {
+  background: #00d34a;
+  color: #fff;
+}
+
+#addFacultyMessage {
+  margin-top: 1rem;
+  padding: 1rem;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 500;
+  display: none;
+  transition: background 0.2s, color 0.2s;
+}
+
+/* General settings-section styling (applies to all settings-section forms and content) */
+.settings-section {
+  margin: 2rem 0;
+}
+
+/* Collapsible button styling */
+.collapsible {
+  background: none;
+  color: inherit;
+  cursor: pointer;
+  width: 100%;
+  border: none;
+  text-align: left;
+  outline: none;
+  font-size: 1.2rem;
+  font-weight: bold;
+  padding: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid #187436;
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.collapsible:hover {
+  background: rgba(0, 211, 74, 0.1);
+}
+
+.collapsible:after {
+  content: '\002B';
+  font-weight: bold;
+  float: right;
+  margin-left: 5px;
+  transition: transform 0.3s ease;
+}
+
+.collapsible.active:after {
+  content: '\2212';
+}
+
+/* Collapsible content styling */
+.content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease-out;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 0 0 8px 8px;
+  padding: 0 1rem;
+}
+
+.content.active {
+  max-height: 500px;
+  padding: 1rem;
+}
+
+/* Settings options (button group or form) */
+.settings-options {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+  flex-direction: row;
+}
+
+/* For forms inside .settings-options, use column layout */
+.settings-options form,
+.settings-options[style*="flex-direction: column"] {
+  flex-direction: column !important;
+  gap: 0.7rem;
+}
+
+/* Input and button styling for all forms */
+.settings-input,
+select.settings-input {
+  font-size: 1rem;
+  padding: 0.7rem 1rem;
+  border: 1.5px solid #187436;
+  border-radius: 7px;
+  background: #fff;
+  color: #187436;
+  transition: border 0.2s, box-shadow 0.2s;
+  margin-bottom: 0.5rem;
+}
+
+.settings-input:focus,
+select.settings-input:focus {
+  border-color: #00d34a;
+  outline: none;
+  box-shadow: 0 0 0 2px #c8e6c9;
+}
+
+.settings-btn {
+  background: #187436;
+  color: #fff;
+  border: none;
+  border-radius: 7px;
+  padding: 0.7rem 2rem;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 0.5rem;
+  transition: background 0.2s, color 0.2s;
+}
+
+.settings-btn.selected {
+  background: #00723F;
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(0,123,63,0.08);
+  border: 1.5px solid #187436;
+  font-weight: bold;
+}
+
+.settings-btn:hover {
+  background: #00d34a;
+  color: #fff;
+}
+
+/* Message box styling */
+.message-box,
+#addFacultyMessage,
+#passwordMessage {
+  margin-top: 1rem;
+  padding: 1rem;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 500;
+  display: none;
+  transition: background 0.2s, color 0.2s;
+}
+
+/* Dark theme adjustments */
+body.dark-theme #addFacultyForm {
+  background: #181818;
+  box-shadow: 0 2px 12px rgba(0, 211, 74, 0.07);
+}
+
+body.dark-theme #addFacultyForm .settings-input,
+body.dark-theme #addFacultyForm select.settings-input {
+  background: #232323;
+  color: #f3f3f3;
+  border-color: #333;
+}
+
+body.dark-theme #addFacultyForm .settings-input:focus,
+body.dark-theme #addFacultyForm select.settings-input:focus {
+  border-color: #00d34a;
+  box-shadow: 0 0 0 2px #00d34a33;
+}
+
+body.dark-theme #addFacultyForm .settings-btn {
+  background: #00d34a;
+  color: #101010;
+}
+
+body.dark-theme #addFacultyForm .settings-btn.selected {
+  background: #00d34a;
+  color: #101010;
+  border: 1.5px solid #00d34a;
+}
+
+body.dark-theme #addFacultyForm .settings-btn:hover {
+  background: #187436;
+  color: #fff;
+}
+
+body.dark-theme .collapsible {
+  border-color: #333;
+  color: #f3f3f3;
+}
+body.dark-theme .collapsible:hover {
+  background: rgba(0, 211, 74, 0.2);
+}
+body.dark-theme .content {
+  background: #232323;
+}
+body.dark-theme .settings-input,
+body.dark-theme select.settings-input {
+  background: #232323;
+  color: #f3f3f3;
+  border-color: #333;
+}
+body.dark-theme .settings-input:focus,
+body.dark-theme select.settings-input:focus {
+  border-color: #00d34a;
+  box-shadow: 0 0 0 2px #00d34a33;
+}
+body.dark-theme .settings-btn {
+  background: #00d34a;
+  color: #101010;
+}
+body.dark-theme .settings-btn.selected {
+  background: #00d34a;
+  color: #101010;
+  border: 1.5px solid #00d34a;
+}
+body.dark-theme .settings-btn:hover {
+  background: #187436;
+  color: #fff;
+}
+body.dark-theme .message-box,
+body.dark-theme #addFacultyMessage,
+body.dark-theme #passwordMessage {
+  background: #232323;
+  color: #f3f3f3;
+}
