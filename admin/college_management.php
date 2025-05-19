@@ -387,7 +387,7 @@ function showFacultyCredentials(facultyId, facultyName) {
                 <div class="error-message">Error loading documents</div>
             `;
         });
-}
+    }
 
     // Modify the faculty table rows to be clickable
     document.addEventListener('DOMContentLoaded', function() {

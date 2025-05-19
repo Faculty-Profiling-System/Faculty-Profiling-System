@@ -9,6 +9,9 @@ if (!isset($_GET['faculty_id'])) {
 
 $facultyId = $_GET['faculty_id'];
 
+// Get the base URL dynamically
+$baseUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]";
+
 // Get verified credentials
 $sql = "SELECT 
             credential_id as id, 
@@ -40,6 +43,9 @@ $result = $stmt->get_result();
 
 $credentials = [];
 while ($row = $result->fetch_assoc()) {
+    // Convert path to properly reference the faculty/uploads directory
+    $relativePath = '../faculty-profiling-system/faculty/' . ltrim($row['file_path'], '/');
+    $row['file_path'] = $baseUrl . '/' . ltrim($relativePath, '/');
     $credentials[] = $row;
 }
 
