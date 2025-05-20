@@ -77,10 +77,22 @@ $credentials_result = $stmt->get_result();
           <li><a href="college_management.php"><img src="../images/department.png" alt="Department Icon" class="menu-icon">COLLEGE MANAGEMENT</a></li>
           <li><a href="user.php"><img src="../images/user.png" alt="User Icon" class="menu-icon">USER MANAGEMENT</a></li>
           <li class="dropdown">
-            <a href="javascript:void(0)" id="reportsDropdown" class="active"><img src="../images/reports.png" alt="Reports Icon" class="menu-icon">REPORTS<img src="../images/dropdown.png" alt="Dropdown Icon" class="down-icon"></a>
+                        <a href="javascript:void(0)" id="reportsDropdown" class="active">
+                <img src="../images/reports.png" alt="Reports Icon" class="menu-icon">
+                REPORTS
+                <i class="fas fa-chevron-down down-icon" id="dropdownArrow"></i>
+            </a>
             <ul class="dropdown-menu">
-              <li><a href="files_report.php" class="active">DOCUMENT FILES</a></li>
-              <li><a href="logs_report.php">USER LOGS</a></li>
+                <li>
+                    <a href="files_report.php" class="active">
+                        <i class="fas fa-file-alt"></i> DOCUMENT FILES
+                    </a>
+                </li>
+                <li>
+                    <a href="logs_report.php">
+                        <i class="fas fa-user-clock"></i> USER LOGS
+                    </a>
+                </li>
             </ul>
           </li>
           <li><a href="setting.php"><img src="../images/setting.png" alt="Settings Icon" class="menu-icon">SETTINGS</a></li>
@@ -94,7 +106,10 @@ $credentials_result = $stmt->get_result();
 
   <div id="main" class="main-content">
     <div class="report-header">
-      <h1>Documents Pending Verification Report - <?= htmlspecialchars($current_college_name) ?></h1>
+      <h1 class="pending-docs-title">
+        <i class="fas fa-file-signature pending-docs-icon"></i>
+        Documents Pending Verification Report - <?= htmlspecialchars($current_college_name) ?>
+      </h1>
     </div>
 
     <div class="report-container">
@@ -163,30 +178,36 @@ $credentials_result = $stmt->get_result();
   <script>
 // Reports dropdown functionality
 document.addEventListener('DOMContentLoaded', function() {
-  document.getElementById('reportsDropdown').addEventListener('click', function(e) {
-    e.preventDefault();
-    const dropdown = this.parentElement;
-    const menu = dropdown.querySelector('.dropdown-menu');
-    
-    // Toggle only the clicked dropdown
-    if (menu.style.display === 'block') {
-      menu.style.display = 'none';
-    } else {
-      // Close all other dropdowns first
-      document.querySelectorAll('.dropdown-menu').forEach(item => {
-        if (item !== menu) {
-          item.style.display = 'none';
-        }
-      });
-      menu.style.display = 'block';
-    }
-  });
-  
+  const reportsDropdown = document.getElementById('reportsDropdown');
+  if (reportsDropdown) {
+    reportsDropdown.addEventListener('click', function(e) {
+      e.preventDefault();
+      const dropdown = this.closest('.dropdown');
+      const menu = dropdown.querySelector('.dropdown-menu');
+      dropdown.classList.toggle('open'); // <-- This toggles the rotation
+
+      // Toggle menu display
+      if (menu.style.display === 'block') {
+        menu.style.display = 'none';
+      } else {
+        // Close all other dropdowns first
+        document.querySelectorAll('.dropdown-menu').forEach(item => {
+          if (item !== menu) {
+            item.style.display = 'none';
+            item.closest('.dropdown').classList.remove('open');
+          }
+        });
+        menu.style.display = 'block';
+      }
+    });
+  }
+
   // Close dropdown when clicking outside
   document.addEventListener('click', function(e) {
     if (!e.target.closest('.dropdown')) {
       document.querySelectorAll('.dropdown-menu').forEach(item => {
         item.style.display = 'none';
+        item.closest('.dropdown').classList.remove('open');
       });
     }
   });

@@ -1,5 +1,17 @@
 <?php
 session_start();
+// Add this after session_start()
+if (!isset($_SESSION['college_id']) && isset($_SESSION['user_id'])) {
+    require_once '../db_connection.php';
+    $stmt = $conn->prepare("SELECT college_id FROM users WHERE user_id = ?");
+    $stmt->bind_param("i", $_SESSION['user_id']);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    if ($result->num_rows > 0) {
+        $_SESSION['college_id'] = $result->fetch_assoc()['college_id'];
+    }
+}
+$current_college_id = $_SESSION['college_id'] ?? null;
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -9,8 +21,11 @@ session_start();
   <title>Settings | Admin</title>
   <link rel="stylesheet" href="../css/admin_style.css?v=<?php echo time(); ?>" />
   <link rel="stylesheet" href="../css/help.css?v=<?php echo time(); ?>">
+  <link rel="stylesheet" href="../css/themes.css?v=<?php echo time(); ?>">
+  <link rel="stylesheet" href="../css/settings.css?v=<?php echo time(); ?>">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-  <script>
+    <script src="../faculty/theme.js?v=<?php echo time(); ?>"></script>
+    <script>
     // Initialize states
     let currentSize = parseInt(localStorage.getItem('plpTextSize')) || 100;
 
@@ -62,10 +77,42 @@ session_start();
     body {
       background: #f4fff4;
       color: #187436;
+      overflow-y: auto;           /* Enable vertical scrolling */
+      scrollbar-width: none;      /* Firefox: hide scrollbar */
+      -ms-overflow-style: none;   /* IE/Edge: hide scrollbar */
     }
 
-                /* Dropdown Styles */
-        nav ul li.dropdown {
+    /* Chrome, Safari, Opera: hide scrollbar */
+    body::-webkit-scrollbar {
+      display: none;
+    }
+
+    /* Dark theme */
+    body.dark-theme {
+      background: #101010 !important;
+      color: #f3f3f3 !important;
+    }
+
+    body.dark-theme .settings-label {
+      color: #f3f3f3;
+    }
+
+    body.dark-theme .settings-btn {
+      background: #222;
+      color: #ccc;
+    }
+
+    body.dark-theme .settings-btn.selected {
+      background: #00d34a;
+      color: #101010;
+    }
+
+    body.dark-theme hr {
+      border-top: 6px solid #333;
+    }
+
+    /* Dropdown Styles */
+    nav ul li.dropdown {
       position: relative;
     }
     
@@ -94,41 +141,106 @@ session_start();
     }
     
     nav ul li.dropdown .dropdown-menu a:hover {
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-    border-right: 3px solid #04b032; /* Color accent */
-    border-left: 3px solid #04b032; /* Color accent */
-    margin-right: 15px;
-    padding-top: 10px;
-    padding-bottom: 10px;
-    background-color: #0e4301;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      border-right: 3px solid #04b032;
+      border-left: 3px solid #04b032;
+      margin-right: 15px;
+      padding-top: 10px;
+      padding-bottom: 10px;
+      background-color: #0e4301;
     }
 
-    /* Dark theme */
-    body.dark-theme {
-      background: #101010 !important;
-      color: #f3f3f3 !important;
+    /* Collapsible sections from 2 setting.php */
+    .collapsible {
+      background: none;
+      color: inherit;
+      cursor: pointer;
+      width: 100%;
+      border: none;
+      text-align: left;
+      outline: none;
+      font-size: 1.2rem;
+      font-weight: bold;
+      padding: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border: 1px solid #187436;
+      border-radius: 8px;
+      margin-bottom: 0.5rem;
+      transition: all 0.3s ease;
     }
 
-    body.dark-theme .settings-label {
+    body.dark-theme .collapsible {
+      border-color: #333;
       color: #f3f3f3;
     }
 
-    body.dark-theme .settings-btn {
+    .collapsible:hover {
+      background: rgba(0, 211, 74, 0.1);
+    }
+
+    body.dark-theme .collapsible:hover {
+      background: rgba(0, 211, 74, 0.2);
+    }
+
+    .collapsible:after {
+      content: '\002B';
+      font-weight: bold;
+      float: right;
+      margin-left: 5px;
+      transition: transform 0.3s ease;
+    }
+
+    .collapsible.active:after {
+      content: '\2212';
+    }
+
+    .content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease-out;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 0 0 8px 8px;
+      padding: 0 1rem;
+    }
+
+    .content.active {
+      max-height: 500px;
+      padding: 1rem;
+    }
+
+    /* Password change form */
+    .settings-input {
+      width: 100%;
+      padding: 0.7rem;
+      margin-bottom: 1rem;
+      border: 1px solid #187436;
+      border-radius: 8px;
+      background: #f4fff4;
+      color: #187436;
+    }
+
+    body.dark-theme .settings-input {
       background: #222;
-      color: #ccc;
+      color: #f3f3f3;
+      border-color: #333;
     }
 
-    body.dark-theme .settings-btn.selected {
-      background: #00d34a;
-      color: #101010;
+    .settings-input:focus {
+      outline: none;
+      border-color: #00d34a;
     }
 
-    body.dark-theme hr {
-      border-top: 6px solid #333;
+    #passwordMessage {
+      display: none;
+      margin-bottom: 1rem;
+      padding: 1rem;
+      border-radius: 4px;
     }
   </style>
 </head>
-<body>
+<body class="setting-page">
   <div class="header">
     <div class="logo-section">
       <img src="../images/logo.png" alt="Logo" />
@@ -143,165 +255,162 @@ session_start();
 
   <div class="navigation" id="menu">
     <div class="navigation-header">
-        <h1>ADMINISTRATOR</h1>
+      <h1>ADMINISTRATOR</h1>
       <h2>| PLP FACULTY PROFILING SYSTEM |</h2>
     </div>
 
     <nav>
-        <ul>
-          <li><a href="home.php"><img src="../images/home.png" alt="Home Icon" class="menu-icon">HOME</a></li>
-          <li><a href="college_management.php"><img src="../images/department.png" alt="Department Icon" class="menu-icon">DEPARTMENT MANAGEMENT</a></li>
-          <li><a href="user.php"><img src="../images/user.png" alt="User Icon" class="menu-icon">USER MANAGEMENT</a></li>
-          <li class="dropdown">
-            <a href="javascript:void(0)" id="reportsDropdown">
-                <img src="../images/reports.png" alt="Reports Icon" class="menu-icon">
-                REPORTS
-                <i class="fas fa-chevron-down down-icon" id="dropdownArrow"></i>
-            </a>
-            <ul class="dropdown-menu">
-                <li>
-                    <a href="files_report.php">
-                        <i class="fas fa-file-alt"></i> DOCUMENT FILES
-                    </a>
-                </li>
-                <li>
-                    <a href="logs_report.php">
-                        <i class="fas fa-user-clock"></i> USER LOGS
-                    </a>
-                </li>
-            </ul>
-          </li>
-          <li><a href="setting.php" class="active"><img src="../images/setting.png" alt="Settings Icon" class="menu-icon">SETTINGS</a></li>
-        </ul>
-      </nav>
+      <ul>
+        <li><a href="home.php"><img src="../images/home.png" alt="Home Icon" class="menu-icon">HOME</a></li>
+        <li><a href="college_management.php"><img src="../images/department.png" alt="Department Icon" class="menu-icon">DEPARTMENT MANAGEMENT</a></li>
+        <li><a href="user.php"><img src="../images/user.png" alt="User Icon" class="menu-icon">USER MANAGEMENT</a></li>
+        <li class="dropdown">
+          <a href="javascript:void(0)" id="reportsDropdown">
+            <img src="../images/reports.png" alt="Reports Icon" class="menu-icon">
+            REPORTS
+            <i class="fas fa-chevron-down down-icon" id="dropdownArrow"></i>
+          </a>
+          <ul class="dropdown-menu">
+            <li>
+              <a href="files_report.php">
+                <i class="fas fa-file-alt"></i> DOCUMENT FILES
+              </a>
+            </li>
+            <li>
+              <a href="logs_report.php">
+                <i class="fas fa-user-clock"></i> USER LOGS
+              </a>
+            </li>
+          </ul>
+        </li>
+        <li><a href="setting.php" class="active"><img src="../images/setting.png" alt="Settings Icon" class="menu-icon">SETTINGS</a></li>
+      </ul>
+    </nav>
 
     <div class="logout-section">
-        <a href="#" onclick="confirmLogout()"><img src="../images/logout.png" alt="Logout Icon" class="menu-icon">LOGOUT</a>
-      </div>
+      <a href="#" onclick="confirmLogout()"><img src="../images/logout.png" alt="Logout Icon" class="menu-icon">LOGOUT</a>
+    </div>
   </div>
 
-  <div id="main" class="main-content">
-    <h2>Admin Settings</h2>
+
+<div id="main" class="main-content">
+    <h2 class="settings-title"><i class="fas fa-cog admin-settings-icon"></i> Admin Settings</h2>
     <hr>
     <div class="settings-section">
-      <label class="settings-label">Text Size</label>
-      <div class="settings-options">
-        <button class="settings-btn" id="size-100" onclick="setTextSize(100)">100%</button>
-        <button class="settings-btn" id="size-150" onclick="setTextSize(150)">150%</button>
-        <button class="settings-btn" id="size-200" onclick="setTextSize(200)">200%</button>
+      <button type="button" class="collapsible">Text Size</button>
+      <div class="content">
+        <div class="settings-options">
+          <button class="settings-btn" id="size-100" onclick="setTextSize(100)">100%</button>
+          <button class="settings-btn" id="size-150" onclick="setTextSize(150)">150%</button>
+          <button class="settings-btn" id="size-200" onclick="setTextSize(200)">200%</button>
+        </div>
       </div>
     </div>
     <hr>
     <div class="settings-section">
-      <label class="settings-label">Theme</label>
-      <div class="settings-options">
-        <button class="settings-btn" id="theme-light" onclick="setTheme('light')">Light</button>
-        <button class="settings-btn" id="theme-dark" onclick="setTheme('dark')">Dark</button>
+      <button type="button" class="collapsible">Theme</button>
+      <div class="content">
+        <div class="settings-options">
+          <button class="settings-btn" id="theme-light" onclick="setTheme('light')">Light</button>
+          <button class="settings-btn" id="theme-dark" onclick="setTheme('dark')">Dark</button>
+        </div>
       </div>
     </div>
     <hr>
-    <style>
-      body, .main-content {
-        background: #101010 !important;
-        color: #f3f3f3 !important;
-      }
-      .settings-section {
-        margin: 2em 0;
-      }
-      .settings-label {
-        display: block;
-        font-size: 2em;
-        font-weight: bold;
-        margin-bottom: 1em;
-        color: #f3f3f3;
-      }
-      .settings-options {
-        display: flex;
-        gap: 1em;
-      }
-      .settings-btn {
-        background: #222;
-        border: none;
-        border-radius: 2em;
-        padding: 0.7em 2em;
-        font-size: 1.5em;
-        font-family: inherit;
-        color: #ccc;
-        cursor: pointer;
-        transition: background 0.2s, color 0.2s;
-        font-weight: 500;
-      }
-      .settings-btn.selected {
-        background: #00d34a;
-        color: #101010;
-      }
-      .settings-btn:focus {
-        outline: 2px solid #00d34a;
-      }
-      hr {
-        border: none;
-        border-top: 6px solid #333;
-        margin: 2em 0;
-      }
-      /* For light theme */
-      body:not(.dark-theme) .main-content,
-      body:not(.dark-theme) {
-        background: #f4fff4 !important;
-        color: #187436 !important;
-      }
-      body:not(.dark-theme) .settings-label {
-        color: #187436;
-      }
-      body:not(.dark-theme) .settings-btn {
-        background: #e3f3e3;
-        color: #187436;
-      }
-      body:not(.dark-theme) .settings-btn.selected {
-        background: #00723F; /* Deeper green */
-        color: #ffffff;
-      }
-      body:not(.dark-theme) hr {
-        border-top: 6px solid #187436;
-      }
-    </style>
+    <div class="settings-section">
+      <button type="button" class="collapsible">Change Password</button>
+      <div class="content">
+        <div id="passwordMessage" class="message-box" style="display: none; margin-bottom: 1rem; padding: 1rem; border-radius: 4px;"></div>
+        <form id="changePasswordForm" class="settings-options" style="flex-direction: column;">
+          <input type="password" id="currentPassword" placeholder="Current Password" class="settings-input" required />
+          <input type="password" id="newPassword" placeholder="New Password" class="settings-input" required />
+          <input type="password" id="confirmPassword" placeholder="Confirm New Password" class="settings-input" required />
+          <button type="submit" class="settings-btn" style="align-self: flex-start;">Change Password</button>
+        </form>
+      </div>
+    </div>
+<hr>
+<div class="settings-section">
+    <button type="button" class="collapsible">Add Faculty User</button>
+    <div class="content">
+        <form id="addFacultyForm" class="settings-options" style="flex-direction: column; width:100%;">
+            <input type="text" class="settings-input" name="faculty_id" placeholder="Faculty ID" required />
+            <input type="text" class="settings-input" name="full_name" placeholder="Full Name" required />
+            <input type="email" class="settings-input" name="email" placeholder="Email" required />
+            <select class="settings-input" name="employment_type" required>
+                <option value="">Select Employment Type</option>
+                <option value="Full-Time">Full-Time</option>
+                <option value="Part-Time">Part-Time</option>
+            </select>
+            <input type="text" class="settings-input" name="specialization" placeholder="Specialization" />
+            <input type="text" class="settings-input" name="contact_number" placeholder="Contact Number" />
+            <select class="settings-input" name="status" required>
+                <option value="Active">Active</option>
+                <option value="Inactive">Inactive</option>
+            </select>
+            <input type="password" class="settings-input" name="password" placeholder="Temporary Password" required />
+            <button type="submit" class="settings-btn" style="align-self: flex-start;">Add Faculty</button>
+        </form>
+        <div id="addFacultyMessage" class="message-box" style="display: none; margin-top: 1rem; padding: 1rem; border-radius: 4px;"></div>
+    </div>
+</div>
+<hr>
   </div>
 
   <?php include '../faculty/help.php'; ?>
 
+  <script>
+  const CURRENT_COLLEGE_ID = <?php echo json_encode($current_college_id ?? null); ?>;
+</script>
+
   <script src="scripts.js?v=<?php echo time(); ?>"></script>
   <script>
-        // Reports dropdown functionality
-        document.addEventListener('DOMContentLoaded', function() {
-  document.getElementById('reportsDropdown').addEventListener('click', function(e) {
-    e.preventDefault();
-    const dropdown = this.closest('.dropdown');
-    const menu = dropdown.querySelector('.dropdown-menu');
-    dropdown.classList.toggle('open');
-    // Toggle menu display
-    if (menu.style.display === 'block') {
-      menu.style.display = 'none';
-    } else {
-      // Close all other dropdowns first
-      document.querySelectorAll('.dropdown-menu').forEach(item => {
-        if (item !== menu) {
-          item.style.display = 'none';
-          item.closest('.dropdown').classList.remove('open');
+    // Reports dropdown functionality
+    document.addEventListener('DOMContentLoaded', function() {
+      document.getElementById('reportsDropdown').addEventListener('click', function(e) {
+        e.preventDefault();
+        const dropdown = this.closest('.dropdown');
+        const menu = dropdown.querySelector('.dropdown-menu');
+        dropdown.classList.toggle('open');
+        // Toggle menu display
+        if (menu.style.display === 'block') {
+          menu.style.display = 'none';
+        } else {
+          // Close all other dropdowns first
+          document.querySelectorAll('.dropdown-menu').forEach(item => {
+            if (item !== menu) {
+              item.style.display = 'none';
+              item.closest('.dropdown').classList.remove('open');
+            }
+          });
+          menu.style.display = 'block';
         }
       });
-      menu.style.display = 'block';
-    }
-  });
 
-  // Close dropdown when clicking outside
-  document.addEventListener('click', function(e) {
-    if (!e.target.closest('.dropdown')) {
-      document.querySelectorAll('.dropdown-menu').forEach(item => {
-        item.style.display = 'none';
-        item.closest('.dropdown').classList.remove('open');
+      // Close dropdown when clicking outside
+      document.addEventListener('click', function(e) {
+        if (!e.target.closest('.dropdown')) {
+          document.querySelectorAll('.dropdown-menu').forEach(item => {
+            item.style.display = 'none';
+            item.closest('.dropdown').classList.remove('open');
+          });
+        }
       });
-    }
-  });
-});
+
+      // Collapsible functionality
+      var coll = document.getElementsByClassName("collapsible");
+      for (var i = 0; i < coll.length; i++) {
+        coll[i].addEventListener("click", function() {
+          this.classList.toggle("active");
+          var content = this.nextElementSibling;
+          if (content.style.maxHeight) {
+            content.style.maxHeight = null;
+          } else {
+            content.style.maxHeight = content.scrollHeight + "px";
+          }
+        });
+      }
+    });
 
     function confirmLogout() {
       if (confirm('Are you sure you want to logout?')) {
@@ -309,6 +418,9 @@ session_start();
       }
     }
   </script>
-  <script src="../faculty/help.js?v=<?php echo time(); ?>"></script>
+    <script src="js/settings.js"></script>
+    <script src="../faculty/help.js"></script>
+    <script src="../faculty/change_password.js"></script>
+    <script src="../faculty/help.js?v=<?php echo time(); ?>"></script>
 </body>
 </html>

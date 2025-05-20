@@ -250,7 +250,7 @@
 
     <div id="main" class="main-content">
         <?php include 'help.php'; ?>
-        <h2>Settings</h2>
+        <h2 class="settings-title"><i class="fas fa-sliders-h faculty-settings-icon"></i> Settings</h2>
         <hr>
         <div class="settings-section">
             <button type="button" class="collapsible">Text Size</button>
