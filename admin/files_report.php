@@ -153,17 +153,27 @@ $credentials_result = $stmt->get_result();
               <td><?= htmlspecialchars($row['school_year'] ?? 'N/A') ?></td>
               <td><?= htmlspecialchars($row['total_loads'] ?? 'N/A') ?></td>
               <td>
-                <button onclick="viewCredentialFile('<?= htmlspecialchars($row['file_path']) ?>')" class="view-file">VIEW FILE</button>
-              </td>
-              <td class="actions">
-                <?php if ($row['source_type'] === 'Credential'): ?>
-                  <button onclick="approveCredential('<?= $row['credential_id'] ?>')" class="approve-btn">Approve</button>
-                  <button onclick="rejectCredential('<?= $row['credential_id'] ?>')" class="reject-btn">Reject</button>
-                <?php elseif ($row['source_type'] === 'TeachingLoad'): ?>
-                  <button onclick="approveTeachingLoad('<?= $row['load_id'] ?>')" class="approve-btn">Approve</button>
-                  <button onclick="rejectTeachingLoad('<?= $row['load_id'] ?>')" class="reject-btn">Reject</button>
-                <?php endif; ?>
-              </td>
+                <button onclick="viewCredentialFile('<?= htmlspecialchars($row['file_path']) ?>')" class="view-file">
+                  <i class="fas fa-file-alt"></i> VIEW FILE
+                </button>
+                              </td>
+                              <td class="actions">
+                  <?php if ($row['source_type'] === 'Credential'): ?>
+                    <button onclick="approveCredential('<?= $row['credential_id'] ?>')" class="action-btn approve-btn">
+                      <i class="fas fa-check-circle"></i> Approve
+                    </button>
+                    <button onclick="rejectCredential('<?= $row['credential_id'] ?>')" class="action-btn reject-btn">
+                      <i class="fas fa-times-circle"></i> Reject
+                    </button>
+                  <?php elseif ($row['source_type'] === 'TeachingLoad'): ?>
+                    <button onclick="approveTeachingLoad('<?= $row['load_id'] ?>')" class="action-btn approve-btn">
+                      <i class="fas fa-check-circle"></i> Approve
+                    </button>
+                    <button onclick="rejectTeachingLoad('<?= $row['load_id'] ?>')" class="action-btn reject-btn">
+                      <i class="fas fa-times-circle"></i> Reject
+                    </button>
+                  <?php endif; ?>
+                </td>
             </tr>
           <?php endwhile; ?>
         </tbody>

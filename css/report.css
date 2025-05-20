@@ -530,3 +530,78 @@ body.report-page {
         white-space: nowrap;
     }
 }
+
+/* Action button styles for report-table */
+.action-btn {
+    padding: 7px 16px;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    transition: background 0.18s, color 0.18s, transform 0.18s;
+    outline: none;
+    margin-bottom: 10px;
+}
+
+.approve-btn {
+    background: linear-gradient(90deg, #28a745 70%, #34d058 100%);
+    color: #fff;
+    border: 1.5px solid #1e7e34;
+}
+.approve-btn i {
+    font-size: 1em;
+    color: #fff;
+}
+.approve-btn:hover {
+    background: linear-gradient(90deg, #34d058 70%, #28a745 100%);
+    color: #fff;
+    transform: translateY(-2px) scale(1.05);
+}
+
+.reject-btn {
+    background: linear-gradient(90deg, #e13041 70%, #ff5f6d 100%);
+    color: #fff;
+    border: 1.5px solid #c82333;
+}
+.reject-btn i {
+    font-size: 1em;
+    color: #fff;
+}
+.reject-btn:hover {
+    background: linear-gradient(90deg, #ff5f6d 70%, #e13041 100%);
+    color: #fff;
+    transform: translateY(-2px) scale(1.05);
+}
+
+.view-file {
+    background: linear-gradient(90deg, #007bff 70%, #00c6ff 100%);
+    color: #fff;
+    border: none;
+    border-radius: 20px;
+    padding: 7px 16px;
+    font-size: 10px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    cursor: pointer;
+    transition: background 0.18s, color 0.18s, transform 0.18s;
+    outline: none;
+}
+
+.view-file i {
+    font-size: 1em;
+    color: #fff;
+}
+
+.view-file:hover {
+    background: linear-gradient(90deg, #00c6ff 70%, #007bff 100%);
+    color: #fff;
+    transform: translateY(-2px) scale(1.05);
+}
