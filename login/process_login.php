@@ -7,6 +7,56 @@ if (!isset($conn) || !($conn instanceof mysqli)) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    // ==================== reCAPTCHA VERIFICATION ====================
+    $recaptcha_secret = "6Lc2ZUArAAAAAHFh_K687kcPCpG27XwlNnv0pcDw";
+    $recaptcha_response = $_POST['g-recaptcha-response'] ?? '';
+
+    if (empty($recaptcha_response)) {
+        header("Location: index.php?error=Please complete the reCAPTCHA verification");
+        exit();
+    }
+
+    $recaptcha_url = "https://www.google.com/recaptcha/api/siteverify";
+    $recaptcha_data = [
+        'secret' => $recaptcha_secret,
+        'response' => $recaptcha_response,
+        'remoteip' => $_SERVER['REMOTE_ADDR']
+    ];
+
+    // Use cURL for more reliable API calls
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $recaptcha_url);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($recaptcha_data));
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true); // Important for security
+
+    $response = curl_exec($ch);
+    if (curl_errno($ch)) {
+        error_log("reCAPTCHA cURL error: " . curl_error($ch));
+        header("Location: index.php?error=reCAPTCHA service unavailable");
+        exit();
+    }
+    curl_close($ch);
+
+    $recaptcha_json = json_decode($response);
+    if (json_last_error() !== JSON_ERROR_NONE) {
+        error_log("reCAPTCHA JSON decode error: " . json_last_error_msg());
+        header("Location: index.php?error=reCAPTCHA configuration error");
+        exit();
+    }
+
+    if (!$recaptcha_json->success) {
+        error_log("reCAPTCHA failed: " . print_r($recaptcha_json, true));
+        $error_msg = "reCAPTCHA verification failed";
+        if (isset($recaptcha_json->{'error-codes'})) {
+            $error_msg .= " (Errors: " . implode(", ", $recaptcha_json->{'error-codes'}) . ")";
+        }
+        header("Location: index.php?error=" . urlencode($error_msg));
+        exit();
+    }
+
+    // ==================== ORIGINAL LOGIN PROCESS ====================
     // Validate input
     if (empty($_POST['username']) || empty($_POST['password'])) {
         header("Location: index.php?error=Username and password are required");

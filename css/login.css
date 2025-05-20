@@ -78,7 +78,7 @@ h1 {
   color: white;
   margin-bottom: 2rem;
   font-size: 2.5rem;
-  margin-top: -80px;
+  margin-top: 30px;
   margin-bottom: 50px;
 }
 
@@ -136,6 +136,14 @@ h1 {
   width: 100%;
 }
 
+.button-row {
+  width: 100%;
+  display: flex;
+  justify-content: flex-start;
+  gap: 15px;
+  margin-top: -10px;
+}
+
 .login-button {
   width: fit-content;
   background: white;
@@ -148,6 +156,8 @@ h1 {
   cursor: pointer;
   transition: 0.3s ease;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
+  margin-top: 15px;
+  margin-bottom: 10px;
 }
 
 .login-button:hover {
@@ -170,9 +180,34 @@ h1 {
   animation: fadeOut 5s ease forwards;
 }
 
+.cancel-button {
+  color: white;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s ease;
+  text-decoration: none;
+  display: inline-block;
+  margin-top: 15px;
+}
+
+.cancel-button:hover {
+  background: #ffcccc;
+  border-radius: 30px;
+  padding: 5px;
+  color: red;
+}
+
 /* Optional fade out after 5s */
 @keyframes fadeOut {
   0%   { opacity: 1; }
   90%  { opacity: 1; }
   100% { opacity: 0; display: none; }
 }
+
+.g-recaptcha {
+    margin: 2px 0;
+    display: flex;
+    justify-content: center;
+}
+
