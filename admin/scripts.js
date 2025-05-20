@@ -190,111 +190,105 @@ function updateCredentialCounts(counts) {
 
 // ====== FORM HANDLING ==========
 function initializeFacultyForm(form) {
-  form.addEventListener('submit', function(e) {
+  form.addEventListener('submit', async function(e) {
     e.preventDefault();
     
-    // Validate form
-    const requiredFields = ['faculty_id', 'full_name', 'email', 'password'];
-    const missingFields = requiredFields.filter(field => !form.elements[field].value.trim());
-    
-    if (missingFields.length > 0) {
-      showFormError(`Please fill in all required fields: ${missingFields.join(', ')}`);
-      return;
-    }
-
-    // Prepare form data
-    const formData = new FormData(form);
-    const data = Object.fromEntries(formData.entries());
-    
-    // Add college_id
-    if (typeof CURRENT_COLLEGE_ID !== 'undefined' && CURRENT_COLLEGE_ID !== null) {
-      data.college_id = CURRENT_COLLEGE_ID;
-    } else {
-      showFormError('College ID is missing');
-      return;
-    }
-
-    // Submit form
-    submitFacultyForm(data)
-      .then(handleFormSuccess)
-      .catch(handleFormError);
-  });
-}
-
-function submitFacultyForm(data) {
-  return fetch('add_faculty.php', {
-    method: 'POST',
-    headers: { 
-      'Content-Type': 'application/json',
-      'X-Requested-With': 'XMLHttpRequest'
-    },
-    body: JSON.stringify(data)
-  })
-  .then(async response => {
-    const text = await response.text();
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const originalBtnText = submitBtn.innerHTML;
+    const messageBox = document.getElementById('addFacultyMessage');
     
     try {
-      const data = text ? JSON.parse(text) : {};
-      if (!response.ok) {
-        throw new Error(data.message || 'Server error occurred');
+      // Show loading state
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+      messageBox.style.display = 'none';
+
+      // Validate form
+      const requiredFields = ['faculty_id', 'full_name', 'email', 'password'];
+      const missingFields = requiredFields.filter(field => !form.elements[field].value.trim());
+      
+      if (missingFields.length > 0) {
+        throw new Error(`Please fill in all required fields: ${missingFields.join(', ')}`);
       }
-      return data;
-    } catch (e) {
-      console.error('Failed to parse JSON:', text);
-      throw new Error('Invalid server response');
+
+      // Validate email format
+      const email = form.elements['email'].value;
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        throw new Error('Please enter a valid email address');
+      }
+
+      // Validate faculty ID format (XX-XXXXX)
+      const facultyId = form.elements['faculty_id'].value;
+      if (!/^\d{2}-\d{5}$/.test(facultyId)) {
+        throw new Error('Faculty ID must be in format XX-XXXXX');
+      }
+
+      // Get college_id from session or form data
+      let college_id = form.dataset.collegeId;
+      if (!college_id) {
+        // Try to get it from a hidden input if not in dataset
+        const collegeIdInput = form.querySelector('input[name="college_id"]');
+        if (collegeIdInput) {
+          college_id = collegeIdInput.value;
+        }
+      }
+
+      if (!college_id) {
+        throw new Error('College_id is required');
+      }
+
+      // Prepare form data
+      const formData = new FormData(form);
+      const data = Object.fromEntries(formData.entries());
+      data.college_id = college_id; // Ensure college_id is included
+
+      // Submit form
+      const response = await fetch('add_faculty.php', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: JSON.stringify(data)
+      });
+
+      const result = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(result.message || 'Server error occurred');
+      }
+
+      if (result.success) {
+        showFormMessage('Faculty added successfully!', 'success');
+        form.reset();
+        
+        // Redirect after delay
+        setTimeout(() => {
+          window.location.href = 'college_management.php';
+        }, 1500);
+      } else {
+        throw new Error(result.message || 'Unknown error occurred');
+      }
+    } catch (error) {
+      console.error('Form submission error:', error);
+      showFormMessage(error.message, 'error');
+      
+      // Highlight problematic fields
+      if (error.message.includes('Faculty ID')) {
+        form.elements['faculty_id'].classList.add('error-field');
+      }
+      if (error.message.includes('Email')) {
+        form.elements['email'].classList.add('error-field');
+      }
+      if (error.message.includes('College_id')) {
+        // You might want to highlight something if college_id is missing
+        console.error('College ID is required but missing');
+      }
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = originalBtnText;
     }
   });
-}
-
-function handleFormSuccess(data) {
-  const messageBox = document.getElementById('addFacultyMessage');
-  if (!messageBox) return;
-  
-  messageBox.style.display = 'block';
-  
-  if (data.success) {
-    messageBox.style.backgroundColor = '#d4edda';
-    messageBox.style.color = '#155724';
-    messageBox.textContent = data.message || 'Faculty added successfully!';
-    
-    // Clear form
-    document.getElementById('addFacultyForm').reset();
-    
-    // Redirect after delay
-    setTimeout(() => {
-      window.location.href = 'college_management.php';
-    }, 1500);
-  } else {
-    handleFormError(new Error(data.message || 'Unknown error occurred'));
-  }
-}
-
-function handleFormError(error) {
-  console.error('Form submission error:', error);
-  const messageBox = document.getElementById('addFacultyMessage');
-  if (messageBox) {
-    messageBox.style.display = 'block';
-    messageBox.style.backgroundColor = '#f8d7da';
-    messageBox.style.color = '#721c24';
-    messageBox.textContent = error.message || 'An error occurred while adding faculty.';
-    
-    // Show more details in console for debugging
-    console.log('Full error:', {
-      name: error.name,
-      message: error.message,
-      stack: error.stack
-    });
-  }
-}
-
-function showFormError(message) {
-  const messageBox = document.getElementById('addFacultyMessage');
-  if (messageBox) {
-    messageBox.style.display = 'block';
-    messageBox.style.backgroundColor = '#f8d7da';
-    messageBox.style.color = '#721c24';
-    messageBox.textContent = message;
-  }
 }
 
 // ====== UTILITY FUNCTIONS ==========
