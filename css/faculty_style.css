@@ -367,7 +367,6 @@ body {
       text-decoration: underline;
   }
   
-  /* Responsive adjustments */
   @media (max-width: 768px) {
       .stats-grid {
           grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));

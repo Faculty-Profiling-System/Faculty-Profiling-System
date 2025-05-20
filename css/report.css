@@ -37,7 +37,6 @@
     border-right: none;
 }
 
-/* Unique header design */
 .report-container thead th {
     background: linear-gradient(90deg, #049129 60%, #04b032 100%);
     color: #fff;

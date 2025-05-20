@@ -2,7 +2,7 @@
 require_once '../db_connection.php';
 session_start();
 
-// Check if user is logged in and has a college_id
+
 if (!isset($_SESSION['user_id'])) {
     header("Location: ../landing/index.php");
     exit();
