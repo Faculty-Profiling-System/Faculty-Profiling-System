@@ -13,7 +13,7 @@ if (isset($_SESSION['user_id'])) {
     $adminName = strtoupper(str_replace('_', ' ', $user['username']));
 }
 
-// Get college_id of the logged in admin - No changes needed here
+// Get college_id of the logged in admin
 $college_id = null;
 if (isset($_SESSION['user_id'])) {
     $stmt = $conn->prepare("SELECT college_id FROM users WHERE user_id = ?");
@@ -24,14 +24,14 @@ if (isset($_SESSION['user_id'])) {
     $college_id = $user['college_id'];
 }
 
-// Initialize faculty status variables - No changes needed here
+// Initialize faculty status variables
 $activeFaculty = 0;
 $inactiveFaculty = 0;
 $totalFaculty = 0;
 $activePercent = 0;
 $inactivePercent = 0;
 
-// Get active/inactive faculty counts - No changes needed here
+// Get active/inactive faculty counts
 if ($college_id) {
     // Count active faculty
     $stmt = $conn->prepare("SELECT COUNT(*) FROM faculty WHERE college_id = ? AND status = 'Active'");
@@ -63,9 +63,7 @@ $stats = [
     'total_female' => 0,
     'total_male' => 0,
     'full_time' => 0,
-    'part_time' => 0,
-    'masters_degrees' => 0,
-    'doctoral_degrees' => 0
+    'part_time' => 0
 ];
 
 if ($college_id) {
@@ -99,16 +97,6 @@ if ($college_id) {
     while ($row = $result->fetch_assoc()) {
         if ($row['employment_type'] === 'Full-Time') $stats['full_time'] = $row['COUNT(*)'];
         if ($row['employment_type'] === 'Part-Time') $stats['part_time'] = $row['COUNT(*)'];
-    }
-
-    // Specialization
-    $stmt = $conn->prepare("SELECT specialization, COUNT(*) FROM faculty WHERE college_id = ? GROUP BY specialization");
-    $stmt->bind_param("i", $college_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    while ($row = $result->fetch_assoc()) {
-        if ($row['specialization'] === 'Master') $stats['masters_degrees'] = $row['COUNT(*)'];
-        if ($row['specialization'] === 'Doctorate') $stats['doctoral_degrees'] = $row['COUNT(*)'];
     }
 }
 ?>
@@ -325,38 +313,6 @@ if ($college_id) {
                     <div class="legend-item">
                         <span class="color-indicator part-time"></span>
                         <span class="legend-label">Part-Time: <?php echo $stats['part_time']; ?></span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Degree Holders Pie Chart Card -->
-        <div class="stat-card pie-chart-card">
-            <div class="stat-header">
-                <img src="../images/degree.png" alt="Degrees" class="stat-icon">
-                <h3>By Degree</h3>
-            </div>
-            <div class="pie-chart-container">
-                <div class="pie-chart" id="degreeChart">
-                    <?php 
-                    $degreeTotal = $stats['masters_degrees'] + $stats['doctoral_degrees'];
-                    if ($degreeTotal > 0) {
-                        $masterPercent = ($stats['masters_degrees'] / $degreeTotal) * 100;
-                        $doctoralPercent = 100 - $masterPercent;
-                        echo '<div class="pie-chart" style="--color1:#9b59b6;--color2:#1abc9c;--percent1:'.$masterPercent.'%;"></div>';
-                    } else {
-                        echo '<div class="pie-chart" style="--color1:#e0e0e0;--color2:#e0e0e0;--percent1:100%;"></div>';
-                    }
-                    ?>
-                </div>
-                <div class="pie-legend">
-                    <div class="legend-item">
-                        <span class="color-indicator master"></span>
-                        <span class="legend-label">Master's: <?php echo $stats['masters_degrees']; ?></span>
-                    </div>
-                    <div class="legend-item">
-                        <span class="color-indicator doctoral"></span>
-                        <span class="legend-label">Doctoral: <?php echo $stats['doctoral_degrees']; ?></span>
                     </div>
                 </div>
             </div>
