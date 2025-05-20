@@ -149,11 +149,20 @@ if (isset($_SESSION['faculty_id'])) {
       </div>
   </div>
 
-    <div class="dashboard-container">
-        <div class="welcome-banner">
-            <h2>Welcome back, <?php echo htmlspecialchars($facultyNameWelcome); ?>!</h2>
-            <p>Here's your dashboard overview</p>
+
+
+          <div class="dashboard-container">
+    <div class="welcome-banner">
+      <header>
+  <h2>
+        <i class="fas fa-home" style="font-size:1.1em;vertical-align:middle;margin-right:8px;"></i>
+        Faculty Home
+      </h2>
+        <div class="welcome-message">
+            <p>Welcome back, <?php echo htmlspecialchars($facultyNameWelcome); ?>! Here's your dashboard overview.</p>
         </div>
+      </header>
+    </div>
 
         <div class="dashboard-grid">
             <!-- Profile Information Card -->
