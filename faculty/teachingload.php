@@ -29,8 +29,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['teaching_file'])) {
     $semester = $_POST['semester'];
     $startYear = $_POST['start_year'];
     $endYear = $_POST['end_year'];
-    $totalLoads = $_POST['total_loads'];
+    $regularLoads = $_POST['regular_loads'];
+    $overloadUnits = $_POST['overload_units'];
+    $totalLoads = $regularLoads + $overloadUnits;
     
+    // Validate loads
+    if ($regularLoads < 0 || $overloadUnits < 0) {
+        $_SESSION['upload_alert'] = 'error';
+        $_SESSION['error_message'] = "Load values cannot be negative";
+        header('Location: teachingload.php');
+        exit();
+    }
+    
+    if ($totalLoads > 50) {
+        $_SESSION['upload_alert'] = 'error';
+        $_SESSION['error_message'] = "Total loads cannot exceed 50 units";
+        header('Location: teachingload.php');
+        exit();
+    }
+
     $file = $_FILES['teaching_file'];
     $originalFileName = $file['name'];
     $fileTmpName = $file['tmp_name'];
@@ -62,8 +79,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['teaching_file'])) {
                 
                 if (move_uploaded_file($fileTmpName, $fileDestination)) {
                     try {
-                        $stmt = $conn->prepare("INSERT INTO teaching_load (faculty_id, file_name, semester, start_year, end_year, total_loads, file_path) VALUES ( ?, ?, ?, ?, ?, ?, ?)");
-                        $stmt->bind_param("sssssis", $_SESSION['faculty_id'], $displayName, $semester, $startYear, $endYear, $totalLoads, $fileDestination);
+                        $stmt = $conn->prepare("INSERT INTO teaching_load (faculty_id, file_name, semester, start_year, end_year, regular_loads, overload_units, total_loads, file_path) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                        $stmt->bind_param("sssssiiss", $_SESSION['faculty_id'], $displayName, $semester, $startYear, $endYear, $regularLoads, $overloadUnits, $totalLoads, $fileDestination);
                         $stmt->execute();
                         $stmt->close();
                         
@@ -230,9 +247,20 @@ try {
                     </div>
                 </div>
                 
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="regular_loads">Regular Loads (units):</label>
+                        <input type="number" id="regular_loads" name="regular_loads" placeholder="e.g. 18" min="0" max="50" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="overload_units">Overload Units:</label>
+                        <input type="number" id="overload_units" name="overload_units" placeholder="e.g. 6" min="0" max="50" required>
+                    </div>
+                </div>
+                
                 <div class="form-group">
-                    <label for="total_loads">Total Loads (units):</label>
-                    <input type="number" id="total_loads" name="total_loads" placeHolder="e.g 25 (Maximum of 50 units)" min="1" max="50" required>
+                    <label>Total Loads: <span id="total-loads-display">0</span> units</label>
                 </div>
                 
                 <div class="form-group file-upload">
@@ -309,6 +337,8 @@ try {
                                 <th>File Name</th>
                                 <th>Semester</th>
                                 <th>Academic Year</th>
+                                <th>Regular Loads</th>
+                                <th>Overload Units</th>
                                 <th>Total Loads</th>
                                 <th>Status</th>
                                 <th>Date Uploaded</th>
@@ -321,6 +351,8 @@ try {
                                     <td><?php echo htmlspecialchars($load['file_name']); ?></td>
                                     <td><?php echo htmlspecialchars($load['semester']); ?></td>
                                     <td><?php echo htmlspecialchars($load['start_year']) . ' - ' . htmlspecialchars($load['end_year']); ?></td>
+                                    <td><?php echo htmlspecialchars($load['regular_loads']); ?></td>
+                                    <td><?php echo htmlspecialchars($load['overload_units']); ?></td>
                                     <td><?php echo htmlspecialchars($load['total_loads']); ?></td>
                                     <td>
                                         <span class="status-badge <?php echo strtolower($load['status']); ?>">
@@ -337,7 +369,9 @@ try {
                                         <a href="<?php echo $load['file_path']; ?>" target="_blank" class="btn-view" title="View"><i class="fas fa-eye"></i></a>
                                         <a href="<?php echo $load['file_path']; ?>" download class="btn-download" title="Download"><i class="fas fa-download"></i></a>
                                         <?php if ($load['status'] === 'Pending' || $load['status'] === 'Rejected'): ?>
-                                            <a href="#" class="btn-delete" title="Delete" onclick="confirmDelete(<?php echo $load['load_id']; ?>)"><i class="fas fa-trash-alt"></i></a>
+                                        <a href="#" onclick="openEditModal('<?php echo $load['load_id']; ?>'); return false;" class="btn-action btn-edit" title="Edit">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
                                         <?php endif; ?>
                                     </td>
                                 </tr>
@@ -348,20 +382,94 @@ try {
             <?php endif; ?>
         </div>
     </div>
+
+    <!-- Edit Modal -->
+    <div id="editTeachingLoadModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2><i class="fas fa-edit"></i> Edit Teaching Load</h2>
+            <form id="editTeachingLoadForm" method="POST" enctype="multipart/form-data">
+                <input type="hidden" id="edit_load_id" name="load_id">
+                
+                <div class="form-group">
+                    <label for="edit_display_name">Document Name:</label>
+                    <input type="text" id="edit_display_name" name="display_name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="edit_semester">Semester:</label>
+                    <select id="edit_semester" name="semester" required>
+                        <option value="First Semester">First Semester</option>
+                        <option value="Second Semester">Second Semester</option>
+                    </select>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="edit_start_year">Start Year:</label>
+                        <select id="edit_start_year" name="start_year" required>
+                            <?php 
+                            $currentYear = date('Y');
+                            for ($year = $currentYear; $year >= 2016; $year--) {
+                                echo "<option value='$year'>$year</option>";
+                            }
+                            ?>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="edit_end_year">End Year:</label>
+                        <select id="edit_end_year" name="end_year" required>
+                            <?php 
+                            for ($year = $currentYear + 1; $year >= 2017; $year--) {
+                                echo "<option value='$year'>$year</option>";
+                            }
+                            ?>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="edit_regular_loads">Regular Loads (units):</label>
+                        <input type="number" id="edit_regular_loads" name="regular_loads" min="0" max="50" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="edit_overload_units">Overload Units:</label>
+                        <input type="number" id="edit_overload_units" name="overload_units" min="0" max="50" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Total Loads: <span id="edit-total-loads-display">0</span> units</label>
+                </div>
+                
+                <div class="form-group file-upload">
+                    <label for="edit_teaching_file">Change PDF File (optional):</label>
+                    <div class="file-upload-wrapper">
+                        <input type="file" id="edit_teaching_file" name="teaching_file" accept=".pdf">
+                        <label for="edit_teaching_file" class="file-upload-label">
+                            <i class="fas fa-cloud-upload"></i>
+                            <span class="file-upload-text">Choose a file</span>
+                            <span class="file-upload-filename" id="edit-file-name">No file chosen</span>
+                        </label>
+                    </div>
+                    <p class="file-info">Current file: <span id="current-file-name"></span></p>
+                </div>
+                
+                <div class="form-buttons">
+                    <button type="button" class="btn-cancel" onclick="closeEditModal()">Cancel</button>
+                    <button type="submit" class="btn-save">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
     
     <?php include 'help.php'; ?>
 
     <script>
         window.onload = function() {
-            <?php if (isset($_SESSION['show_alert'])): ?>
-                <?php if ($_SESSION['show_alert'] === 'success'): ?>
-                    alert('Teaching load deleted successfully!');
-                <?php elseif ($_SESSION['show_alert'] === 'error'): ?>
-                    alert('Error: Could not delete teaching load');
-                <?php endif; ?>
-                <?php unset($_SESSION['show_alert']); ?>
-            <?php endif; ?>
-            
             <?php if (isset($_SESSION['upload_alert'])): ?>
                 <?php if ($_SESSION['upload_alert'] === 'success'): ?>
                     alert('Teaching load uploaded successfully!');
@@ -373,17 +481,26 @@ try {
                 unset($_SESSION['error_message']);
                 ?>
             <?php endif; ?>
+            
+            // Update total loads display when page loads
+            updateTotalLoads();
         };
+
+        // Calculate and display total loads
+        function updateTotalLoads() {
+            const regularLoads = parseInt(document.getElementById('regular_loads').value) || 0;
+            const overloadUnits = parseInt(document.getElementById('overload_units').value) || 0;
+            const totalLoads = regularLoads + overloadUnits;
+            document.getElementById('total-loads-display').textContent = totalLoads;
+        }
+
+        // Add event listeners to update total loads when values change
+        document.getElementById('regular_loads').addEventListener('input', updateTotalLoads);
+        document.getElementById('overload_units').addEventListener('input', updateTotalLoads);
 
         // Prevent form resubmission
         if (window.history.replaceState) {
             window.history.replaceState(null, null, window.location.href);
-        }
-
-        function confirmDelete(loadId) {
-            if (confirm('Are you sure you want to delete this teaching load?')) {
-                window.location.href = 'delete_teaching_load.php?id=' + loadId;
-            }
         }
 
         document.querySelector('.main-content').addEventListener('click', function() {
@@ -397,12 +514,103 @@ try {
                 window.location.href = '../landing/index.php';
             }
         }
-        
-        function confirmDelete(loadId) {
-            if (confirm('Are you sure you want to delete this teaching load?')) {
-                window.location.href = 'delete_teaching_load.php?id=' + loadId;
+
+        // File name display
+        document.getElementById('teaching_file').addEventListener('change', function(e) {
+            const fileName = e.target.files[0] ? e.target.files[0].name : 'No file chosen';
+            document.getElementById('file-name').textContent = fileName;
+        });
+
+        // Edit Modal Functions
+        function openEditModal(loadId) {
+            // Fetch the teaching load data via AJAX
+            fetch(`get_teaching_load.php?id=${loadId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const load = data.load;
+                        
+                        // Populate the form fields
+                        document.getElementById('edit_load_id').value = load.load_id;
+                        document.getElementById('edit_display_name').value = load.file_name;
+                        document.getElementById('edit_semester').value = load.semester;
+                        document.getElementById('edit_start_year').value = load.start_year;
+                        document.getElementById('edit_end_year').value = load.end_year;
+                        document.getElementById('edit_regular_loads').value = load.regular_loads;
+                        document.getElementById('edit_overload_units').value = load.overload_units;
+                        document.getElementById('edit-total-loads-display').textContent = load.total_loads;
+                        document.getElementById('current-file-name').textContent = load.file_name;
+                        
+                        // Show the modal
+                        document.getElementById('editTeachingLoadModal').style.display = 'block';
+                    } else {
+                        alert('Error loading teaching load data: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while loading the teaching load data.');
+                });
+        }
+
+        function closeEditModal() {
+            document.getElementById('editTeachingLoadModal').style.display = 'none';
+        }
+
+        // Close modal when clicking outside of it
+        window.onclick = function(event) {
+            const modal = document.getElementById('editTeachingLoadModal');
+            if (event.target == modal) {
+                closeEditModal();
             }
         }
+
+        // Close modal with X button
+        document.querySelector('.close-modal').addEventListener('click', closeEditModal);
+
+        // Update total loads for edit form
+        function updateEditTotalLoads() {
+            const regularLoads = parseInt(document.getElementById('edit_regular_loads').value) || 0;
+            const overloadUnits = parseInt(document.getElementById('edit_overload_units').value) || 0;
+            const totalLoads = regularLoads + overloadUnits;
+            document.getElementById('edit-total-loads-display').textContent = totalLoads;
+        }
+
+        // Add event listeners for edit form
+        document.getElementById('edit_regular_loads').addEventListener('input', updateEditTotalLoads);
+        document.getElementById('edit_overload_units').addEventListener('input', updateEditTotalLoads);
+
+        // Handle file name display for edit form
+        document.getElementById('edit_teaching_file').addEventListener('change', function(e) {
+            const fileName = e.target.files[0] ? e.target.files[0].name : 'No file chosen';
+            document.getElementById('edit-file-name').textContent = fileName;
+        });
+
+        // Handle form submission
+        document.getElementById('editTeachingLoadForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            
+            fetch('update_teaching_load.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Teaching load updated successfully!');
+                    closeEditModal();
+                    window.location.reload();
+                } else {
+                    alert('Error updating teaching load: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while updating the teaching load.');
+            });
+        });
     </script>
     <script src="help.js?v=<?php echo time(); ?>"></script>
     <script src="../scripts.js?v=<?php echo time(); ?>"></script>
