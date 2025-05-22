@@ -314,7 +314,7 @@ try {
                                         <a href="<?php echo $credential['file_path']; ?>" target="_blank" class="btn-view" title="View"><i class="fas fa-eye"></i></a>
                                         <a href="<?php echo $credential['file_path']; ?>" download class="btn-download" title="Download"><i class="fas fa-download"></i></a>
                                         <?php if ($credential['status'] === 'Pending' || $credential['status'] === 'Rejected'): ?>
-                                            <a href="#" class="btn-delete" title="Delete" onclick="confirmDelete(<?php echo $credential['credential_id']; ?>)"><i class="fas fa-trash-alt"></i></a>
+                                            <a href="#" class="btn-edit" title="Edit" onclick="openEditModal(<?php echo $credential['credential_id']; ?>)"><i class="fas fa-edit"></i></a>
                                         <?php endif; ?>
                                     </td>
                                 </tr>
@@ -326,6 +326,70 @@ try {
         </div>
     </div>
     
+    <!-- Edit Credential Modal -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeEditModal()">&times;</span>
+            <h2><i class="fas fa-edit"></i> Edit Credential</h2>
+            <form id="editCredentialForm" enctype="multipart/form-data">
+                <input type="hidden" id="edit_credential_id" name="credential_id">
+                
+                <div class="form-group">
+                    <label for="edit_credential_type">Credential Type:</label>
+                    <select id="edit_credential_type" name="credential_type" required>
+                        <option value="">Select Type</option>
+                        <option value="PDS">PDS</option>
+                        <option value="SALN">SALN</option>
+                        <option value="TOR">TOR</option>
+                        <option value="Diploma">Diploma</option>
+                        <option value="Certificates">Certificates</option>
+                        <option value="Evaluation">Evaluation</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="edit_credential_name">Credential Name:</label>
+                    <input type="text" id="edit_credential_name" name="credential_name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="edit_issued_by">Issued By:</label>
+                    <input type="text" id="edit_issued_by" name="issued_by" required>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="edit_issued_date">Issued Date:</label>
+                        <input type="date" id="edit_issued_date" name="issued_date" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="edit_expiry_date">Expiry Date (if applicable):</label>
+                        <input type="date" id="edit_expiry_date" name="expiry_date">
+                    </div>
+                </div>
+                
+                <div class="form-group file-upload">
+                    <label for="edit_credential_file">Update PDF File (optional):</label>
+                    <div class="file-upload-wrapper">
+                        <input type="file" id="edit_credential_file" name="credential_file" accept=".pdf">
+                        <label for="edit_credential_file" class="file-upload-label">
+                            <i class="fas fa-cloud-upload"></i>
+                            <span class="file-upload-text">Choose a file</span>
+                            <span class="file-upload-filename" id="edit-file-name">No file chosen</span>
+                        </label>
+                    </div>
+                    <p class="current-file">Current file: <span id="current-file-name"></span></p>
+                </div>
+                
+                <div class="form-buttons">
+                    <button type="button" class="btn-cancel" onclick="closeEditModal()">Cancel</button>
+                    <button type="submit" class="btn-save"><i class="fas fa-save"></i> Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <?php include 'help.php'; ?>
 
     <script>
@@ -354,42 +418,6 @@ try {
             window.history.replaceState(null, null, window.location.href);
         }
 
-        function confirmDelete(credentialId) {
-            if (confirm('Are you sure you want to delete this credential?')) {
-                // Show loading indicator if you have one
-                const row = document.querySelector(`tr[data-id="${credentialId}"]`);
-                if (row) row.classList.add('deleting');
-                
-                fetch(`credential_api/delete_credential.php?id=${credentialId}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            // Remove the row from the table
-                            const row = document.querySelector(`tr[data-id="${credentialId}"]`);
-                            if (row) row.remove();
-                            
-                            // Show success message
-                            alert(data.message || 'Credential deleted successfully');
-                            
-                            // If table is empty now, show empty state
-                            if (document.querySelectorAll('tbody tr').length === 0) {
-                                document.querySelector('.empty-state').style.display = 'flex';
-                            }
-                        } else {
-                            alert(data.message || 'Error deleting credential');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        alert('An error occurred while deleting the credential');
-                    })
-                    .finally(() => {
-                        // Hide loading indicator if you have one
-                        const row = document.querySelector(`tr[data-id="${credentialId}"]`);
-                        if (row) row.classList.remove('deleting');
-                    });
-            }
-        }
 
         document.querySelector('.main-content').addEventListener('click', function() {
             if (document.querySelector('.navigation.active')) {
@@ -402,6 +430,79 @@ try {
                 window.location.href = '../landing/index.php';
             }
         }
+
+        // Edit Modal Functions
+        function openEditModal(credentialId) {
+            // Fetch credential data
+            fetch(`get_credential.php?id=${credentialId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const credential = data.credential;
+                        
+                        // Populate form fields
+                        document.getElementById('edit_credential_id').value = credential.credential_id;
+                        document.getElementById('edit_credential_type').value = credential.credential_type;
+                        document.getElementById('edit_credential_name').value = credential.credential_name;
+                        document.getElementById('edit_issued_by').value = credential.issued_by;
+                        document.getElementById('edit_issued_date').value = credential.issued_date;
+                        document.getElementById('edit_expiry_date').value = credential.expiry_date || '';
+                        
+                        // Show current file name
+                        const fileName = credential.credential_name;
+                        document.getElementById('current-file-name').textContent = fileName;
+                        
+                        // Show modal
+                        document.getElementById('editModal').style.display = 'block';
+                    } else {
+                        alert('Error loading credential data: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while loading credential data');
+                });
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').style.display = 'none';
+            document.getElementById('editCredentialForm').reset();
+            document.getElementById('current-file-name').textContent = '';
+            document.getElementById('edit-file-name').textContent = 'No file chosen';
+        }
+
+        // Handle edit form submission
+        document.getElementById('editCredentialForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const credentialId = document.getElementById('edit_credential_id').value;
+            
+            fetch('update_credential.php', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Credential updated successfully!');
+                    closeEditModal();
+                    window.location.reload(); // Refresh to show changes
+                } else {
+                    alert('Error updating credential: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while updating the credential');
+            });
+        });
+
+        // Update file name display for edit modal
+        document.getElementById('edit_credential_file').addEventListener('change', function(e) {
+            const fileName = e.target.files[0] ? e.target.files[0].name : 'No file chosen';
+            document.getElementById('edit-file-name').textContent = fileName;
+        });
     </script>
     <script src="help.js?v=<?php echo time(); ?>"></script>
     <script src="../scripts.js?v=<?php echo time(); ?>"></script>
