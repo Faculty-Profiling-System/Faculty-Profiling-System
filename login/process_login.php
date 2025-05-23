@@ -7,56 +7,6 @@ if (!isset($conn) || !($conn instanceof mysqli)) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // ==================== reCAPTCHA VERIFICATION ====================
-    $recaptcha_secret = "6Lc2ZUArAAAAAHFh_K687kcPCpG27XwlNnv0pcDw";
-    $recaptcha_response = $_POST['g-recaptcha-response'] ?? '';
-
-    if (empty($recaptcha_response)) {
-        header("Location: index.php?error=Please complete the reCAPTCHA verification");
-        exit();
-    }
-
-    $recaptcha_url = "https://www.google.com/recaptcha/api/siteverify";
-    $recaptcha_data = [
-        'secret' => $recaptcha_secret,
-        'response' => $recaptcha_response,
-        'remoteip' => $_SERVER['REMOTE_ADDR']
-    ];
-
-    // Use cURL for more reliable API calls
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, $recaptcha_url);
-    curl_setopt($ch, CURLOPT_POST, true);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($recaptcha_data));
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true); // Important for security
-
-    $response = curl_exec($ch);
-    if (curl_errno($ch)) {
-        error_log("reCAPTCHA cURL error: " . curl_error($ch));
-        header("Location: index.php?error=reCAPTCHA service unavailable");
-        exit();
-    }
-    curl_close($ch);
-
-    $recaptcha_json = json_decode($response);
-    if (json_last_error() !== JSON_ERROR_NONE) {
-        error_log("reCAPTCHA JSON decode error: " . json_last_error_msg());
-        header("Location: index.php?error=reCAPTCHA configuration error");
-        exit();
-    }
-
-    if (!$recaptcha_json->success) {
-        error_log("reCAPTCHA failed: " . print_r($recaptcha_json, true));
-        $error_msg = "reCAPTCHA verification failed";
-        if (isset($recaptcha_json->{'error-codes'})) {
-            $error_msg .= " (Errors: " . implode(", ", $recaptcha_json->{'error-codes'}) . ")";
-        }
-        header("Location: index.php?error=" . urlencode($error_msg));
-        exit();
-    }
-
-    // ==================== ORIGINAL LOGIN PROCESS ====================
     // Validate input
     if (empty($_POST['username']) || empty($_POST['password'])) {
         header("Location: index.php?error=Username and password are required");
@@ -70,8 +20,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $dummy_hash = password_hash('dummy_password', PASSWORD_DEFAULT);
     $authenticated = false;
 
-    // Modified query to get both user and faculty/college info if available
-    $query = "SELECT u.*, f.college_id 
+    // Get user data including login attempts
+    $query = "SELECT u.*, f.status as faculty_status, f.college_id 
               FROM users u 
               LEFT JOIN faculty f ON u.faculty_id = f.faculty_id 
               WHERE username = ? LIMIT 1";
@@ -94,59 +44,100 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $result = $stmt->get_result();
     $user = $result->fetch_assoc();
 
-    // Verify password (works with dummy hash for non-existent users)
+    // Verify password
     $authenticated = $user && password_verify($password, $user['password_hash'] ?? $dummy_hash);
 
     if ($authenticated && $user) {
+        // Check if account is active
+        if ($user['faculty_status'] !== 'Active') {
+            header("Location: index.php?error=Your account is inactive. Please contact your administrator.");
+            exit();
+        }
+
+        // Reset login attempts on successful login
+        $reset_attempts = $conn->prepare("UPDATE users SET login_attempts = 0 WHERE user_id = ?");
+        $reset_attempts->bind_param("i", $user['user_id']);
+        $reset_attempts->execute();
+        $reset_attempts->close();
+
         // Regenerate session ID to prevent fixation
         session_regenerate_id(true);
-        
-        // Set session variables (original logic)
+
+        // Set session variables
         $_SESSION['user_id'] = $user['user_id'];
         $_SESSION['username'] = $user['username'];
         $_SESSION['role'] = $user['role'];
         $_SESSION['faculty_id'] = $user['faculty_id'];
-        
-        // Add college_id to session if available (for logging)
+
         if (isset($user['college_id'])) {
             $_SESSION['college_id'] = $user['college_id'];
         }
 
-        // Only record login for faculty users (not admins)
+        // Record login for faculty users
         if ($user['role'] === 'Faculty' && isset($user['college_id'])) {
-            // Record login
             $insert_login = "INSERT INTO user_logins (user_id, college_id, login_time, ip_address, user_agent, session_status) 
                             VALUES (?, ?, NOW(), ?, ?, 'active')";
             $login_stmt = $conn->prepare($insert_login);
-            
+
             if ($login_stmt) {
-                $college_id = $user['college_id'] ?? null; // Handle null for admins
+                $college_id = $user['college_id'] ?? null;
                 $login_stmt->bind_param("iiss", 
                     $user['user_id'], 
                     $college_id,
                     $_SERVER['REMOTE_ADDR'], 
                     $_SERVER['HTTP_USER_AGENT']
                 );
-                
+
                 if ($login_stmt->execute()) {
                     $_SESSION['current_login_id'] = $conn->insert_id;
-                    error_log("Login recorded - ID: ".$conn->insert_id); // Debug
                 }
                 $login_stmt->close();
             }
         }
 
-        // Redirect based on role (original logic)
-        if ($user['role'] === 'Admin') {
-            header("Location: ../admin/home.php");
-        } elseif ($user['role'] === 'Head') {
+        $user['login_attempts'] = 0; // Reset login attempts in session
+
+        // Redirect based on role
+        if ($user['role'] === 'Admin' || $user['role'] === 'Head') {
             header("Location: ../admin/home.php");
         } else { 
             header("Location: ../faculty/home.php");
         }
         exit();
+
     } else {
-        header("Location: index.php?error=Invalid credentials");
+        // Handle failed login attempt
+        if ($user) {
+            $new_attempts = $user['login_attempts'] + 1;
+            $max_attempts = 3;
+            
+            $update_stmt = $conn->prepare("UPDATE users SET login_attempts = ? WHERE user_id = ?");
+            $update_stmt->bind_param("ii", $new_attempts, $user['user_id']);
+            $update_stmt->execute();
+            $update_stmt->close();
+            
+            // Custom messages based on attempt count
+            $error_message = "Invalid username or password";
+            
+            if ($new_attempts == 1) {
+                $error_message = "Invalid credentials. 2 attempts remaining.";
+            } elseif ($new_attempts == 2) {
+                $error_message = "Invalid credentials. 1 attempt remaining. Next failed attempt will lock your account.";
+            } elseif ($new_attempts >= $max_attempts) {
+                // Lock the account
+                $deactivate_stmt = $conn->prepare("UPDATE faculty SET status = 'Inactive' WHERE faculty_id = ?");
+                $deactivate_stmt->bind_param("s", $user['faculty_id']);
+                $deactivate_stmt->execute();
+                $deactivate_stmt->close();
+                
+                $error_message = "Account locked due to 3 failed attempts. Please contact your administrator.";
+            }
+            
+            header("Location: index.php?error=" . urlencode($error_message));
+            exit();
+        }
+        
+        header("Location: index.php?error=Invalid username or password");
         exit();
     }
 } else {
