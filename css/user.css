@@ -278,6 +278,26 @@
     width: 95%;
 }
 
+.toggle-password {
+    position: absolute;
+    right: 10px;
+    top: 40%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #6c757d;
+    transition: color 0.2s;
+}
+
+.toggle-password:hover {
+    color: #495057;
+}
+
+.toggle-password svg {
+    display: block;
+    width: 18px;
+    height: 18px;
+}
+
 
 /* Modal Buttons */
 .modal-buttons {
