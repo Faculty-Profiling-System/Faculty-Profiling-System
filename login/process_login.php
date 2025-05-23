@@ -26,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
               LEFT JOIN faculty f ON u.faculty_id = f.faculty_id 
               WHERE username = ? LIMIT 1";
     $stmt = $conn->prepare($query);
-    
+        
     if ($stmt === false) {
         error_log("Prepare failed: " . $conn->error);
         header("Location: index.php?error=System error");
@@ -48,8 +48,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $authenticated = $user && password_verify($password, $user['password_hash'] ?? $dummy_hash);
 
     if ($authenticated && $user) {
-        // Check if account is active
-        if ($user['faculty_status'] !== 'Active') {
+        // Check if account is active (only for faculty)
+        if ($user['role'] === 'Faculty' && $user['faculty_status'] !== 'Active') {
             header("Location: index.php?error=Your account is inactive. Please contact your administrator.");
             exit();
         }
@@ -108,33 +108,40 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     } else {
         // Handle failed login attempt
         if ($user) {
-            $new_attempts = $user['login_attempts'] + 1;
-            $max_attempts = 3;
-            
-            $update_stmt = $conn->prepare("UPDATE users SET login_attempts = ? WHERE user_id = ?");
-            $update_stmt->bind_param("ii", $new_attempts, $user['user_id']);
-            $update_stmt->execute();
-            $update_stmt->close();
-            
-            // Custom messages based on attempt count
-            $error_message = "Invalid username or password";
-            
-            if ($new_attempts == 1) {
-                $error_message = "Invalid credentials. 2 attempts remaining.";
-            } elseif ($new_attempts == 2) {
-                $error_message = "Invalid credentials. 1 attempt remaining. Next failed attempt will lock your account.";
-            } elseif ($new_attempts >= $max_attempts) {
-                // Lock the account
-                $deactivate_stmt = $conn->prepare("UPDATE faculty SET status = 'Inactive' WHERE faculty_id = ?");
-                $deactivate_stmt->bind_param("s", $user['faculty_id']);
-                $deactivate_stmt->execute();
-                $deactivate_stmt->close();
+            // Only increment attempts and lock account for faculty users
+            if ($user['role'] === 'Faculty') {
+                $new_attempts = $user['login_attempts'] + 1;
+                $max_attempts = 3;
                 
-                $error_message = "Account locked due to 3 failed attempts. Please contact your administrator.";
+                $update_stmt = $conn->prepare("UPDATE users SET login_attempts = ? WHERE user_id = ?");
+                $update_stmt->bind_param("ii", $new_attempts, $user['user_id']);
+                $update_stmt->execute();
+                $update_stmt->close();
+                
+                // Custom messages based on attempt count
+                $error_message = "Invalid username or password";
+                
+                if ($new_attempts == 1) {
+                    $error_message = "Invalid credentials. 2 attempts remaining.";
+                } elseif ($new_attempts == 2) {
+                    $error_message = "Invalid credentials. 1 attempt remaining. Next failed attempt will lock your account.";
+                } elseif ($new_attempts >= $max_attempts) {
+                    // Lock the account
+                    $deactivate_stmt = $conn->prepare("UPDATE faculty SET status = 'Inactive' WHERE faculty_id = ?");
+                    $deactivate_stmt->bind_param("s", $user['faculty_id']);
+                    $deactivate_stmt->execute();
+                    $deactivate_stmt->close();
+                    
+                    $error_message = "Account locked due to 3 failed attempts. Please contact your administrator.";
+                }
+                
+                header("Location: index.php?error=" . urlencode($error_message));
+                exit();
+            } else {
+                // For admin/head, just show generic error
+                header("Location: index.php?error=Invalid username or password");
+                exit();
             }
-            
-            header("Location: index.php?error=" . urlencode($error_message));
-            exit();
         }
         
         header("Location: index.php?error=Invalid username or password");
