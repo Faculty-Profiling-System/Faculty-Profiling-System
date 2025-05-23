@@ -4,31 +4,35 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PERSONAL DATA SHEET</title>
+    <link rel="stylesheet" href="../css/themes.css">
     <style>
         body {
             font-family: 'Arial', sans-serif;
             line-height: 1.5;
             margin: 0;
             padding: 20px 25px;
-            color: #333;
+            color: var(--pds-text);
+            background-color: var(--bg-color);
         }
         
         .pds-container {
             max-width: 1000px;
             margin: 0 auto;
+            background-color: var(--pds-bg);
+            color: var(--pds-text);
         }
         
         .pds-header {
             text-align: center;
             margin-bottom: 15px;
             padding-bottom: 15px;
-            border-bottom: 2px solid #1b6a0d;
+            border-bottom: 2px solid var(--primary-color);
         }
         
         .pds-header h1 {
             margin: 5px 0;
             font-size: 24px;
-            color: #1b6a0d;
+            color: var(--pds-header-text);
         }
         
         .pds-section {
@@ -37,10 +41,11 @@
         }
         
         .section-title {
-            background-color: #f8f9fa;
+            background-color: var(--pds-section-bg);
+            color: var(--pds-section-text);
             padding: 8px 12px;
             font-size: 18px;
-            border-left: 4px solid #1b6a0d;
+            border-left: 4px solid var(--primary-color);
             margin-bottom: 15px;
         }
         
@@ -50,24 +55,31 @@
             border-collapse: collapse;
             margin-bottom: 20px;
             font-size: 14px;
+            border: 1px solid var(--pds-table-border);
+            background-color: var(--pds-table-row-bg);
         }
         
         .data-table th {
-            background-color: #1b6a0d;
-            color: white;
+            background-color: var(--pds-table-header-bg);
+            color: var(--pds-table-header-text);
             padding: 10px;
             text-align: left;
             font-weight: 600;
+            border: 1px solid var(--pds-table-border);
         }
         
         .data-table td {
             padding: 10px;
-            border-bottom: 1px solid #e0e0e0;
-            vertical-align: top;
+            border: 1px solid var(--pds-table-border);
+            color: var(--pds-text);
         }
         
         .data-table tr:nth-child(even) {
-            background-color: #f9f9f9;
+            background-color: var(--pds-table-row-alt-bg);
+        }
+        
+        .data-table tr:hover {
+            background-color: var(--pds-table-row-hover);
         }
         
         /* Compact table for smaller data */
@@ -89,9 +101,10 @@
         
         .signature-line {
             width: 250px;
-            border-top: 1px solid #333;
+            border-top: 1px solid var(--pds-border);
             text-align: center;
             padding-top: 5px;
+            color: var(--pds-text);
         }
         
         /* Utility classes */
@@ -104,7 +117,8 @@
         }
         
         .highlight {
-            background-color: #e8f5e9;
+            background-color: var(--primary-light);
+            color: var(--pds-text);
         }
     </style>
 </head>

@@ -155,7 +155,7 @@ if (isset($_SESSION['faculty_id'])) {
     <div class="welcome-banner">
       <header>
   <h2>
-        <i class="fas fa-home" style="font-size:1.1em;vertical-align:middle;margin-right:8px;"></i>
+        <i class="fas fa-home"></i>
         Faculty Home
       </h2>
         <div class="welcome-message">
