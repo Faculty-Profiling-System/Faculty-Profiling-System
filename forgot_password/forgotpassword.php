@@ -5,6 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Forgot Password - PLP</title>
   <link rel="stylesheet" href="../css/styleFP.css" />
+  <style>
+    .message { color: green; margin-bottom: 15px; text-align: center; }
+    .error { color: red; margin-bottom: 15px; text-align: center; }
+    .success-message { 
+      display: none;
+      background-color: #d4edda;
+      color: #155724;
+      padding: 15px;
+      margin: 20px 0;
+      border-radius: 5px;
+      text-align: center;
+    }
+  </style>
 </head>
 <body>
   <div class="container">
@@ -19,14 +32,76 @@
       </div>
       <div class="form-box">
         <h1>Forgot your password</h1>
-        <p>Please enter the email address you’d like your password reset information sent to</p>
-        <label for="email">Enter email address</label>
-        <input type="email" id="email" placeholder="faculty@plpasig.edu.ph" />
-        <button onclick="resetLink()">Request reset link</button>
+        <?php
+        session_start();
+        
+        if (isset($_SESSION['message'])) {
+            echo '<p class="message">' . $_SESSION['message'] . '</p>';
+            unset($_SESSION['message']);
+        }
+        
+        if (isset($_SESSION['error'])) {
+            echo '<p class="error">' . $_SESSION['error'] . '</p>';
+            unset($_SESSION['error']);
+        }
+        ?>
+        <div id="successMessage" class="success-message"></div>
+        <p>Please enter the email address you'd like your password reset information sent to</p>
+        <form id="forgotPasswordForm" action="process_forgotpassword.php" method="POST">
+          <label for="email">Enter email address</label>
+          <input type="email" id="email" name="email" placeholder="faculty@plpasig.edu.ph" required />
+          <button type="submit">Request reset link</button>
+        </form>
         <a href="../login/index.php" class="back-link">Back To Login</a>
       </div>
     </div>
   </div>
-  <script src="scriptFP.js"></script>
+  
+  <script>
+    document.getElementById('forgotPasswordForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const form = e.target;
+      const formData = new FormData(form);
+      const successMessage = document.getElementById('successMessage');
+      
+      fetch(form.action, {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          // Show success message
+          successMessage.textContent = data.message;
+          successMessage.style.display = 'block';
+          successMessage.style.backgroundColor = '#d4edda';
+          successMessage.style.color = '#155724';
+          
+          // Hide the form
+          form.style.display = 'none';
+          
+          // Hide after 5 seconds
+          setTimeout(() => {
+            successMessage.style.display = 'none';
+            form.style.display = 'block';
+          }, 5000);
+        } else {
+          // Show error message
+          successMessage.textContent = data.error;
+          successMessage.style.display = 'block';
+          successMessage.style.backgroundColor = '#f8d7da';
+          successMessage.style.color = '#721c24';
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        successMessage.textContent = 'An error occurred. Please try again.';
+        successMessage.style.display = 'block';
+        successMessage.style.backgroundColor = '#f8d7da';
+        successMessage.style.color = '#721c24';
+      });
+    });
+  </script>
 </body>
 </html>
