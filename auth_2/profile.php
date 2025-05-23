@@ -110,11 +110,10 @@ require_once('../db_connection.php');
 
     <script>
         function confirmLogout() {
-        if (confirm('Are you sure you want to logout?')) {
-            // If user confirms, redirect to logout page
-            window.location.href = '../landing/index.php';
-        }
-        // If user cancels, do nothing
+            if (confirm('Are you sure you want to logout?')) {
+                // Change this to point to your process_logout.php
+                window.location.href = '../login/process_logout.php';
+            }
         }
 
         // Modal functions

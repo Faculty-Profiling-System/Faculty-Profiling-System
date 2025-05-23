@@ -516,7 +516,8 @@ try {
 
         function confirmLogout() {
             if (confirm('Are you sure you want to logout?')) {
-                window.location.href = '../landing/index.php';
+                // Change this to point to your process_logout.php
+                window.location.href = '../login/process_logout.php';
             }
         }
 

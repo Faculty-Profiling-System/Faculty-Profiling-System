@@ -42,8 +42,6 @@
         updateSelected();
     });
     </script>
-    
-    <!-- Separate script for collapsible functionality -->
     <script>
     document.addEventListener('DOMContentLoaded', function() {
         var coll = document.getElementsByClassName("collapsible");
@@ -213,11 +211,12 @@
     </div>
     
     <script>
-      function confirmLogout() {
-      if (confirm('Are you sure you want to logout?')) {
-        window.location.href = '../landing/index.php';
-      }
-    }
+        function confirmLogout() {
+            if (confirm('Are you sure you want to logout?')) {
+                // Change this to point to your process_logout.php
+                window.location.href = '../login/process_logout.php';
+            }
+        }
     </script>
     <script src="js/settings.js"></script>
     <script src="help.js"></script>

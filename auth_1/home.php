@@ -357,7 +357,7 @@ if ($college_id) {
     </div>
   </div>
 
-  <?php include '../faculty/help.php'; ?>
+  <?php include '../auth_2/help.php'; ?>
 
   <script>
     // Reports dropdown functionality
@@ -395,12 +395,13 @@ if ($college_id) {
     
     //log-out
     function confirmLogout() {
-      if (confirm('Are you sure you want to logout?')) {
-        window.location.href = '../landing/index.php';
-      }
-    }
+            if (confirm('Are you sure you want to logout?')) {
+                // Change this to point to your process_logout.php
+                window.location.href = '../login/process_logout.php';
+            }
+        }
   </script>
-  <script src="../faculty/help.js?v=<?php echo time(); ?>"></script>
+  <script src="../auth_2/help.js?v=<?php echo time(); ?>"></script>
   <script src="scripts.js?v=<?php echo time(); ?>"></script>
 </body>
 </html>

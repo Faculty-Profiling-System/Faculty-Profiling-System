@@ -17,7 +17,7 @@ function applyFilters() {
 }
 
 function viewCredentialFile(relativePath) {
-    const fullPath = '../faculty/' + relativePath;
+    const fullPath = '../auth_2/' + relativePath;
     window.open(fullPath, '_blank');
 }
 

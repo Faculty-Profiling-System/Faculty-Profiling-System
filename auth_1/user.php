@@ -343,7 +343,7 @@ $users = $stmt->get_result();
   </form>
 
     
-  <?php include '../faculty/help.php'; ?>
+  <?php include '../auth_2/help.php'; ?>
 
   <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -400,7 +400,8 @@ $users = $stmt->get_result();
 
     function confirmLogout() {
       if (confirm('Are you sure you want to logout?')) {
-        window.location.href = '../landing/index.php';
+        // Change this to point to your process_logout.php
+        window.location.href = '../login/process_logout.php';
       }
     }
 
@@ -411,7 +412,7 @@ $users = $stmt->get_result();
   </script>
   <script src="scripts.js?v=<?php echo time(); ?>"></script>
   <script src="users.js?v=<?php echo time(); ?>"></script>
-    <script src="../faculty/help.js?v=<?php echo time(); ?>"></script>
+    <script src="../auth_2/help.js?v=<?php echo time(); ?>"></script>
   <?php if (isset($conn)) $conn->close(); ?>
 </body>
 </html>

@@ -1,9 +1,3 @@
-function confirmLogout() {
-    if (confirm('Are you sure you want to logout?')) {
-        window.location.href = '../landing/index.php';
-    }
-}
-
 function openAddModal() {
     document.getElementById('addModal').style.display = 'block';
 }

@@ -21,18 +21,19 @@
             background-color: var(--pds-bg);
             color: var(--pds-text);
         }
-        
-        .pds-header {
-            text-align: center;
-            margin-bottom: 15px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid var(--primary-color);
-        }
-        
-        .pds-header h1 {
+
+        .pds-section h1 {
             margin: 5px 0;
             font-size: 24px;
             color: var(--pds-header-text);
+            text-align: center;
+        }
+
+        .pds-section p {
+            margin: 5px 0;
+            font-size: 12px;
+            color: var(--pds-header-text);
+            text-align: center;
         }
         
         .pds-section {
@@ -49,7 +50,6 @@
             margin-bottom: 15px;
         }
         
-        /* Improved Table Styles */
         .data-table {
             width: 100%;
             border-collapse: collapse;
@@ -60,17 +60,17 @@
         }
         
         .data-table th {
-            background-color: var(--pds-table-header-bg);
-            color: var(--pds-table-header-text);
+            background-color: #808080 ;
+            color: white;
             padding: 10px;
             text-align: left;
             font-weight: 600;
-            border: 1px solid var(--pds-table-border);
+            border: 1px solid black;
         }
         
         .data-table td {
             padding: 10px;
-            border: 1px solid var(--pds-table-border);
+            border: 1px solid black;
             color: var(--pds-text);
         }
         
@@ -124,13 +124,10 @@
 </head>
 <body>
     <div class="pds-container">
-        <div class="pds-header">
-            <h1>PERSONAL DATA SHEET</h1>
-            <p>PAMANTASAN NG LUNGSOD NG PASIG</p>
-        </div>
-
         <!-- I. PERSONAL INFORMATION -->
         <div class="pds-section">
+            <h1>PERSONAL DATA SHEET</h1>
+            <p>PAMANTASAN NG LUNGSOD NG PASIG</p> <hr>
             <div class="section-title">I. PERSONAL INFORMATION</div>
             
             <div style="display: flex;">
@@ -223,6 +220,7 @@
                 </tr>
             </table>
         </div>
+        <hr>
 
         <!-- II. EDUCATIONAL BACKGROUND -->
         <div class="pds-section">
@@ -260,6 +258,7 @@
                 </tbody>
             </table>
         </div>
+        <hr>
 
         <!-- III. CIVIL SERVICE ELIGIBILITY -->
         <div class="pds-section">
@@ -295,6 +294,7 @@
                 </tbody>
             </table>
         </div>
+        <hr>
 
         <!-- IV. WORK EXPERIENCE -->
         <div class="pds-section">
@@ -336,6 +336,7 @@
                 </tbody>
             </table>
         </div>
+        <hr>
 
         <!-- V. TRAINING PROGRAMS -->
         <div class="pds-section">
@@ -373,6 +374,7 @@
                 </tbody>
             </table>
         </div>
+        <hr>
 
         <!-- SIGNATURE SECTION -->
         <div class="signature-area">

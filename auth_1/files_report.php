@@ -181,7 +181,7 @@ $credentials_result = $stmt->get_result();
     </div>
   </div>
 
-  <?php include '../faculty/help.php'; ?>
+  <?php include '../auth_2/help.php'; ?>
 
   <script src="report.js?v=<?php echo time(); ?>"></script>
   <script src="scripts.js?v=<?php echo time(); ?>"></script>
@@ -224,11 +224,12 @@ document.addEventListener('DOMContentLoaded', function() {
 });
     
     function confirmLogout() {
-      if (confirm('Are you sure you want to logout?')) {
-        window.location.href = '../landing/index.php';
-      }
-    }
+            if (confirm('Are you sure you want to logout?')) {
+                // Change this to point to your process_logout.php
+                window.location.href = '../login/process_logout.php';
+            }
+        }
   </script>
-  <script src="../faculty/help.js?v=<?php echo time(); ?>"></script>
+  <script src="../auth_2/help.js?v=<?php echo time(); ?>"></script>
 </body>
 </html>

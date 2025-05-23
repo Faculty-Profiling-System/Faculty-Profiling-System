@@ -99,9 +99,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         // Redirect based on role
         if ($user['role'] === 'Admin' || $user['role'] === 'Head') {
-            header("Location: ../admin/home.php");
+            header("Location: ../auth_1/home.php");
         } else { 
-            header("Location: ../faculty/home.php");
+            header("Location: ../auth_2/home.php");
         }
         exit();
 

@@ -206,7 +206,7 @@ $current_college_name = $college_row['college_name'];
             </div>
     </div>
 
-    <?php include '../faculty/help.php'; ?>
+    <?php include '../auth_2/help.php'; ?>
 
   <script src="scripts.js?v=<?php echo time(); ?>"></script>
   <script>
@@ -258,11 +258,12 @@ $current_college_name = $college_row['college_name'];
                 });
             });
         
-    function confirmLogout() {
-        if (confirm('Are you sure you want to logout?')) {
-            window.location.href = '../landing/index.php';
+        function confirmLogout() {
+            if (confirm('Are you sure you want to logout?')) {
+                // Change this to point to your process_logout.php
+                window.location.href = '../login/process_logout.php';
+            }
         }
-    }
 
     function changeStatus(facultyId, newStatus) {
         if (confirm(`Are you sure you want to ${newStatus === 'Active' ? 'activate' : 'deactivate'} this faculty member?`)) {
@@ -422,6 +423,6 @@ function showFacultyCredentials(facultyId, facultyName) {
 }
 
   </script>
-  <script src="../faculty/help.js?v=<?php echo time(); ?>"></script>
+  <script src="../auth_2/help.js?v=<?php echo time(); ?>"></script>
 </body>
 </html>

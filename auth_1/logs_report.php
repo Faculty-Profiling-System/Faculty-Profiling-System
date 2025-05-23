@@ -292,7 +292,7 @@ $document_logs_result = $stmt->get_result();
     </table>
 </div>
 
-  <?php include '../faculty/help.php'; ?>
+  <?php include '../auth_2/help.php'; ?>
 
   <script src="report.js?v=<?php echo time(); ?>"></script>
   <script src="scripts.js?v=<?php echo time(); ?>"></script>
@@ -341,24 +341,12 @@ $document_logs_result = $stmt->get_result();
               });
           });
     
-function confirmLogout() {
-    if (confirm("Are you sure you want to logout?")) {
-        // Show loading indicator
-        document.body.style.cursor = 'wait';
-        
-        // Create a hidden iframe to ensure logout completes
-        const iframe = document.createElement('iframe');
-        iframe.style.display = 'none';
-        iframe.src = '../admin/process_logout.php';
-        
-        iframe.onload = function() {
-            // Redirect after logout completes
-            window.location.href = "../landing/index.php";
-        };
-        
-        document.body.appendChild(iframe);
-    }
-}
+        function confirmLogout() {
+            if (confirm('Are you sure you want to logout?')) {
+                // Change this to point to your process_logout.php
+                window.location.href = '../login/process_logout.php';
+            }
+        }
     
     // Tab switching functionality
     function switchTab(tabId) {
@@ -377,6 +365,6 @@ function confirmLogout() {
       event.currentTarget.classList.add('active');
     }
   </script>
-  <script src="../faculty/help.js?v=<?php echo time(); ?>"></script>
+  <script src="../auth_2/help.js?v=<?php echo time(); ?>"></script>
 </body>
 </html>

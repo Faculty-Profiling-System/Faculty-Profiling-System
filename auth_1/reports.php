@@ -133,11 +133,12 @@
   
   function confirmLogout() {
     if (confirm('Are you sure you want to logout?')) {
-      window.location.href = '../landing/index.php';
+      // Change this to point to your process_logout.php
+      window.location.href = '../login/process_logout.php';
     }
   }
 </script>
 <script src="scripts.js?v=<?php echo time(); ?>"></script>
-    <script src="../faculty/help.js?v=<?php echo time(); ?>"></script>
+    <script src="../auth_2/help.js?v=<?php echo time(); ?>"></script>
 </body>
 </html>

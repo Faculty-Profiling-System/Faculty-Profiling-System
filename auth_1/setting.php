@@ -24,7 +24,7 @@ $current_college_id = $_SESSION['college_id'] ?? null;
   <link rel="stylesheet" href="../css/themes.css?v=<?php echo time(); ?>">
   <link rel="stylesheet" href="../css/settings.css?v=<?php echo time(); ?>">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <script src="../faculty/theme.js?v=<?php echo time(); ?>"></script>
+    <script src="../auth_2/theme.js?v=<?php echo time(); ?>"></script>
     <script>
     // Initialize states
     //let currentSize = parseInt(localStorage.getItem('plpTextSize')) || 100;
@@ -358,7 +358,7 @@ $current_college_id = $_SESSION['college_id'] ?? null;
 <hr>
   </div>
 
-  <?php include '../faculty/help.php'; ?>
+  <?php include '../auth_2/help.php'; ?>
 
   <script>
   const CURRENT_COLLEGE_ID = <?php echo json_encode($current_college_id ?? null); ?>;
@@ -415,12 +415,12 @@ $current_college_id = $_SESSION['college_id'] ?? null;
 
     function confirmLogout() {
       if (confirm('Are you sure you want to logout?')) {
-        window.location.href = '../landing/index.php';
+        // Change this to point to your process_logout.php
+        window.location.href = '../login/process_logout.php';
       }
     }
   </script>
-    <script src="../faculty/help.js"></script>
-    <script src="../faculty/change_password.js"></script>
-    <script src="../faculty/help.js?v=<?php echo time(); ?>"></script>
+    <script src="../auth_2/change_password.js"></script>
+    <script src="../auth_2/help.js?v=<?php echo time(); ?>"></script>
 </body>
 </html>
