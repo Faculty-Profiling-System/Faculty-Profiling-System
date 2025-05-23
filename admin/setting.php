@@ -212,14 +212,15 @@ $current_college_id = $_SESSION['college_id'] ?? null;
 
     /* Password change form */
     .settings-input {
-      width: 100%;
+      display: block;
+      margin: 0.5rem auto 1rem auto;
+      width: 70%;
       padding: 0.7rem;
-      margin-bottom: 1rem;
       border: 1px solid #187436;
       border-radius: 8px;
       background: #f4fff4;
       color: #187436;
-    }
+}
 
     body.dark-theme .settings-input {
       background: #222;
