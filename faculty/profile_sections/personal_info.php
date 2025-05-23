@@ -31,7 +31,7 @@ $faculty_data = $result->fetch_assoc();
                 <tr>
                     <th width="25%">Faculty ID</th>
                     <td class="readonly-field"><?php echo htmlspecialchars($faculty_data['faculty_id']); ?>
-                        <i class="fas fa-lock" style="color:#1b6a0d; font-size:0.9em; float: right;"></i>
+                        <i class="fas fa-lock" style="font-size:0.9em; float: right;"></i>
                     </td>
 
                     <th width="25%">Employment Type</th>
@@ -52,7 +52,7 @@ $faculty_data = $result->fetch_assoc();
                     <th>College</th>
                     <td class="readonly-field">
                         <?php echo htmlspecialchars($faculty_data['college_name']); ?>
-                        <i class="fas fa-lock" style="color:#1b6a0d; font-size:0.9em; float: right;"></i>
+                        <i class="fas fa-lock" style="font-size:0.9em; float: right;"></i>
                     </td>
                 </tr>
                 <tr>

@@ -6,6 +6,7 @@
     --primary-light: #e6f4ea;
     --accent-color: #015f22;
     --text-color: #333333;
+    --text-muted: #666666;
     --bg-color: #f4fff4;
     --card-bg: #ffffff;
     --border-color: #dddddd;
@@ -14,8 +15,38 @@
     --input-text: #333333;
     --button-bg: var(--primary-color);
     --button-text: #ffffff;
+    --button-icon: #ffffff;
     --header-bg: #ffffff;
     --header-text: #333333;
+    --welcome-text: #000000;
+    --stat-card-bg: #ffffff;
+    --stat-card-text: #187436;
+    --stat-card-border: #04b032;
+    --section-title-color: #00812d;
+    --filter-bg: #f8f9fa;
+    --filter-border: #e0e0e0;
+    --filter-label: #555555;
+    --filter-select-bg: #ffffff;
+    --filter-select-text: #333333;
+    --filter-select-border: #dddddd;
+    
+    /* Readonly field colors - Light */
+    --readonly-bg: #f9f9f9;
+    --readonly-text: #555555;
+    
+    /* PDS theme colors - Light */
+    --pds-bg: #ffffff;
+    --pds-text: #333333;
+    --pds-border: rgba(0, 0, 0, 0.1);
+    --pds-header-text: #6a6b6a;
+    --pds-section-bg: #6a6b6a;
+    --pds-section-text: #ffffff;
+    --pds-table-border: #d1d5db;
+    --pds-table-header-bg: #6a6b6a;
+    --pds-table-header-text: #ffffff;
+    --pds-table-row-bg: #ffffff;
+    --pds-table-row-alt-bg: #f8fafc;
+    --pds-table-row-hover: #f1f5f9;
     
     /* Credential action button colors - Light theme */
     --btn-view-bg: #007bff;
@@ -24,21 +55,54 @@
     --btn-download-text: #ffffff;
     --btn-delete-bg: #dc3545;
     --btn-delete-text: #ffffff;
+    --tooltip-bg: #333333;
+    --tooltip-text: #ffffff;
 }
 
 /* Dark theme variables */
 body.dark-theme {
     --bg-color: #101010;
     --text-color: #f3f3f3;
+    --text-muted: #888888;
     --card-bg: #1a1a1a;
     --border-color: #333;
     --icon-color: #f3f3f3;
     --input-bg: #222;
     --input-text: #f3f3f3;
-    --button-bg: #00d34a;
-    --button-text: #101010;
+    --button-bg: #4caf50;
+    --button-text: #ffffff;
+    --button-icon: #ffffff;
     --header-bg: var(--primary-color);
     --header-text: #ffffff;
+    --welcome-text: #f3f3f3;
+    --stat-card-bg: #1a1a1a;
+    --stat-card-text: #00ff4c;
+    --stat-card-border: #333;
+    --section-title-color: #f3f3f3;
+    --filter-bg: #1a1a1a;
+    --filter-border: #333333;
+    --filter-label: #f3f3f3;
+    --filter-select-bg: #222222;
+    --filter-select-text: #f3f3f3;
+    --filter-select-border: #444444;
+    
+    /* Readonly field colors - Dark */
+    --readonly-bg: #222222;
+    --readonly-text: #cccccc;
+    
+    /* PDS theme colors - Dark */
+    --pds-bg: #1a1a1a;
+    --pds-text: #f3f3f3;
+    --pds-border: #333333;
+    --pds-header-text: #f3f3f3;
+    --pds-section-bg: #333333;
+    --pds-section-text: #f3f3f3;
+    --pds-table-border: #444444;
+    --pds-table-header-bg: #333333;
+    --pds-table-header-text: #f3f3f3;
+    --pds-table-row-bg: #1a1a1a;
+    --pds-table-row-alt-bg: #222222;
+    --pds-table-row-hover: #2a2a2a;
     
     /* Credential action button colors - Dark theme */
     --btn-view-bg: #0056b3;
@@ -47,6 +111,8 @@ body.dark-theme {
     --btn-download-text: #ffffff;
     --btn-delete-bg: #bd2130;
     --btn-delete-text: #ffffff;
+    --tooltip-bg: #ffffff;
+    --tooltip-text: #333333;
 }
 
 /* Base Styles - Applied to both themes */
@@ -55,11 +121,53 @@ body {
     color: var(--text-color);
 }
 
-/* Header and Navigation - Always Light Theme */
+/* Header and Navigation */
 .header,
 .navigation {
-    background-color: var(--primary-color) !important;
-    color: white !important;
+    background-color: var(--primary-color);
+    color: white;
+}
+
+/* Welcome Message and Dashboard Elements */
+.welcome-message {
+    color: var(--welcome-text);
+}
+
+.dashboard-container h1,
+.dashboard-container h2 {
+    color: var(--section-title-color);
+}
+
+/* Teaching Load and Credentials Headings */
+body.dark-theme .header-content h2,
+body.dark-theme .card h2,
+body.dark-theme .settings-title {
+    color: #f3f3f3;
+}
+
+body.dark-theme .card h2 i,
+body.dark-theme .settings-title i {
+    color: #f3f3f3;
+}
+
+.stat-card {
+    background-color: var(--stat-card-bg);
+    border-left: 3px solid var(--stat-card-border);
+    border-right: 3px solid var(--stat-card-border);
+}
+
+.stat-card h3 {
+    color: var(--stat-card-text);
+}
+
+.stat-card .value,
+.stat-value {
+    color: var(--stat-card-text);
+}
+
+.section-title {
+    color: var(--section-title-color);
+    border-bottom: 1px solid var(--border-color);
 }
 
 /* Cards and Containers */
@@ -69,9 +177,17 @@ body {
 .scheduleFile,
 .profile-container,
 .credential-item,   
-.credentials-container {
+.credentials-container,
+.admin-credentials-card {
     background-color: var(--card-bg);
     border-color: var(--border-color);
+    color: var(--text-color);
+}
+
+/* Add credentials-info dark theme styles */
+body.dark-theme .credentials-info p,
+body.dark-theme .schedule-info p {
+    color: #ffffff;
 }
 
 /* Form Elements */
@@ -123,11 +239,23 @@ input::placeholder {
 }
 
 /* Icons */
+body.dark-theme .icon,
+body.dark-theme .credential-icon i,
+body.dark-theme .fa,
+body.dark-theme .fas,
+body.dark-theme .edit-toggle i,
+body.dark-theme .readonly-field i {
+    color: var(--icon-color);
+}
+
+/* Remove the general icon styling to preserve default colors in light theme */
 .icon,
 .credential-icon i,
 .fa,
-.fas{
-    color: var(--icon-color);
+.fas,
+.edit-toggle i,
+.readonly-field i {
+    color: inherit;
 }
 
 /* Tables */
@@ -151,27 +279,11 @@ tr:hover {
 
 /* Help Button */
 .help-button {
-    position: fixed;
-    bottom: 30px;
-    right: 30px;
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
     background-color: var(--button-bg);
     color: var(--button-text);
-    border: none;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 24px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-    transition: all 0.3s ease;
-    z-index: 1000;
 }
 
 .help-button:hover {
-    transform: scale(1.1);
     background-color: var(--accent-color);
 }
 
@@ -187,23 +299,23 @@ tr:hover {
     border-color: var(--border-color);
 }
 
-body.dark-theme .help-option {
+.help-option {
     background-color: var(--card-bg);
     color: var(--text-color);
     border: 1px solid var(--border-color);
 }
 
-body.dark-theme .help-option i {
+.help-option i {
     color: var(--primary-color);
 }
 
-body.dark-theme .help-option:hover {
+.help-option:hover {
     background-color: var(--primary-color);
-    color: #ffffff;
+    color: var(--button-text);
 }
 
-body.dark-theme .help-option:hover i {
-    color: #ffffff;
+.help-option:hover i {
+    color: var(--button-text);
 }
 
 /* Settings Page */
@@ -212,34 +324,24 @@ body.dark-theme .help-option:hover i {
 }
 
 .settings-label {
-    font-size: 2em;
-    font-weight: bold;
-    margin-bottom: 1em;
     color: var(--text-color);
-}
-
-.settings-options {
-    display: flex;
-    gap: 1.5em;
-    justify-content: center;
-    align-items: center;
 }
 
 .settings-btn {
     background-color: var(--card-bg);
     color: var(--text-color);
     border: 1px solid var(--border-color);
-    border-radius: 2em;
-    padding: 0.7em 2em;
-    font-size: 1.5em;
-    cursor: pointer;
-    transition: all 0.2s;
 }
 
 .settings-btn.selected {
     background-color: var(--button-bg);
     color: var(--button-text);
-    border-color: transparent;
+}
+
+/* Dark theme specific settings button styles */
+body.dark-theme .settings-btn.selected {
+    background-color: #4CAF50;
+    color: #ffffff;
 }
 
 /* Scrollbar */
@@ -262,101 +364,221 @@ body.dark-theme .help-option:hover i {
     opacity: 0.7;
 }
 
-/* Credential Action Buttons */
+/* Credential Actions */
 .credential-actions .btn {
-    padding: 0.375rem 0.75rem;
-    border-radius: 0.25rem;
-    border: none;
-    margin: 0 0.25rem;
-    transition: all 0.2s ease-in-out;
-}
-
-.credential-actions .btn-view {
-    background-color: var(--btn-view-bg);
-    color: var(--btn-view-text);
-}
-
-.credential-actions .btn-download {
-    background-color: var(--btn-download-bg);
-    color: var(--btn-download-text);
-}
-
-.credential-actions .btn-delete {
-    background-color: var(--btn-delete-bg);
-    color: var(--btn-delete-text);
+    background-color: var(--button-bg);
+    color: var(--button-text);
 }
 
 .credential-actions .btn:hover {
     opacity: 0.85;
-    transform: translateY(-1px);
 }
 
 .credential-actions .btn i {
     color: inherit;
-    margin-right: 0.25rem;
 }
 
-/* Profile Page Specific Styles */
-.section-header {
-    background-color: var(--primary-color);
-    color: #ffffff;
-    padding: 1rem;
-    border-radius: 4px 4px 0 0;
-    font-weight: bold;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.section-header h2 {
-    color: #ffffff;
-    margin: 0;
-}
-
-body.dark-theme .info-label {
-    color: #ffffff;
-    font-weight: bold;
-}
-
-body.dark-theme .info-value {
-    color: #ffffff;
-}
-
-body.dark-theme .profile-container {
-    background-color: var(--card-bg);
-}
-
-body.dark-theme #specialization,
-body.dark-theme #faculty-id,
-body.dark-theme #college-name {
-    color: #ffffff;
-}
-
-/* Home Page Action Buttons */
-body.dark-theme .action-btn {
-    background-color: var(--card-bg);
+/* Profile Info */
+.info-label,
+.info-value {
     color: var(--text-color);
-    border: 1px solid var(--border-color);
 }
 
-body.dark-theme .action-btn i {
+#specialization,
+#faculty-id,
+#college-name {
+    color: var(--text-color);
+}
+
+/* Schedule Info */
+.schedule-info p {
+    color: var(--text-color);
+}
+
+.count-number {
+    color: var(--text-color);
+}
+
+/* Filters Section */
+.filters {
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: var(--filter-bg);
+    border-radius: 5px;
+    border: 1px solid var(--filter-border);
+}
+
+.filter-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+    color: var(--filter-label);
+    font-size: 14px;
+}
+
+.filter-group select {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid var(--filter-select-border);
+    border-radius: 4px;
+    background-color: var(--filter-select-bg);
+    color: var(--filter-select-text);
+    font-size: 14px;
+    transition: border-color 0.3s;
+}
+
+.filter-group select:focus {
+    border-color: var(--primary-color);
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(24, 116, 54, 0.2);
+}
+
+/* PDS Container Styles */
+.pds-container {
+    background-color: var(--pds-bg);
+    color: var(--pds-text);
+    box-shadow: 0 0 15px var(--pds-border);
+}
+
+.pds-header h1 {
+    color: var(--pds-header-text);
+}
+
+.pds-header p {
+    color: var(--pds-text);
+    opacity: 0.8;
+}
+
+.pds-section h2 {
+    background-color: var(--pds-section-bg);
+    color: var(--pds-section-text);
+}
+
+.pds-section h2::after {
+    border-bottom-color: var(--pds-border);
+}
+
+.pds-section h3 {
+    color: var(--pds-text);
+    border-bottom-color: var(--pds-border);
+}
+
+.pds-table {
+    border-color: var(--pds-table-border);
+}
+
+.pds-table th {
+    background-color: var(--pds-table-header-bg);
+    color: var(--pds-table-header-text);
+    border-right-color: var(--pds-table-border);
+}
+
+.pds-table td {
+    border-color: var(--pds-table-border);
+    color: var(--pds-text);
+}
+
+.pds-table tr {
+    background-color: var(--pds-table-row-bg);
+}
+
+.pds-table tr:nth-child(even) {
+    background-color: var(--pds-table-row-alt-bg);
+}
+
+.pds-table tr:hover {
+    background-color: var(--pds-table-row-hover);
+}
+
+/* Readonly Fields */
+.readonly-field {
+    background-color: var(--readonly-bg);
+    color: var(--readonly-text);
+    padding-left: 20px;
+}
+
+/* Dark theme specific overrides for settings page */
+body.dark-theme .settings-section .collapsible {
+    background: #1e1e1e;
+    border-color: #333333;
+}
+
+body.dark-theme .settings-section .collapsible:hover {
+    background: #252525;
+}
+
+body.dark-theme .settings-section .content {
+    background: #1e1e1e;
+}
+
+body.dark-theme .input-wrapper input {
+    background: #1e1e1e;
+    border-color: #333333;
+    color: #ffffff;
+}
+
+body.dark-theme .input-wrapper input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(0, 211, 74, 0.1);
+}
+
+body.dark-theme .toggle-password {
+    color: #888888;
+}
+
+body.dark-theme .toggle-password:hover,
+body.dark-theme .toggle-password:focus {
     color: var(--primary-color);
 }
 
-body.dark-theme .action-btn:hover {
-    background-color: var(--primary-color);
-    color: #ffffff;
+body.dark-theme .hint {
+    color: #888888;
 }
 
-body.dark-theme .action-btn:hover i {
+body.dark-theme .change-password-btn {
+    background-color: var(--button-bg);
     color: var(--button-text);
 }
 
-/* Schedule Info Dark Theme */
-body.dark-theme .schedule-info p {
-    color: #ffffff
+body.dark-theme .change-password-btn i {
+    color: var(--button-icon);
 }
 
-body.dark-theme .count-number {
-    color: #ffffff;
+body.dark-theme .change-password-btn:hover {
+    background-color: var(--accent-color);
+    opacity: 0.9;
+}
+
+body.dark-theme .change-password-btn:disabled {
+    background: #333333;
+    color: #666666;
+}
+
+body.dark-theme .message-box.success {
+    background-color: rgba(40, 167, 69, 0.1);
+    border-color: rgba(40, 167, 69, 0.2);
+    color: #2ecc71;
+}
+
+body.dark-theme .message-box.error {
+    background-color: rgba(220, 53, 69, 0.1);
+    border-color: rgba(220, 53, 69, 0.2);
+    color: #ff4444;
+}
+
+body.dark-theme .password-strength {
+    background: #333333;
+}
+
+/* Dark theme specific overrides for strength bar colors */
+body.dark-theme .strength-bar.weak {
+    background: #dc3545;
+}
+
+body.dark-theme .strength-bar.medium {
+    background: #ffc107;
+}
+
+body.dark-theme .strength-bar.strong {
+    background: #28a745;
 }

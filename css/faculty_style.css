@@ -395,12 +395,9 @@ body {
   color: #187436;
   margin-bottom: 0.5em;
 }
+
 .faculty-settings-icon {
   color: #187436;
   font-size: 1.3em;
   margin-right: 8px;
-}
-
-body.dark-theme .faculty-settings-icon {
-  color: #00d34a;
 }

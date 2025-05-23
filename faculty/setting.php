@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="../css/faculty_style.css?v=<?php echo time(); ?>"/>
     <link rel="stylesheet" href="../css/help.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="../css/themes.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="../css/settings.css?v=<?php echo time(); ?>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="theme.js?v=<?php echo time(); ?>"></script>
     <script>
@@ -59,160 +60,6 @@
         }
     });
     </script>
-    <style>
-    /* Light theme (default) */
-    body {
-      background: #f4fff4;
-      color: #187436;
-    }
-
-    /* Dark theme */
-    body.dark-theme {
-      background: #101010 !important;
-      color: #f3f3f3 !important;
-    }
-
-    .main-content {
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 2rem;
-    }
-
-    .settings-section {
-      margin: 2rem 0;
-    }
-
-    .collapsible {
-      background: none;
-      color: inherit;
-      cursor: pointer;
-      width: 100%;
-      border: none;
-      text-align: left;
-      outline: none;
-      font-size: 1.2rem;
-      font-weight: bold;
-      padding: 1rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border: 1px solid #187436;
-      border-radius: 8px;
-      margin-bottom: 0.5rem;
-      transition: all 0.3s ease;
-    }
-
-    body.dark-theme .collapsible {
-      border-color: #333;
-      color: #f3f3f3;
-    }
-
-    .collapsible:hover {
-      background: rgba(0, 211, 74, 0.1);
-    }
-
-    body.dark-theme .collapsible:hover {
-      background: rgba(0, 211, 74, 0.2);
-    }
-
-    .collapsible:after {
-      content: '\002B';
-      font-weight: bold;
-      float: right;
-      margin-left: 5px;
-      transition: transform 0.3s ease;
-    }
-
-    .collapsible.active:after {
-      content: '\2212';
-    }
-
-    .content {
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height 0.3s ease-out;
-      background: rgba(255, 255, 255, 0.05);
-      border-radius: 0 0 8px 8px;
-      padding: 0 1rem;
-    }
-
-    .content.active {
-      max-height: 500px;
-      padding: 1rem;
-    }
-
-    .settings-options {
-      display: flex;
-      gap: 1rem;
-      margin-top: 1rem;
-    }
-
-    .settings-btn {
-      background: #e3f3e3;
-      border: none;
-      border-radius: 8px;
-      padding: 0.7rem 1.5rem;
-      font-size: 1rem;
-      color: #187436;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-
-    body.dark-theme .settings-btn {
-      background: #222;
-      color: #f3f3f3;
-    }
-
-    .settings-btn.selected {
-      background: #00723F;
-      color: #ffffff;
-    }
-
-    body.dark-theme .settings-btn.selected {
-      background: #00d34a;
-      color: #101010;
-    }
-
-    .settings-input {
-      width: 100%;
-      padding: 0.7rem;
-      margin-bottom: 1rem;
-      border: 1px solid #187436;
-      border-radius: 8px;
-      background: #f4fff4;
-      color: #187436;
-    }
-
-    body.dark-theme .settings-input {
-      background: #222;
-      color: #f3f3f3;
-      border-color: #333;
-    }
-
-    .settings-input:focus {
-      outline: none;
-      border-color: #00d34a;
-    }
-
-    hr {
-      border: none;
-      border-top: 1px solid #187436;
-      margin: 2rem 0;
-    }
-
-    body.dark-theme hr {
-      border-color: #333;
-    }
-
-    body.dark-theme .logout-section a {
-      color: #f3f3f3;
-    }
-
-    body.dark-theme .logout-section a:hover {
-      background: #00d34a;
-      color: #101010;
-    }
-    </style>
 </head>
 <body>
     <div class="header">
@@ -276,12 +123,89 @@
         <div class="settings-section">
             <button type="button" class="collapsible">Change Password</button>
             <div class="content">
-                <div id="passwordMessage" class="message-box" style="display: none; margin-bottom: 1rem; padding: 1rem; border-radius: 4px;"></div>
-                <form id="changePasswordForm" class="settings-options" style="flex-direction: column;">
-                    <input type="password" id="currentPassword" placeholder="Current Password" class="settings-input" required />
-                    <input type="password" id="newPassword" placeholder="New Password" class="settings-input" required />
-                    <input type="password" id="confirmPassword" placeholder="Confirm New Password" class="settings-input" required />
-                    <button type="submit" class="settings-btn" style="align-self: flex-start;">Change Password</button>
+                <div id="passwordMessage" class="message-box" aria-live="polite"></div>
+                <form id="changePasswordForm" class="password-form">
+                    <div class="form-field">
+                        <label for="currentPassword">Current Password</label>
+                        <div class="input-wrapper">
+                            <input 
+                                type="password" 
+                                id="currentPassword" 
+                                required 
+                                autocomplete="current-password"
+                                aria-describedby="currentPasswordHint" 
+                            />
+                            <button 
+                                type="button" 
+                                class="toggle-password" 
+                                aria-label="Toggle current password visibility"
+                                onclick="togglePasswordVisibility('currentPassword', this)"
+                            >
+                                <i class="fas fa-eye-slash"></i>
+                            </button>
+                        </div>
+                        <small id="currentPasswordHint" class="hint">Enter your current password</small>
+                    </div>
+
+                    <div class="form-field">
+                        <label for="newPassword">New Password</label>
+                        <div class="input-wrapper">
+                            <input 
+                                type="password" 
+                                id="newPassword" 
+                                required 
+                                autocomplete="new-password"
+                                aria-describedby="newPasswordHint passwordStrength" 
+                            />
+                            <div class="password-tooltip" id="passwordTooltip">
+                                <ul>
+                                    <li>At least 8 characters long</li>
+                                    <li>Include at least one uppercase letter</li>
+                                    <li>Include at least one lowercase letter</li>
+                                    <li>Include at least one number</li>
+                                    <li>Include at least one special character</li>
+                                </ul>
+                            </div>
+                            <button 
+                                type="button" 
+                                class="toggle-password" 
+                                aria-label="Toggle new password visibility"
+                                onclick="togglePasswordVisibility('newPassword', this)"
+                            >
+                                <i class="fas fa-eye-slash"></i>
+                            </button>
+                        </div>
+                        <small id="newPasswordHint" class="hint">Password must be at least 8 characters</small>
+                        <div id="passwordStrength" class="password-strength">
+                            <div class="strength-bar"></div>
+                        </div>
+                    </div>
+
+                    <div class="form-field">
+                        <label for="confirmPassword">Confirm New Password</label>
+                        <div class="input-wrapper">
+                            <input 
+                                type="password" 
+                                id="confirmPassword" 
+                                required 
+                                autocomplete="new-password"
+                                aria-describedby="confirmPasswordHint" 
+                            />
+                            <button 
+                                type="button" 
+                                class="toggle-password" 
+                                aria-label="Toggle confirm password visibility"
+                                onclick="togglePasswordVisibility('confirmPassword', this)"
+                            >
+                                <i class="fas fa-eye-slash"></i>
+                            </button>
+                        </div>
+                        <small id="confirmPasswordHint" class="hint">Re-enter your new password</small>
+                    </div>
+
+                    <button type="submit" class="change-password-btn">
+                        <i class="fas fa-key"></i> Change Password
+                    </button>
                 </form>
             </div>
         </div>

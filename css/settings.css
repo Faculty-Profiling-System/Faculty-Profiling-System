@@ -1,276 +1,383 @@
-/* Add Faculty User Form Styles */
+/* General Settings Page Styles */
+body {
+    background: var(--bg-color);
+    color: var(--text-color);
+    overflow-y: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+body::-webkit-scrollbar {
+    display: none;
+}
+
 .main-content {
-  max-width: 800px;
-  margin: 0.1rem auto;
-  padding: 1.5rem 1.5rem;
-  background: none;
-  box-shadow: none;
-    font-size: 1.3rem;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
 }
 
-#addFacultyForm {
-  display: flex;
-  flex-direction: column;
-  gap: 0.7rem;
-  background: rgba(244, 255, 244, 0.85);
-  border-radius: 10px;
-  padding: 1.5rem 1.5rem 1rem 1.5rem;
-  box-shadow: 0 2px 12px rgba(24, 116, 54, 0.07);
-  max-width: 500px;
-  margin: 0 auto;
-}
-
-#addFacultyForm .settings-input,
-#addFacultyForm select.settings-input {
-  font-size: 1rem;
-  padding: 0.7rem 1rem;
-  border: 1.5px solid #187436;
-  border-radius: 7px;
-  background: #fff;
-  color: #187436;
-  transition: border 0.2s, box-shadow 0.2s;
-  margin-bottom: 0.5rem;
-}
-
-#addFacultyForm .settings-input:focus,
-#addFacultyForm select.settings-input:focus {
-  border-color: #00d34a;
-  outline: none;
-  box-shadow: 0 0 0 2px #c8e6c9;
-}
-
-#addFacultyForm .settings-btn {
-  background: #187436;
-  color: #fff;
-  border: none;
-  border-radius: 7px;
-  padding: 0.7rem 2rem;
-  font-size: 1rem;
-  font-weight: bold;
-  cursor: pointer;
-  margin-top: 0.5rem;
-  transition: background 0.2s, color 0.2s;
-}
-
-#addFacultyForm .settings-btn:hover {
-  background: #00d34a;
-  color: #fff;
-}
-
-#addFacultyMessage {
-  margin-top: 1rem;
-  padding: 1rem;
-  border-radius: 6px;
-  font-size: 1rem;
-  font-weight: 500;
-  display: none;
-  transition: background 0.2s, color 0.2s;
-}
-
-/* General settings-section styling (applies to all settings-section forms and content) */
 .settings-section {
-  margin: 2rem 0;
+    margin: 2rem 0;
 }
 
-/* Collapsible button styling */
+/* Collapsible Section Styles */
 .collapsible {
-  background: none;
-  color: inherit;
-  cursor: pointer;
-  width: 100%;
-  border: none;
-  text-align: left;
-  outline: none;
-  font-size: 1.2rem;
-  font-weight: bold;
-  padding: 1rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border: 1px solid #187436;
-  border-radius: 8px;
-  margin-bottom: 0.5rem;
-  transition: all 0.3s ease;
+    background: var(--bg-color);
+    color: var(--text-color);
+    cursor: pointer;
+    width: 100%;
+    border: none;
+    text-align: left;
+    outline: none;
+    font-size: 1.2rem;
+    font-weight: bold;
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    margin-bottom: 0.5rem;
+    transition: all 0.3s ease;
 }
 
 .collapsible:hover {
-  background: rgba(0, 211, 74, 0.1);
+    background: var(--card-bg);
 }
 
 .collapsible:after {
-  content: '\002B';
-  font-weight: bold;
-  float: right;
-  margin-left: 5px;
-  transition: transform 0.3s ease;
+    content: '\002B';
+    font-weight: bold;
+    float: right;
+    margin-left: 5px;
+    transition: transform 0.3s ease;
 }
 
 .collapsible.active:after {
-  content: '\2212';
+    content: '\2212';
 }
 
-/* Collapsible content styling */
 .content {
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height 0.3s ease-out;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 0 0 8px 8px;
-  padding: 0 1rem;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out;
+    background: var(--card-bg);
+    border-radius: 0 0 8px 8px;
+    padding: 0 1rem;
 }
 
 .content.active {
-  max-height: 500px;
-  padding: 1rem;
+    max-height: 500px;
+    padding: 1rem;
 }
 
-/* Settings options (button group or form) */
+/* Settings Options and Buttons */
 .settings-options {
-  display: flex;
-  gap: 1rem;
-  margin-top: 1rem;
-  flex-wrap: wrap;
-  flex-direction: row;
-}
-
-/* For forms inside .settings-options, use column layout */
-.settings-options form,
-.settings-options[style*="flex-direction: column"] {
-  flex-direction: column !important;
-  gap: 0.7rem;
-}
-
-/* Input and button styling for all forms */
-.settings-input,
-select.settings-input {
-  font-size: 1rem;
-  padding: 0.7rem 1rem;
-  border: 1.5px solid #187436;
-  border-radius: 7px;
-  background: #fff;
-  color: #187436;
-  transition: border 0.2s, box-shadow 0.2s;
-  margin-bottom: 0.5rem;
-}
-
-.settings-input:focus,
-select.settings-input:focus {
-  border-color: #00d34a;
-  outline: none;
-  box-shadow: 0 0 0 2px #c8e6c9;
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
 }
 
 .settings-btn {
-  background: #187436;
-  color: #fff;
-  border: none;
-  border-radius: 7px;
-  padding: 0.7rem 2rem;
-  font-size: 1rem;
-  font-weight: bold;
-  cursor: pointer;
-  margin-top: 0.5rem;
-  transition: background 0.2s, color 0.2s;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 0.7rem 1.5rem;
+    font-size: 1rem;
+    color: var(--text-color);
+    cursor: pointer;
+    transition: all 0.3s ease;
 }
 
 .settings-btn.selected {
-  background: #00723F;
-  color: #fff;
-  box-shadow: 0 2px 8px rgba(0,123,63,0.08);
-  border: 1.5px solid #187436;
-  font-weight: bold;
+    background: var(--primary-color);
+    color: var(--button-text);
 }
 
-.settings-btn:hover {
-  background: #00d34a;
-  color: #fff;
+/* Password Change Form Styles */
+.password-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    padding: 0.5rem 0;
+    width: 100%;
+    max-width: 100%;
 }
 
-/* Message box styling */
-.message-box,
-#addFacultyMessage,
-#passwordMessage {
-  margin-top: 1rem;
-  padding: 1rem;
-  border-radius: 6px;
-  font-size: 1rem;
-  font-weight: 500;
-  display: none;
-  transition: background 0.2s, color 0.2s;
+.form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    width: 100%;
 }
 
-/* Dark theme adjustments */
-body.dark-theme #addFacultyForm {
-  background: #181818;
-  box-shadow: 0 2px 12px rgba(0, 211, 74, 0.07);
+.form-field label {
+    font-weight: 600;
+    color: var(--text-color);
+    font-size: 0.95rem;
 }
 
-body.dark-theme #addFacultyForm .settings-input,
-body.dark-theme #addFacultyForm select.settings-input {
-  background: #232323;
-  color: #f3f3f3;
-  border-color: #333;
+.input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
 }
 
-body.dark-theme #addFacultyForm .settings-input:focus,
-body.dark-theme #addFacultyForm select.settings-input:focus {
-  border-color: #00d34a;
-  box-shadow: 0 0 0 2px #00d34a33;
+.input-wrapper input {
+    width: 100%;
+    padding: 0.8rem 2.8rem 0.8rem 1rem;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    background: var(--input-bg);
+    color: var(--input-text);
+    font-size: 1rem;
+    transition: all 0.2s ease;
 }
 
-body.dark-theme #addFacultyForm .settings-btn {
-  background: #00d34a;
-  color: #101010;
+.input-wrapper input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(0, 126, 51, 0.1);
 }
 
-body.dark-theme #addFacultyForm .settings-btn.selected {
-  background: #00d34a;
-  color: #101010;
-  border: 1.5px solid #00d34a;
+.toggle-password {
+    position: absolute;
+    right: 0.8rem;
+    background: transparent;
+    border: none;
+    padding: 0.4rem;
+    cursor: pointer;
+    color: var(--text-muted);
+    transition: color 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-body.dark-theme #addFacultyForm .settings-btn:hover {
-  background: #187436;
-  color: #fff;
+.toggle-password:hover,
+.toggle-password:focus {
+    color: var(--primary-color);
 }
 
-body.dark-theme .collapsible {
-  border-color: #333;
-  color: #f3f3f3;
+.hint {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-top: 0.2rem;
+    opacity: 0.9;
 }
-body.dark-theme .collapsible:hover {
-  background: rgba(0, 211, 74, 0.2);
+
+/* Password Strength Indicator */
+.password-strength {
+    height: 4px;
+    background: var(--border-color);
+    border-radius: 2px;
+    margin-top: 0.5rem;
+    overflow: hidden;
 }
-body.dark-theme .content {
-  background: #232323;
+
+.strength-bar {
+    height: 100%;
+    width: 0;
+    background: var(--primary-color);
+    transition: width 0.3s ease, background-color 0.3s ease;
 }
-body.dark-theme .settings-input,
-body.dark-theme select.settings-input {
-  background: #232323;
-  color: #f3f3f3;
-  border-color: #333;
+
+.strength-bar.weak {
+    width: 33.33%;
+    background: #dc3545;
 }
-body.dark-theme .settings-input:focus,
-body.dark-theme select.settings-input:focus {
-  border-color: #00d34a;
-  box-shadow: 0 0 0 2px #00d34a33;
+
+.strength-bar.medium {
+    width: 66.66%;
+    background: #ffc107;
 }
-body.dark-theme .settings-btn {
-  background: #00d34a;
-  color: #101010;
+
+.strength-bar.strong {
+    width: 100%;
+    background: #28a745;
 }
-body.dark-theme .settings-btn.selected {
-  background: #00d34a;
-  color: #101010;
-  border: 1.5px solid #00d34a;
+
+.change-password-btn {
+    background-color: var(--button-bg);
+    color: var(--button-text);
+    padding: 0.8rem 1.5rem;
+    border-radius: 8px;
+    border: none;
+    font-size: 1rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 0.5rem;
+    width: 100%;
 }
-body.dark-theme .settings-btn:hover {
-  background: #187436;
-  color: #fff;
+
+.change-password-btn i {
+    color: var(--button-icon);
 }
-body.dark-theme .message-box,
-body.dark-theme #addFacultyMessage,
-body.dark-theme #passwordMessage {
-  background: #232323;
-  color: #f3f3f3;
+
+.change-password-btn:hover {
+    background-color: var(--accent-color);
+    transform: translateY(-1px);
+}
+
+.change-password-btn:active {
+    transform: translateY(0);
+}
+
+.change-password-btn:disabled {
+    background: var(--border-color);
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Message Box Styles */
+.message-box {
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    display: none;
+}
+
+.message-box.show {
+    display: flex;
+}
+
+.message-box.success {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+    border: 1px solid #c8e6c9;
+}
+
+.message-box.error {
+    background-color: #ffebee;
+    color: #c62828;
+    border: 1px solid #ffcdd2;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 600px) {
+    .input-wrapper input {
+        font-size: 16px; /* Prevents zoom on mobile */
+    }
+
+    .change-password-btn {
+        padding: 1rem;
+    }
+}
+
+/* Admin-specific Dropdown Styles */
+nav ul li.dropdown {
+    position: relative;
+}
+
+nav ul li.dropdown .dropdown-menu {
+    display: none;
+    position: relative;
+    left: 0;
+    min-width: 200px;
+    z-index: 1000;
+    padding: 0;
+    margin: 0;
+}
+
+nav ul li.dropdown .dropdown-menu li {
+    padding: 0;
+    list-style: none;
+}
+
+nav ul li.dropdown .dropdown-menu a {
+    color: white;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+    font-size: 14px;
+    font-family: 'Trebuchet MS';
+}
+
+nav ul li.dropdown .dropdown-menu a:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    border-right: 3px solid #04b032;
+    border-left: 3px solid #04b032;
+    margin-right: 15px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    background-color: #0e4301;
+}
+
+/* Add Faculty Form Styles */
+#addFacultyForm {
+    flex-direction: column;
+    width: 100%;
+}
+
+#addFacultyForm .settings-input {
+    margin-bottom: 1rem;
+}
+
+#addFacultyMessage {
+    margin-top: 1rem;
+}
+
+/* Password Tooltip Styles */
+.password-tooltip {
+    position: absolute;
+    top: -120px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--tooltip-bg, #333);
+    color: var(--tooltip-text, #fff);
+    padding: 1rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    width: max-content;
+    max-width: 300px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    z-index: 1000;
+}
+
+.password-tooltip::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 10px 10px 0;
+    border-style: solid;
+    border-color: var(--tooltip-bg, #333) transparent transparent;
+}
+
+.password-tooltip.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.password-tooltip ul {
+    margin: 0;
+    padding-left: 1.2rem;
+    list-style-type: none;
+}
+
+.password-tooltip ul li {
+    margin: 0.3rem 0;
+    position: relative;
+}
+
+.password-tooltip ul li::before {
+    content: '•';
+    position: absolute;
+    left: -1rem;
+    color: var(--primary-color);
 }

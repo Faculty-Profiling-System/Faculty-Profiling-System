@@ -123,45 +123,6 @@ if ($college_id) {
     .admin-credentials-card { font-size: 1em; }
     .section-title { font-size: 1.5em; }
     .view-link { font-size: 0.9em; }
-
-
-    /* Dark theme */
-    body.dark-theme {
-      background: #101010 !important;
-      color: #f3f3f3 !important;
-    }
-
-    body.dark-theme .stat-card {
-      background: #1a1a1a !important;
-      border: 1px solid #333;
-    }
-
-    body.dark-theme .stat-card h3 {
-      color: #00ff4c !important;
-      text-shadow: 0 0 10px rgba(0, 255, 76, 0.3);
-    }
-
-    body.dark-theme .value {
-      color: #ffffff !important;
-    }
-
-    body.dark-theme .admin-credentials-card {
-      background: #222;
-      color: #f3f3f3;
-    }
-
-    body.dark-theme .admin-credentials-card h3 {
-      color: #f3f3f3;
-    }
-
-    body.dark-theme .view-link {
-      color: #00d34a;
-    }
-
-    body.dark-theme .welcome-message,
-    body.dark-theme .section-title {
-      color: #f3f3f3;
-    }
   </style>
   <script>
     // Check and apply theme and text size on page load
