@@ -31,6 +31,7 @@
         
         <div class="password-wrapper">
           <input type="password" name="password" placeholder="PASSWORD" class="input-field" id="password" required />
+          <i class="fas fa-eye-slash toggle-visibility" id="togglePassword"></i>
         </div>
         
         <a href="../forgot_password/forgotpassword.php" class="forgot-password">Forgot password?</a>
