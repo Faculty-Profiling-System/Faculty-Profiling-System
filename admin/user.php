@@ -32,23 +32,49 @@ $college_result = $stmt->get_result();
 $college_row = $college_result->fetch_assoc();
 $current_college_name = $college_row['college_name'];
 
-$available_faculty_query = "SELECT f.faculty_id 
-                           FROM faculty f 
-                           LEFT JOIN users u ON f.faculty_id = u.faculty_id 
-                           WHERE u.user_id IS NULL AND f.college_id = ?";
-$stmt = $conn->prepare($available_faculty_query);
-$stmt->bind_param("i", $current_college_id);
-$stmt->execute();
-$available_faculty_result = $stmt->get_result();
-$available_faculty = [];
-while ($row = $available_faculty_result->fetch_assoc()) {
-    $available_faculty[] = $row['faculty_id'];
+// Handle account unlock/reactivation requests
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['reactivate_user'])) {
+    $user_id = $_POST['user_id'];
+    
+    // First get the faculty_id for this user
+    $faculty_query = "SELECT faculty_id FROM users WHERE user_id = ?";
+    $stmt = $conn->prepare($faculty_query);
+    $stmt->bind_param("i", $user_id);
+    $stmt->execute();
+    $faculty_result = $stmt->get_result();
+    $user_data = $faculty_result->fetch_assoc();
+    
+    if ($user_data && $user_data['faculty_id']) {
+        // Reactivate the faculty account and reset login attempts
+        $reactivate_stmt = $conn->prepare("UPDATE faculty SET status = 'Active' WHERE faculty_id = ?");
+        $reactivate_stmt->bind_param("s", $user_data['faculty_id']);
+        $reactivate_stmt->execute();
+        $reactivate_stmt->close();
+        
+        $reset_stmt = $conn->prepare("UPDATE users SET login_attempts = 0 WHERE user_id = ?");
+        $reset_stmt->bind_param("i", $user_id);
+        if ($reset_stmt->execute()) {
+            $_SESSION['success_message'] = "Account reactivated successfully";
+        } else {
+            $_SESSION['error_message'] = "Error reactivating account";
+        }
+        $reset_stmt->close();
+    } else {
+        $_SESSION['error_message'] = "Error: Faculty record not found";
+    }
+    
+    header("Location: user.php");
+    exit();
 }
 
-// Fetch users from the same college
-$sql = "SELECT * FROM vw_faculty_users WHERE college_name = ?";
+// Fetch users from the same college with faculty status
+$sql = "SELECT u.*, f.status as faculty_status, f.full_name, f.email 
+        FROM users u
+        JOIN faculty f ON u.faculty_id = f.faculty_id
+        WHERE f.college_id = ?
+        ORDER BY f.status DESC, f.full_name"; // Sort by status (Inactive first)
 $stmt = $conn->prepare($sql);
-$stmt->bind_param("s", $current_college_name);
+$stmt->bind_param("i", $current_college_id);
 $stmt->execute();
 $users = $stmt->get_result();
 ?>
@@ -122,69 +148,99 @@ $users = $stmt->get_result();
                 User Management<?php if (!empty($current_college_name)) echo ' - ' . htmlspecialchars($current_college_name); ?>
             </h1>
         </div>
-      <div class="user-management-container">
-          <div class="search-add-container">
-              <div class="search-box">
-                  <i class="fas fa-search"></i>
-                  <input type="text" id="searchInput" placeholder="Search faculty...">
-              </div>
-              
-              <button class="add-user-btn" onclick="openAddModal()">
-                    <i class="fas fa-user-plus"></i>
-                  Add User
-              </button>
-          </div>
+      <!-- Display success/error messages -->
+  <?php if (isset($_SESSION['success_message'])): ?>
+      <div class="alert alert-success">
+          <?= $_SESSION['success_message']; ?>
+          <?php unset($_SESSION['success_message']); ?>
+      </div>
+  <?php endif; ?>
 
-          <div class="table-container">
-              <table class="user-table">
-                  <thead>
-                      <tr>
-                          <th>Faculty ID</th>
-                          <th>Name</th>
-                          <th>Email</th>
-                          <th>Username</th>
-                          <th>Status</th>
-                          <th>Actions</th>
-                      </tr>
-                  </thead>
-                  <tbody>
-                      <?php if ($users->num_rows > 0): ?>
-                          <?php while ($user = $users->fetch_assoc()): 
-                            $statusClass = $user['status'] === 'Active' ? 'status-active' : 'status-inactive'; ?>
-                              <tr>
-                                  <td><?= htmlspecialchars($user['faculty_id']) ?></td>
-                                  <td><?= htmlspecialchars($user['full_name']) ?></td>
-                                  <td><?= htmlspecialchars($user['email']) ?></td>
-                                  <td><?= htmlspecialchars($user['username']) ?></td>
-                                  <td>
-                                    <span class="status-badge <?= $statusClass ?>">
-                                      <?= htmlspecialchars($user['status']) ?>
-                                    </span>
-                                  </td>
-                                  <td>
-                                    <?php if ($user['status'] === 'Active'): ?>
+  <?php if (isset($_SESSION['error_message'])): ?>
+      <div class="alert alert-error">
+          <?= $_SESSION['error_message']; ?>
+          <?php unset($_SESSION['error_message']); ?>
+      </div>
+  <?php endif; ?>
+
+  <div class="user-management-container">
+      <div class="search-add-container">
+          <div class="search-box">
+              <i class="fas fa-search"></i>
+              <input type="text" id="searchInput" placeholder="Search faculty...">
+          </div>
+          
+          <button class="add-user-btn" onclick="openAddModal()">
+                <i class="fas fa-user-plus"></i>
+              Add User
+          </button>
+      </div>
+
+      <div class="table-container">
+          <table class="user-table">
+              <thead>
+                  <tr>
+                      <th>Faculty ID</th>
+                      <th>Name</th>
+                      <th>Email</th>
+                      <th>Username</th>
+                      <th>Status</th>
+                      <th>Actions</th>
+                      <!-- <th>Actions</th> -->
+                  </tr>
+              </thead>
+              <tbody>
+                  <?php if ($users->num_rows > 0): ?>
+                      <?php while ($user = $users->fetch_assoc()): 
+                        $statusClass = $user['faculty_status'] === 'Active' ? 'status-active' : 'status-inactive';
+                        ?>
+                          <tr>
+                              <td><?= htmlspecialchars($user['faculty_id']) ?></td>
+                              <td><?= htmlspecialchars($user['full_name']) ?></td>
+                              <td><?= htmlspecialchars($user['email']) ?></td>
+                              <td><?= htmlspecialchars($user['username']) ?></td>
+                              <td>
+                                  <span class="status-badge <?= $user['faculty_status'] === 'Active' ? 'status-active' : 'status-inactive' ?>">
+                                      <?= htmlspecialchars($user['faculty_status']) ?>
+                                  </span>
+                              </td>
+                              <td> 
+                                  <?php if ($user['faculty_status'] === 'Active'): ?>
                                       <button class="action-btn edit-btn" onclick="openEditModal(
                                           '<?= htmlspecialchars($user['faculty_id']) ?>',
                                           '<?= htmlspecialchars($user['username']) ?>'
                                       )">
                                           <i class="fas fa-pen"></i> Edit
                                       </button>
-                                    <?php else: ?>
+                                  <?php else: ?>
                                       <button class="action-btn edit-btn" disabled style="opacity: 0.5; cursor: not-allowed;">
                                           <i class="fas fa-pen"></i> Edit
                                       </button>
-                                    <?php endif; ?>
-                                  </td>
-                              </tr>
-                          <?php endwhile; ?>
-                      <?php else: ?>
-                          <tr>
-                              <td colspan="5" class="no-results">No users found</td>
+                                  <?php endif; ?>
+                              </td>
+                              <!-- <td>
+                                <?php if ($user['faculty_status'] === 'Active'): ?>
+                                  <button class="action-btn edit-btn" onclick="openEditModal(
+                                      '<?= htmlspecialchars($user['faculty_id']) ?>',
+                                      '<?= htmlspecialchars($user['username']) ?>'
+                                  )">
+                                      <i class="fas fa-pen"></i> Edit
+                                  </button>
+                                <?php else: ?>
+                                  <button class="action-btn edit-btn" disabled style="opacity: 0.5; cursor: not-allowed;">
+                                      <i class="fas fa-pen"></i> Edit
+                                  </button>
+                                <?php endif; ?>
+                              </td> -->
                           </tr>
-                      <?php endif; ?>
-                  </tbody>
-              </table>
-          </div>
+                      <?php endwhile; ?>
+                  <?php else: ?>
+                      <tr>
+                          <td colspan="7" class="no-results">No users found</td>
+                      </tr>
+                  <?php endif; ?>
+              </tbody>
+          </table>
       </div>
   </div>
 
