@@ -22,6 +22,15 @@ if (!$current_user || !isset($current_user['college_id'])) {
 }
 
 $current_college_id = $current_user['college_id'];
+
+// Fetch the college name for the current user
+$college_query = "SELECT college_name FROM colleges WHERE college_id = ?";
+$stmt = $conn->prepare($college_query);
+$stmt->bind_param("i", $current_college_id);
+$stmt->execute();
+$college_result = $stmt->get_result();
+$college_row = $college_result->fetch_assoc();
+$current_college_name = $college_row['college_name'];
 ?>
 <!DOCTYPE html>
 <html lang="en">

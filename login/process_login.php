@@ -139,7 +139,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         // Redirect based on role (original logic)
         if ($user['role'] === 'Admin') {
             header("Location: ../admin/home.php");
-        } else {
+        } elseif ($user['role'] === 'Head') {
+            header("Location: ../admin/home.php");
+        } else { 
             header("Location: ../faculty/home.php");
         }
         exit();

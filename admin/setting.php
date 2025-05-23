@@ -27,7 +27,7 @@ $current_college_id = $_SESSION['college_id'] ?? null;
     <script src="../faculty/theme.js?v=<?php echo time(); ?>"></script>
     <script>
     // Initialize states
-    let currentSize = parseInt(localStorage.getItem('plpTextSize')) || 100;
+    //let currentSize = parseInt(localStorage.getItem('plpTextSize')) || 100;
 
     // Check and apply theme and text size on page load
     document.addEventListener('DOMContentLoaded', function() {
@@ -334,7 +334,8 @@ $current_college_id = $_SESSION['college_id'] ?? null;
     <button type="button" class="collapsible">Add Faculty User</button>
     <div class="content">
         <form id="addFacultyForm" class="settings-options" style="flex-direction: column; width:100%;">
-            <input type="text" class="settings-input" name="faculty_id" placeholder="Faculty ID" required />
+            <input type="text" class="settings-input" name="faculty_id" placeholder="Faculty ID (format: XX-XXXXX)" required />
+            <input type="hidden" name="college_id" value="<?php echo $current_college_id; ?>">
             <input type="text" class="settings-input" name="full_name" placeholder="Full Name" required />
             <input type="email" class="settings-input" name="email" placeholder="Email" required />
             <select class="settings-input" name="employment_type" required>
@@ -348,10 +349,9 @@ $current_college_id = $_SESSION['college_id'] ?? null;
                 <option value="Active">Active</option>
                 <option value="Inactive">Inactive</option>
             </select>
-            <input type="password" class="settings-input" name="password" placeholder="Temporary Password" required />
             <button type="submit" class="settings-btn" style="align-self: flex-start;">Add Faculty</button>
+                    <div id="addFacultyMessage" class="message-box" style="display: none; margin-top: 1rem; padding: 1rem; border-radius: 4px;"></div>
         </form>
-        <div id="addFacultyMessage" class="message-box" style="display: none; margin-top: 1rem; padding: 1rem; border-radius: 4px;"></div>
     </div>
 </div>
 <hr>
@@ -418,7 +418,6 @@ $current_college_id = $_SESSION['college_id'] ?? null;
       }
     }
   </script>
-    <script src="js/settings.js"></script>
     <script src="../faculty/help.js"></script>
     <script src="../faculty/change_password.js"></script>
     <script src="../faculty/help.js?v=<?php echo time(); ?>"></script>
