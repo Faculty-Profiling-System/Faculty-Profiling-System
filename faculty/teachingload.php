@@ -217,6 +217,7 @@ try {
                         <option value="">Select Semester</option>
                         <option value="First Semester">First Semester</option>
                         <option value="Second Semester">Second Semester</option>
+                        <option value="Summer">Summer</option>
                     </select>
                 </div>
                 
@@ -303,6 +304,7 @@ try {
                                 <option value="">All Semesters</option>
                                 <option value="First Semester" <?php echo (isset($_GET['semester']) && $_GET['semester'] == 'First Semester') ? 'selected' : ''; ?>>First Semester</option>
                                 <option value="Second Semester" <?php echo (isset($_GET['semester']) && $_GET['semester'] == 'Second Semester') ? 'selected' : ''; ?>>Second Semester</option>
+                                <option value="Summer" <?php echo (isset($_GET['semester']) && $_GET['semester'] == 'Summer') ? 'selected' : ''; ?>>Summer</option>
                             </select>
                         </div>
                         
@@ -355,14 +357,16 @@ try {
                                     <td><?php echo htmlspecialchars($load['overload_units']); ?></td>
                                     <td><?php echo htmlspecialchars($load['total_loads']); ?></td>
                                     <td>
-                                        <span class="status-badge <?php echo strtolower($load['status']); ?>">
-                                            <?php echo htmlspecialchars($load['status']); ?>
-                                        </span>
-                                        <?php if ($load['status'] === 'Rejected' && !empty($load['reason'])): ?>
-                                            <span class="reason-tooltip" title="<?php echo htmlspecialchars($load['reason']); ?>">
-                                                <i class="fas fa-info-circle"></i>
+                                        <div class="status-cell">
+                                            <span class="status-badge <?php echo strtolower($load['status']); ?>">
+                                                <?php echo htmlspecialchars($load['status']); ?>
                                             </span>
-                                        <?php endif; ?>
+                                            <?php if ($load['status'] === 'Rejected' && !empty($load['reason'])): ?>
+                                                <span class="reason-tooltip" title="<?php echo htmlspecialchars($load['reason']); ?>">
+                                                    <i class="fas fa-info-circle"></i>
+                                                </span>
+                                            <?php endif; ?>
+                                        </div>
                                     </td>
                                     <td><?php echo date('M d, Y h:i A', strtotime($load['created_at'])); ?></td>
                                     <td class="actions">
@@ -401,6 +405,7 @@ try {
                     <select id="edit_semester" name="semester" required>
                         <option value="First Semester">First Semester</option>
                         <option value="Second Semester">Second Semester</option>
+                        <option value="Summer">Summer</option>
                     </select>
                 </div>
                 
