@@ -12,10 +12,6 @@ document.addEventListener('DOMContentLoaded', () => {
     bar3.style.transform = 'rotate(0) translate(0)';
   }
 
-  // Load initial data
-  updateDashboardCounts();
-  fetchAdminData();
-
   // Initialize form submission if form exists
   const addFacultyForm = document.getElementById('addFacultyForm');
   if (addFacultyForm) {
@@ -52,70 +48,6 @@ function toggleMenu() {
     bar2.style.opacity = '0';
     bar3.style.transform = 'rotate(-45deg) translate(7px, -6px)';
   }
-}
-
-// ====== DASHBOARD FUNCTIONS ==========
-function fetchAdminData() {
-  fetch('get_admin_data.php')
-    .then(response => {
-      if (!response.ok) throw new Error('Network response was not ok');
-      return response.json();
-    })
-    .then(data => {
-      const adminNameElement = document.getElementById('adminName');
-      if (adminNameElement) {
-        adminNameElement.textContent = data.name || 'Admin';
-      }
-    })
-    .catch(error => {
-      console.error('Error loading admin data:', error);
-      const adminNameElement = document.getElementById('adminName');
-      if (adminNameElement) {
-        adminNameElement.textContent = 'Admin';
-      }
-    });
-}
-
-function updateDashboardCounts() {
-  fetchStatsData();
-  fetchRecentCredentials();
-}
-
-function fetchStatsData() {
-  fetch('get_stats_data.php')
-    .then(response => {
-      if (!response.ok) throw new Error('Network response was not ok');
-      return response.json();
-    })
-    .then(data => {
-      const statsContainer = document.getElementById('statsContainer');
-      if (!statsContainer) return;
-
-      renderStatsCards(statsContainer, [
-        { title: 'Total Faculty Members', value: data.total_faculty || 0 },
-        { title: 'Total Female', value: data.total_female || 0 },
-        { title: 'Total Male', value: data.total_male || 0 },
-        { title: 'Full-Time', value: data.full_time || 0 },
-        { title: 'Part-Time', value: data.part_time || 0 },
-        { title: "Master's Degrees", value: data.masters_degrees || 0 },
-        { title: 'Doctoral Degrees', value: data.doctoral_degrees || 0 }
-      ]);
-    })
-    .catch(error => {
-      console.error('Error loading stats:', error);
-      const statsContainer = document.getElementById('statsContainer');
-      if (!statsContainer) return;
-      
-      renderStatsCards(statsContainer, [
-        { title: 'Total Faculty Members', value: 0 },
-        { title: 'Total Female', value: 0 },
-        { title: 'Total Male', value: 0 },
-        { title: 'Full-Time', value: 0 },
-        { title: 'Part-Time', value: 0 },
-        { title: "Master's Degrees", value: 0 },
-        { title: 'Doctoral Degrees', value: 0 }
-      ]);
-    });
 }
 
 function renderStatsCards(container, stats) {
@@ -156,30 +88,6 @@ function populateCredentialList(elementId, items) {
   });
 }
 
-function fetchRecentCredentials() {
-  fetch('get_recent_credentials.php')
-    .then(response => {
-      if (!response.ok) throw new Error('Network response was not ok');
-      return response.json();
-    })
-    .then(data => {
-      populateCredentialList('documentUploadsList', data.new_uploads || []);
-      populateCredentialList('pendingDocumentsList', data.pending_verifications || []);
-      
-      updateCredentialCounts([
-        data.new_uploads?.length || 0,
-        data.pending_verifications?.length || 0,
-        data.accreditation_reviews?.length || 0
-      ]);
-    })
-    .catch(error => {
-      console.error('Error loading credentials:', error);
-      populateCredentialList('documentUploadsList', []);
-      populateCredentialList('pendingDocumentsList', []);
-      updateCredentialCounts([0, 0, 0]);
-    });
-}
-
 function updateCredentialCounts(counts) {
   document.querySelectorAll('.credential-card .stat-value').forEach((el, index) => {
     if (index < counts.length) {
@@ -202,10 +110,17 @@ function initializeFacultyForm(form) {
       submitBtn.disabled = true;
       submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
       messageBox.style.display = 'none';
+      messageBox.textContent = '';
+
+      // Clear previous error highlights
+      form.querySelectorAll('.error-field').forEach(el => el.classList.remove('error-field'));
 
       // Validate form
-      const requiredFields = ['faculty_id', 'full_name', 'email', 'password'];
-      const missingFields = requiredFields.filter(field => !form.elements[field].value.trim());
+      const requiredFields = ['faculty_id', 'full_name', 'email', 'college_id'];
+      const missingFields = requiredFields.filter(field => {
+        const element = form.elements[field];
+        return !element || !element.value.trim();
+      });
       
       if (missingFields.length > 0) {
         throw new Error(`Please fill in all required fields: ${missingFields.join(', ')}`);
@@ -223,24 +138,9 @@ function initializeFacultyForm(form) {
         throw new Error('Faculty ID must be in format XX-XXXXX');
       }
 
-      // Get college_id from session or form data
-      let college_id = form.dataset.collegeId;
-      if (!college_id) {
-        // Try to get it from a hidden input if not in dataset
-        const collegeIdInput = form.querySelector('input[name="college_id"]');
-        if (collegeIdInput) {
-          college_id = collegeIdInput.value;
-        }
-      }
-
-      if (!college_id) {
-        throw new Error('College_id is required');
-      }
-
       // Prepare form data
       const formData = new FormData(form);
       const data = Object.fromEntries(formData.entries());
-      data.college_id = college_id; // Ensure college_id is included
 
       // Submit form
       const response = await fetch('add_faculty.php', {
@@ -252,27 +152,48 @@ function initializeFacultyForm(form) {
         body: JSON.stringify(data)
       });
 
-      const result = await response.json();
+      // Handle response
+      const responseText = await response.text();
+      let result;
       
-      if (!response.ok) {
-        throw new Error(result.message || 'Server error occurred');
+      try {
+        result = JSON.parse(responseText);
+      } catch (e) {
+        console.error('Failed to parse JSON:', responseText);
+        throw new Error('Server returned an invalid response');
       }
 
-      if (result.success) {
-        showFormMessage('Faculty added successfully!', 'success');
-        form.reset();
-        
-        // Redirect after delay
-        setTimeout(() => {
-          window.location.href = 'college_management.php';
-        }, 1500);
-      } else {
-        throw new Error(result.message || 'Unknown error occurred');
+      if (!response.ok || !result.success) {
+        throw new Error(result.message || 'Failed to add faculty');
       }
-    } catch (error) {
-      console.error('Form submission error:', error);
-      showFormMessage(error.message, 'error');
+
+      // Success - show message in box and alert
+      messageBox.textContent = result.message || 'Faculty added successfully!';
+      messageBox.style.display = 'block';
+      messageBox.style.backgroundColor = '#d4edda';
+      messageBox.style.color = '#155724';
       
+      alert(result.message || 'Faculty added successfully!');
+      
+      form.reset();
+      
+      // Redirect after delay
+      setTimeout(() => {
+        window.location.reload();
+      }, 1500);
+
+    } catch (error) {
+      console.error('Error:', error);
+      
+      // Show error in message box
+      messageBox.textContent = error.message;
+      messageBox.style.display = 'block';
+      messageBox.style.backgroundColor = '#f8d7da';
+      messageBox.style.color = '#721c24';
+      
+      // Also show alert
+      alert('Error: ' + error.message);
+
       // Highlight problematic fields
       if (error.message.includes('Faculty ID')) {
         form.elements['faculty_id'].classList.add('error-field');
@@ -280,9 +201,9 @@ function initializeFacultyForm(form) {
       if (error.message.includes('Email')) {
         form.elements['email'].classList.add('error-field');
       }
-      if (error.message.includes('College_id')) {
-        // You might want to highlight something if college_id is missing
-        console.error('College ID is required but missing');
+      if (error.message.includes('College')) {
+        const collegeInput = form.querySelector('input[name="college_id"]');
+        if (collegeInput) collegeInput.classList.add('error-field');
       }
     } finally {
       submitBtn.disabled = false;
